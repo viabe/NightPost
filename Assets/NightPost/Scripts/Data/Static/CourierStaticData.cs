@@ -1,40 +1,6 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-public enum ERegionType
-{
-    None,
-    // 기본 지역
-    Town,
-    // 산
-    Mountain,
-    // 외각 지역
-    Outskirts
-}
-public enum EVehicleType
-{
-    None,
-    // 도보
-    Walking,
-    // 자전거
-    Bicycle,
-    // 긴 노선 / 긴급 편지
-    Motorcycle,
-    // 무게 조건
-    Truck
-}
-public enum ECourierTraitType
-{
-    None,
-    // 산길 노선 배달 시간 감소
-    MountainExpert,
-    // 야간 편지 또는 야간 노선 시간 감소
-    NightExpert,
-    // 긴급 편지 배달 시간 감소
-    UrgentExpert,
-    // 무거운 편지 시간 페널티 감소
-    HeavyLoadExpert
-}
+
 [Serializable]
 public class CourierTraitData
 {
@@ -45,6 +11,7 @@ public class CourierTraitData
     public ECourierTraitType TraitType => traitType;
     public float TimeReductionRate => timeReductionRate;
 }
+[CreateAssetMenu(fileName = "Courier_", menuName = "NightPost/Static Data/Courier")]
 public class CourierStaticData : ScriptableObject
 {
     // 배달부 ID

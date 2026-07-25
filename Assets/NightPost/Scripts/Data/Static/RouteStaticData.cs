@@ -1,11 +1,5 @@
 using UnityEngine;
-public enum ERouteDifficulty
-{
-    None,
-    Easy,
-    Normal,
-    Hard
-}
+
 // 해금 조건 
 [System.Serializable]
 public class RouteUnlockConditionData

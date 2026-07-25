@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class FacilityProgressData : MonoBehaviour
+public class FacilityProgressData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    // 설비 ID
+    [SerializeField] private int facilityID = 0;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // 현재 레벨
+    [SerializeField] private int currentLevel = 0;
+
+    public int FacilityID => facilityID;
+    public int CurrentLevel => currentLevel;
 }
+

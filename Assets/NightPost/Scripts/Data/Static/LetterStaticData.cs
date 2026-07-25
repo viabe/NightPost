@@ -1,16 +1,5 @@
 using UnityEngine;
 
-public enum ELetterUrgency
-{
-    Normal,
-    Urgent
-}
-public enum ELetterWeight
-{
-    Light,
-    Normal,
-    Heavy
-}
 [CreateAssetMenu(fileName = "LetterStaticData", menuName = "NightPost/Static Data/Letter")]
 public class LetterStaticData : ScriptableObject
 {

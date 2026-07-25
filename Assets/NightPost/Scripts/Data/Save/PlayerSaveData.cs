@@ -1,16 +1,42 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSaveData : MonoBehaviour
+public class PlayerSaveData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    // 플레이어가 보유한 재화
+    [SerializeField] private int currency = 0;
+    // 누적 배달 완료 수
+    [SerializeField] private int completedDeliveryCount = 0;
+    // 실제 고용한 배달부 ID
+    [SerializeField] private List<int> ownedCourierIDs;
+    // 현재 이용 가능한 노선 ID
+    [SerializeField] private List<int> unlockedRouteIDs;
+    // 편지별 진행 상태
+    [SerializeField] private List<LetterProgressData> letterProgressList;
+    // 현재 진행 중인 배달
+    [SerializeField] private List<ActiveDeliveryData> activeDeliveryList;
+    // 완료됐지만 결과 확인이 필요한 배달
+    [SerializeField] private List<DeliveryResultData> deliveryResultsList;
+    // 설비별 현재 레벨
+    [SerializeField] private List<FacilityProgressData> facilityProgressesList;
+    // 획득한 답장 ID
+    [SerializeField] private List<int> receivedReplyIDs;
+    // 읽은 답장 ID
+    [SerializeField] private List<int> readReplyIDs;
+    // 마지막 저장 시각
+    [SerializeField] private long lastSaveUnixTime;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+    public int Currency => currency;
+    public int CompleteDeliveryCount => completedDeliveryCount;
+    public List<int> OwnedCourierIDs => ownedCourierIDs;
+    public List<int> UnlockedRouteIDs => unlockedRouteIDs;
+    public List<LetterProgressData> LetterProgressesList => letterProgressList;
+    public List<ActiveDeliveryData> ActiveDeliveryList => activeDeliveryList;
+    public List<DeliveryResultData> DeliveryResultsList => deliveryResultsList;
+    public List<FacilityProgressData> FacilityProgressesList => facilityProgressesList;
+    public List<int> ReceivedReplyIDs => receivedReplyIDs;
+    public List<int> ReadReplyIds => readReplyIDs;
+    public long LastSaveUnixTime => lastSaveUnixTime; 
+
 }
