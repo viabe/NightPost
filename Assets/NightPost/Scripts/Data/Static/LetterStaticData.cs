@@ -1,23 +1,23 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [CreateAssetMenu(fileName = "LetterStaticData", menuName = "NightPost/Static Data/Letter")]
 public class LetterStaticData : ScriptableObject
 {
-    // ÆíÁö ID
+    // íŽ¸ì§€ ID
     [SerializeField, Min(1)] private int letterID = 1;
-    // ¹ß½ÅÀÚ
+    // ë°œì‹ ìž
     [SerializeField] private string senderName = string.Empty;
-    // ÆíÁö Á¦¸ñ
+    // íŽ¸ì§€ ì œëª©
     [SerializeField] private string letterTitle = string.Empty;
-    // ÆíÁö º»¹®
+    // íŽ¸ì§€ ë³¸ë¬¸
     [SerializeField] private string letterBody = string.Empty;
-    // ÆíÁö ¸ñÀûÁö
+    // íŽ¸ì§€ ëª©ì ì§€
     [SerializeField] private ERegionType destinationRegion = ERegionType.None;
-    // ÆíÁö ±ä±Þµµ
+    // íŽ¸ì§€ ê¸´ê¸‰ë„
     [SerializeField] ELetterUrgency urgency = ELetterUrgency.Normal;
-    // ÆíÁö ¹«°Ô
+    // íŽ¸ì§€ ë¬´ê²Œ
     [SerializeField] ELetterWeight weight = ELetterWeight.Normal;
-    // ±âº» º¸»ó
+    // ê¸°ë³¸ ë³´ìƒ
     [SerializeField] private int letterReward = 10;
 
     public int LetterID => letterID;

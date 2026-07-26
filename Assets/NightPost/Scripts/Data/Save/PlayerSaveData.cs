@@ -1,29 +1,29 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSaveData : ScriptableObject
 {
-    // ÇÃ·¹ÀÌ¾î°¡ º¸À¯ÇÑ ÀçÈ­
+    // í”Œë ˆì´ì–´ê°€ ë³´ìœ í•œ ì¬í™”
     [SerializeField] private int currency = 0;
-    // ´©Àû ¹è´Ş ¿Ï·á ¼ö
+    // ëˆ„ì  ë°°ë‹¬ ì™„ë£Œ ìˆ˜
     [SerializeField] private int completedDeliveryCount = 0;
-    // ½ÇÁ¦ °í¿ëÇÑ ¹è´ŞºÎ ID
+    // ì‹¤ì œ ê³ ìš©í•œ ë°°ë‹¬ë¶€ ID
     [SerializeField] private List<int> ownedCourierIDs;
-    // ÇöÀç ÀÌ¿ë °¡´ÉÇÑ ³ë¼± ID
+    // í˜„ì¬ ì´ìš© ê°€ëŠ¥í•œ ë…¸ì„  ID
     [SerializeField] private List<int> unlockedRouteIDs;
-    // ÆíÁöº° ÁøÇà »óÅÂ
+    // í¸ì§€ë³„ ì§„í–‰ ìƒíƒœ
     [SerializeField] private List<LetterProgressData> letterProgressList;
-    // ÇöÀç ÁøÇà ÁßÀÎ ¹è´Ş
+    // í˜„ì¬ ì§„í–‰ ì¤‘ì¸ ë°°ë‹¬
     [SerializeField] private List<ActiveDeliveryData> activeDeliveryList;
-    // ¿Ï·áµÆÁö¸¸ °á°ú È®ÀÎÀÌ ÇÊ¿äÇÑ ¹è´Ş
+    // ì™„ë£Œëì§€ë§Œ ê²°ê³¼ í™•ì¸ì´ í•„ìš”í•œ ë°°ë‹¬
     [SerializeField] private List<DeliveryResultData> deliveryResultsList;
-    // ¼³ºñº° ÇöÀç ·¹º§
+    // ì„¤ë¹„ë³„ í˜„ì¬ ë ˆë²¨
     [SerializeField] private List<FacilityProgressData> facilityProgressesList;
-    // È¹µæÇÑ ´äÀå ID
+    // íšë“í•œ ë‹µì¥ ID
     [SerializeField] private List<int> receivedReplyIDs;
-    // ÀĞÀº ´äÀå ID
+    // ì½ì€ ë‹µì¥ ID
     [SerializeField] private List<int> readReplyIDs;
-    // ¸¶Áö¸· ÀúÀå ½Ã°¢
+    // ë§ˆì§€ë§‰ ì €ì¥ ì‹œê°
     [SerializeField] private long lastSaveUnixTime;
 
 

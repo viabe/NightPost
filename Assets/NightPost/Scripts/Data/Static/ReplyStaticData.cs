@@ -1,16 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 [CreateAssetMenu(fileName = "Reply_", menuName = "NightPost/Static Data/Reply")]
 public class ReplyStaticData : ScriptableObject
 {
-    // ´äÀå ID
+    // ë‹µìž¥ ID
     [SerializeField, Min(1)] private int replyID = 1;
-    // ¿¬°á ÆíÁö ID
+    // ì—°ê²° íŽ¸ì§€ ID
     [SerializeField, Min(1)] private int linkedLetterID = 1;
-    // ¹ß½ÅÀÚ
+    // ë°œì‹ ìž
     [SerializeField] private string senderName = string.Empty;
-    // ³»¿ë
+    // ë‚´ìš©
     [SerializeField] private string replyBody = string.Empty;
-    // ÀÌ¹ÌÁö
+    // ì´ë¯¸ì§€
     [SerializeField] private Sprite replyImage;
 
     public int ReplyID => replyID;

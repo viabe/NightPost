@@ -1,12 +1,12 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class LetterProgressData : ScriptableObject
 {
-    // ¿¬°áµÈ ÆíÁö Á¤Àû µ¥ÀÌÅÍ ID
+    // ì—°ê²°ëœ íŽ¸ì§€ ì •ì  ë°ì´í„° ID
     [SerializeField] private int letterID = 0;
-    // ÇöÀç ÆíÁö »óÅÂ
+    // í˜„ìž¬ íŽ¸ì§€ ìƒíƒœ
     [SerializeField] private ELetterProgressState state = ELetterProgressState.New;
-    // 	ÇÃ·¹ÀÌ¾î°¡ ÆíÁö º»¹®À» ÀÐ¾ú´ÂÁö
+    // 	í”Œë ˆì´ì–´ê°€ íŽ¸ì§€ ë³¸ë¬¸ì„ ì½ì—ˆëŠ”ì§€
     [SerializeField] private bool isRead = false;
 
     public int LetterID => letterID;

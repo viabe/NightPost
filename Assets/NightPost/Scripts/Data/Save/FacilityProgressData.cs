@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class FacilityProgressData : ScriptableObject
 {
-    // ¼³ºñ ID
+    // ì„¤ë¹„ ID
     [SerializeField] private int facilityID = 0;
 
-    // ÇöÀç ·¹º§
+    // í˜„ìž¬ ë ˆë²¨
     [SerializeField] private int currentLevel = 0;
 
     public int FacilityID => facilityID;

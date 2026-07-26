@@ -1,0 +1,27 @@
+# EditorConfig — https://editorconfig.org
+# 한글 주석 깨짐(mojibake) 방지: 코드 파일 인코딩을 UTF-8(BOM)로 통일한다.
+# 한글 Windows의 Visual Studio / Rider가 BOM을 보고 인코딩을 확실히 인식하므로
+# CP949(EUC-KR)로 잘못 저장돼 머지 시 깨지는 문제를 막는다.
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# C# / Unity 스크립트: BOM 포함 UTF-8 로 강제
+[*.cs]
+charset = utf-8-bom
+end_of_line = crlf
+indent_size = 4
+
+# Unity 가 자동 생성/관리하는 파일은 포맷을 건드리지 않는다
+[*.{meta,unity,asset,prefab,mat,anim,controller,asmdef,asmref}]
+charset = utf-8
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+[*.md]
+trim_trailing_whitespace = false

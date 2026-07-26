@@ -1,16 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class DeliveryResultData : ScriptableObject
 {
-    // ¿øº» ¹è´Þ ID
+    // ì›ë³¸ ë°°ë‹¬ ID
     [SerializeField] private int deliveryID = 0;
-    // ¿Ï·áµÈ ÆíÁö ID
+    // ì™„ë£Œëœ íŽ¸ì§€ ID
     [SerializeField] private int letterID = 0;
-    // ½ÇÁ¦ Áö±ÞÇÒ º¸»ó
+    // ì‹¤ì œ ì§€ê¸‰í•  ë³´ìƒ
     [SerializeField] private int rewardAmount = 0;
-    // ¹è´Þ ¿Ï·á ½Ã°¢
+    // ë°°ë‹¬ ì™„ë£Œ ì‹œê°
     [SerializeField] private long completedAtUnixTime = 0;
-    // ÇÃ·¹ÀÌ¾î°¡ °á°ú¸¦ È®ÀÎÇß´ÂÁö
+    // í”Œë ˆì´ì–´ê°€ ê²°ê³¼ë¥¼ í™•ì¸í–ˆëŠ”ì§€
     [SerializeField] private bool isChecked = false;
 
     public int DeliveryID => deliveryID;

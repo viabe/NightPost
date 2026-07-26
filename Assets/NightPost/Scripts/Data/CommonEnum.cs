@@ -1,4 +1,4 @@
-
+ï»¿
 public enum ELetterUrgency
 {
     Normal,
@@ -13,35 +13,35 @@ public enum ELetterWeight
 public enum ERegionType
 {
     None,
-    // ±âº» Áö¿ª
+    // ê¸°ë³¸ ì§€ì—­
     Town,
-    // »ê
+    // ì‚°
     Mountain,
-    // ¿Ü°û Áö¿ª
+    // ì™¸ê³½ ì§€ì—­
     Outskirts
 }
 public enum EVehicleType
 {
     None,
-    // µµº¸
+    // ë„ë³´
     Walking,
-    // ÀÚÀü°Å
+    // ìì „ê±°
     Bicycle,
-    // ±ä ³ë¼± / ±ä±Ş ÆíÁö
+    // ê¸´ ë…¸ì„  / ê¸´ê¸‰ í¸ì§€
     Motorcycle,
-    // ¹«°Ô Á¶°Ç
+    // ë¬´ê²Œ ì¡°ê±´
     Truck
 }
 public enum ECourierTraitType
 {
     None,
-    // »ê±æ ³ë¼± ¹è´Ş ½Ã°£ °¨¼Ò
+    // ì‚°ê¸¸ ë…¸ì„  ë°°ë‹¬ ì‹œê°„ ê°ì†Œ
     MountainExpert,
-    // ¾ß°£ ÆíÁö ¶Ç´Â ¾ß°£ ³ë¼± ½Ã°£ °¨¼Ò
+    // ì•¼ê°„ í¸ì§€ ë˜ëŠ” ì•¼ê°„ ë…¸ì„  ì‹œê°„ ê°ì†Œ
     NightExpert,
-    // ±ä±Ş ÆíÁö ¹è´Ş ½Ã°£ °¨¼Ò
+    // ê¸´ê¸‰ í¸ì§€ ë°°ë‹¬ ì‹œê°„ ê°ì†Œ
     UrgentExpert,
-    // ¹«°Å¿î ÆíÁö ½Ã°£ Æä³ÎÆ¼ °¨¼Ò
+    // ë¬´ê±°ìš´ í¸ì§€ ì‹œê°„ í˜ë„í‹° ê°ì†Œ
     HeavyLoadExpert
 }
 

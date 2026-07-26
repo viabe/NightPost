@@ -1,18 +1,18 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class ActiveDeliveryData : ScriptableObject
 {
-    // ¹è´Þ °íÀ¯ ID
+    // ë°°ë‹¬ ê³ ìœ  ID
     [SerializeField]private int deliveryID = 0;
-    // ¹è´Þ ÁßÀÎ ÆíÁö ID
+    // ë°°ë‹¬ ì¤‘ì¸ íŽ¸ì§€ ID
     [SerializeField] private int letterID = 0;
-    // ¹èÁ¤µÈ ¹è´ÞºÎ ID
+    // ë°°ì •ëœ ë°°ë‹¬ë¶€ ID
     [SerializeField] private int courierID = 0;
-    // ¼±ÅÃµÈ ³ë¼± ID
+    // ì„ íƒëœ ë…¸ì„  ID
     [SerializeField] private int roteID = 0;
-    // ¹è´Þ ½ÃÀÛ ½Ã°¢
+    // ë°°ë‹¬ ì‹œìž‘ ì‹œê°
     [SerializeField] private long startedAtUnixTime = 0;
-    // ¹è´Þ ¿Ï·á ¿¹Á¤ ½Ã°¢]
+    // ë°°ë‹¬ ì™„ë£Œ ì˜ˆì • ì‹œê°]
     [SerializeField] private long completeAtUnixTime = 0;
 
     public int DeliveryID => deliveryID;

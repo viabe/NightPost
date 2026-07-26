@@ -1,4 +1,4 @@
-namespace NightPost.UI
+﻿namespace NightPost.UI
 {
     /// <summary>
     /// 화면/팝업 식별자. PopupManager가 이 값으로 뷰를 열고 닫는다.

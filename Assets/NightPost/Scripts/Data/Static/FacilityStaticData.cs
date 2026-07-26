@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 [System.Serializable]
 public class FacilityLevelData
 {
@@ -11,13 +11,13 @@ public class FacilityLevelData
 [CreateAssetMenu(fileName = "Facility_", menuName = "NightPost/Static Data/Facility")]
 public class FacilityStaticData : ScriptableObject
 {
-    // ¼³ºñ ID
+    // ì„¤ë¹„ ID
     [SerializeField] private int facilityID = 0;
-    // ÀÌ¸§
+    // ì´ë¦„
     [SerializeField] private string facilityName = string.Empty;
-    // ¼³¸í
+    // ì„¤ëª…
     [SerializeField] private string description = string.Empty;
-    // ·¹º§ µ¥ÀÌÅÍ
+    // ë ˆë²¨ ë°ì´í„°
     [SerializeField] private FacilityLevelData[] levelData;
         
     public int FacilityID => facilityID;

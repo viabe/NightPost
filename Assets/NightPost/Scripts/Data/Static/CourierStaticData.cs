@@ -1,12 +1,12 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 
 [Serializable]
 public class CourierTraitData
 {
-    // Æ¯¼º Á¾·ù
+    // íŠ¹ì„± ì¢…ë¥˜
     [SerializeField] private ECourierTraitType traitType = ECourierTraitType.None;
-    // ¹è´Þ ½Ã°£ °¨¼ÒÀ²
+    // ë°°ë‹¬ ì‹œê°„ ê°ì†Œìœ¨
     [SerializeField, Range(0f, 1f)] private float timeReductionRate = 0.2f;
     public ECourierTraitType TraitType => traitType;
     public float TimeReductionRate => timeReductionRate;
@@ -14,17 +14,17 @@ public class CourierTraitData
 [CreateAssetMenu(fileName = "Courier_", menuName = "NightPost/Static Data/Courier")]
 public class CourierStaticData : ScriptableObject
 {
-    // ¹è´ÞºÎ ID
+    // ë°°ë‹¬ë¶€ ID
     [SerializeField] private int courierID = 0;
-    // ¹è´ÞºÎ ÀÌ¸§
+    // ë°°ë‹¬ë¶€ ì´ë¦„
     [SerializeField] private string courierName = string.Empty;
-    // ÀÌµ¿ ¼ö´Ü
+    // ì´ë™ ìˆ˜ë‹¨
     [SerializeField] private EVehicleType transportation = EVehicleType.None;
-    // ±âº» ¼Óµµ
+    // ê¸°ë³¸ ì†ë„
     [SerializeField] private float speed = 1.0f;
-    // Æ¯¼º
+    // íŠ¹ì„±
     [SerializeField] private CourierTraitData trait;
-    // ÀÌ¹ÌÁö
+    // ì´ë¯¸ì§€
     [SerializeField] private Sprite courierImage = null;
 
     public int CourierID => courierID;

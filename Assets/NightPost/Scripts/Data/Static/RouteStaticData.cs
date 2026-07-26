@@ -1,12 +1,12 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
-// ÇØ±Ý Á¶°Ç 
+// í•´ê¸ˆ ì¡°ê±´ 
 [System.Serializable]
 public class RouteUnlockConditionData
 {
-    // °ÔÀÓ ½ÃÀÛ ½Ã ±âº» ÇØ±Ý ¿©ºÎ
+    // ê²Œìž„ ì‹œìž‘ ì‹œ ê¸°ë³¸ í•´ê¸ˆ ì—¬ë¶€
     [SerializeField] private bool unlockedByDefault = false;
-    // ÇÊ¿äÇÑ ´©Àû ¹è´Þ ¿Ï·á ¼ö
+    // í•„ìš”í•œ ëˆ„ì  ë°°ë‹¬ ì™„ë£Œ ìˆ˜
     [SerializeField, Min(0)] private int requiredCompletedDeliveryCount = 0;
 
     public bool IsUnlockedByDefault => unlockedByDefault;
@@ -15,17 +15,17 @@ public class RouteUnlockConditionData
 [CreateAssetMenu(fileName = "Route_", menuName = "NightPost/Static Data/Route")]
 public class RouteStaticData : ScriptableObject
 {
-    // ³ë¼± ID
+    // ë…¸ì„  ID
     [SerializeField] private int routeID = 0;
-    // ³ë¼± ÀÌ¸§
+    // ë…¸ì„  ì´ë¦„
     [SerializeField] private string routeName = string.Empty;
-    // Áö¿ª
+    // ì§€ì—­
     [SerializeField] private ERegionType regionType = ERegionType.None;
-    // ±âº» ¼Ò¿ä ½Ã°£
+    // ê¸°ë³¸ ì†Œìš” ì‹œê°„
     [SerializeField] private float baseDeliveryTimeSeconds = 1f;
-    // ³­ÀÌµµ
+    // ë‚œì´ë„
     [SerializeField] private ERouteDifficulty difficulty = ERouteDifficulty.None;
-    // ÇØ±Ý Á¶°Ç
+    // í•´ê¸ˆ ì¡°ê±´
     [SerializeField] private RouteUnlockConditionData unlockCondition = new RouteUnlockConditionData();
 
     public int RouteID => routeID;
