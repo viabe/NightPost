@@ -7,13 +7,14 @@
 // 4. 목표 지점 도착 판정
 // 5. 이동 방향과 이동 상태 제공
 // 6. 자동 이동 완료 이벤트 발생
+
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float stopDistance;
-    [SerializeField] private float minMoveX;
-    [SerializeField] private float maxMoveX;
+    [SerializeField] private float moveSpeed = 5;
+    [SerializeField] private float stopDistance = 0.05f;
+    [SerializeField] private float minMoveX = -9;
+    [SerializeField] private float maxMoveX = 9;
 
     private Rigidbody2D rigidbody;
 
@@ -23,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isManualMoving;
     private bool isAutoMoving;
     private float moveDirection = 1f;
+
+    public event System.Action AutoMoveCompleted;
 
     private void Awake()
     {
@@ -131,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
         isAutoMoving = false;
 
         // 이후 자동 이동 완료 이벤트를 발생시킨다.
-
+        AutoMoveCompleted?.Invoke();
     }
     //==================================================================
     // getter
