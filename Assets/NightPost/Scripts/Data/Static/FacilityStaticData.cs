@@ -2,11 +2,21 @@
 [System.Serializable]
 public class FacilityLevelData
 {
+    // 레벨 
+    [SerializeField, Min(1)] private int level = 1;
+    // 업그레이드 비용
     [SerializeField] private int upgradeCost = 0;
-    [SerializeField, Range(0f, 1f)] private float deliveryTimeReductionRate = 0.0f;
+    // 업그레이드 되는 효과
+    [SerializeField]private EFacilityEffectType effectType = EFacilityEffectType.None;
+    // 업그레이드 값
+    [SerializeField, Min(0f)] private float effectValue = 0f;
+    [SerializeField] private EVehicleType unlockedVehicle = EVehicleType.None;
 
+    public int Level => level;
     public int UpgradeCost => upgradeCost;
-    public float DeliveryTimeReductionRate => deliveryTimeReductionRate;
+    public EFacilityEffectType EffectType => effectType;
+    public float EffectValue => effectValue;
+    public EVehicleType UnlockedVehicle => unlockedVehicle;
 }
 [CreateAssetMenu(fileName = "Facility_", menuName = "NightPost/Static Data/Facility")]
 public class FacilityStaticData : ScriptableObject
@@ -18,11 +28,11 @@ public class FacilityStaticData : ScriptableObject
     // 설명
     [SerializeField] private string description = string.Empty;
     // 레벨 데이터
-    [SerializeField] private FacilityLevelData[] levelData;
-        
+    [SerializeField] private FacilityLevelData[] levelData = new FacilityLevelData[0];
+
     public int FacilityID => facilityID;
     public string FacilityName => facilityName;
     public string Description => description;   
     public FacilityLevelData[] LevelData => levelData;
-    public int MaxLevel => levelData.Length > 0 ? levelData.Length - 1 : 0;
+    public int MaxLevel => levelData == null ? 0 : levelData.Length;
 }

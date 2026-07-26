@@ -54,8 +54,20 @@ public enum ERouteDifficulty
 }
 public enum ELetterProgressState
 {
+    // 새로 도착
     New,
+    // 대기중
     Waiting,
+    // 배달중
     Delivering,
+    // 완료
     Completed
+}
+public enum EFacilityEffectType
+{
+    None,
+    SortingTimeReduction,
+    DeliveryTimeReduction,
+    LetterCapacityIncrease,
+    VehicleUnlock
 }

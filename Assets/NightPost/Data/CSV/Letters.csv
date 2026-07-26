@@ -1,0 +1,16 @@
+﻿letterID,senderName,letterTitle,letterBody,destinationRegion,urgency,weight,letterReward,unlockedByDefault,requiredCompletedDeliveryCount
+1001,윤아,창가에 놓인 화분,오래 비운 집의 화분을 돌봐주셔서 감사합니다. 작은 새잎이 돋으면 제게도 알려주세요.,Town,Normal,Light,80,True,0
+1002,한결,빵 냄새가 나는 봉투,예전에 함께 만들었던 빵의 냄새를 아직 기억하나요. 언젠가 다시 같은 주방에 서고 싶습니다.,Town,Normal,Light,90,False,1
+1003,미정,반송하지 말아주세요,수취인이 이사했다는 말을 들었습니다. 그래도 이 편지만은 꼭 찾아서 전해주세요.,Town,Urgent,Light,120,False,2
+1004,수현,강 건너의 친구에게,강 건너 마을로 이사한 뒤에도 우리가 함께 걷던 길을 자주 떠올립니다.,Outskirts,Normal,Normal,130,False,3
+1005,재민,젖은 사진 한 장,비에 젖은 사진을 함께 보냅니다. 그날의 오해를 이제는 풀고 싶습니다.,Outskirts,Urgent,Light,150,False,4
+1006,은채,잃어버린 목도리,눈 오는 날 잃어버린 목도리를 찾아주신 분께 감사의 마음을 전하고 싶습니다.,Town,Normal,Normal,110,False,5
+1007,도윤,산 너머 작은 집,산속에 혼자 계신 할머니께 생활용품과 안부를 함께 전해주세요.,Mountain,Normal,Heavy,180,False,6
+1008,서연,오늘 밤까지 부탁해요,오늘 밤 열리는 작은 공연에 꼭 와달라는 말을 늦기 전에 전하고 싶어요.,Outskirts,Urgent,Light,200,False,7
+1009,민호,아버지의 오래된 지도,아버지가 남긴 지도 끝에 무엇이 있는지 아는 사람에게 답을 구합니다.,Mountain,Normal,Heavy,220,False,8
+1010,익명,우체국에 남겨진 편지,이 편지의 수취인은 우체국입니다. 현재 국장만 봉투를 열어주세요.,Town,Urgent,Normal,250,False,9
+1011,지우,별이 잘 보이는 곳,예전에 약속한 것처럼 별이 가장 밝은 날 다시 만나고 싶습니다.,Mountain,Normal,Light,180,False,10
+1012,하린,마지막 기차가 떠나기 전,마지막 기차가 떠나기 전에 오래 숨겨둔 마음을 전해주세요.,Outskirts,Urgent,Normal,260,False,11
+1013,정체불명,전임 국장에게,과거에 끝내지 못한 배달의 기록을 확인하려면 오래된 산길을 찾아오십시오.,Town,Urgent,Heavy,300,False,12
+1014,익명,주소가 지워진 봉투,비에 번진 주소 대신 봉투에 남은 단서만으로 수취인을 찾아주세요.,Mountain,Urgent,Light,320,False,13
+1015,전임 국장,밤에 오는 편지,새로운 국장에게 이 우체국과 마지막 미완성 배달을 맡깁니다.,Outskirts,Urgent,Heavy,500,False,14

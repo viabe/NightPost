@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82860a576422ece4d98f80e47e5d892a, type: 3}
+  m_Name: Facility_4002
+  m_EditorClassIdentifier: Assembly-CSharp::FacilityStaticData
+  facilityID: 4002
+  facilityName: "\uBC30\uB2EC \uCC28\uACE0"
+  description: "\uC0C8\uB85C\uC6B4 \uC774\uB3D9 \uC218\uB2E8\uC744 \uC0AC\uC6A9\uD560
+    \uC218 \uC788\uAC8C \uD569\uB2C8\uB2E4."
+  levelData:
+  - level: 1
+    upgradeCost: 0
+    effectType: 4
+    effectValue: 0
+    unlockedVehicle: 2
+  - level: 2
+    upgradeCost: 1000
+    effectType: 4
+    effectValue: 0
+    unlockedVehicle: 3
+  - level: 3
+    upgradeCost: 3000
+    effectType: 4
+    effectValue: 0
+    unlockedVehicle: 4

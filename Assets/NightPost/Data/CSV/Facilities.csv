@@ -1,0 +1,10 @@
+﻿facilityID,facilityName,description,level,upgradeCost,effectType,effectValue,unlockedVehicle
+4001,분류대,편지 분류 효율을 높입니다.,1,0,SortingTimeReduction,0.0,None
+4001,분류대,편지 분류 효율을 높입니다.,2,500,SortingTimeReduction,0.1,None
+4001,분류대,편지 분류 효율을 높입니다.,3,1500,SortingTimeReduction,0.2,None
+4002,배달 차고,새로운 이동 수단을 사용할 수 있게 합니다.,1,0,VehicleUnlock,0.0,Bicycle
+4002,배달 차고,새로운 이동 수단을 사용할 수 있게 합니다.,2,1000,VehicleUnlock,0.0,Motorcycle
+4002,배달 차고,새로운 이동 수단을 사용할 수 있게 합니다.,3,3000,VehicleUnlock,0.0,Truck
+4003,편지 보관함,우체국에 보관할 수 있는 편지 수를 늘립니다.,1,0,LetterCapacityIncrease,5,None
+4003,편지 보관함,우체국에 보관할 수 있는 편지 수를 늘립니다.,2,800,LetterCapacityIncrease,10,None
+4003,편지 보관함,우체국에 보관할 수 있는 편지 수를 늘립니다.,3,2000,LetterCapacityIncrease,15,None
