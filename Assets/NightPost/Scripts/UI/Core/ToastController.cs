@@ -41,7 +41,8 @@ namespace NightPost.UI
                 _group.alpha = 0f;
                 _group.blocksRaycasts = false;   // 토스트는 입력을 막지 않는다
                 _group.interactable = false;
-                _group.gameObject.SetActive(false);
+                // GameObject를 끄지 않는다: 이 컨트롤러가 _group과 같은 오브젝트(Toast)에 있어도
+                // 자기 자신을 비활성화해 코루틴이 멈추는 일이 없도록 alpha만으로 표시/숨김한다.
             }
         }
 
@@ -68,8 +69,6 @@ namespace NightPost.UI
                 yield break;
             }
 
-            _group.gameObject.SetActive(true);
-
             while (_queue.Count > 0)
             {
                 _label.text = _queue.Dequeue();
@@ -79,7 +78,6 @@ namespace NightPost.UI
                 yield return Fade(1f, 0f);
             }
 
-            _group.gameObject.SetActive(false);
             _runner = null;
         }
 
