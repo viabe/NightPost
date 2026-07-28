@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e532393e5fbc9f47a89310136901e92, type: 3}
+  m_Name: Reply_5006
+  m_EditorClassIdentifier: Assembly-CSharp::ReplyStaticData
+  replyID: 5006
+  linkedLetterID: 1006
+  senderName: "\uB098\uB798"
+  replyTitle: "\uBAA9\uB3C4\uB9AC\uB97C \uCC3E\uC544\uC918\uC11C \uACE0\uB9C8\uC6CC\uC694"
+  replyBody: "\uC5B4\uBA38\uB2C8\uAC00 \uB9CC\uB4E4\uC5B4\uC8FC\uC2E0 \uBAA9\uB3C4\uB9AC\uB77C
+    \uD3EC\uAE30\uD558\uC9C0 \uBABB\uD588\uC5B4\uC694. \uC815\uB9D0 \uAC10\uC0AC\uD569\uB2C8\uB2E4."
+  replyImage: {fileID: 0}

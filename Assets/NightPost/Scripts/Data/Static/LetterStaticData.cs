@@ -19,6 +19,8 @@ public class LetterStaticData : ScriptableObject
     [SerializeField] ELetterWeight weight = ELetterWeight.Normal;
     // 기본 보상
     [SerializeField] private int letterReward = 10;
+    // 해금 조건
+    [SerializeField] private UnlockConditionData unlockCondition = new();
 
     public int LetterID => letterID;
     public string SenderName => senderName;
@@ -28,4 +30,5 @@ public class LetterStaticData : ScriptableObject
     public ELetterUrgency Urgency => urgency;
     public ELetterWeight Weight => weight;
     public int LetterReward => letterReward;
+    public UnlockConditionData UnlockCondition => unlockCondition;
 }
