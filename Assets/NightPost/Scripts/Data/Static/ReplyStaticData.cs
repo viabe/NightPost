@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 [CreateAssetMenu(fileName = "Reply_", menuName = "NightPost/Static Data/Reply")]
 public class ReplyStaticData : ScriptableObject
 {
@@ -8,6 +9,7 @@ public class ReplyStaticData : ScriptableObject
     [SerializeField, Min(1)] private int linkedLetterID = 1;
     // 발신자
     [SerializeField] private string senderName = string.Empty;
+    [SerializeField] private string replyTitle = string.Empty;
     // 내용
     [SerializeField] private string replyBody = string.Empty;
     // 이미지
@@ -16,6 +18,7 @@ public class ReplyStaticData : ScriptableObject
     public int ReplyID => replyID;
     public int LinkedLetterID => linkedLetterID;
     public string SenderName => senderName;
+    public string ReplyTitle => replyTitle;
     public string ReplyBody => replyBody;
     public Sprite ReplyImage => replyImage;
 }

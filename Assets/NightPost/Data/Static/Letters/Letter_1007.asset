@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cc3b3e1c12873743bea798fd2670486, type: 3}
+  m_Name: Letter_1007
+  m_EditorClassIdentifier: Assembly-CSharp::LetterStaticData
+  letterID: 1007
+  senderName: "\uB3C4\uC724"
+  letterTitle: "\uC0B0 \uB108\uBA38 \uC791\uC740 \uC9D1"
+  letterBody: "\uC0B0\uC18D\uC5D0 \uD63C\uC790 \uACC4\uC2E0 \uD560\uBA38\uB2C8\uAED8
+    \uC0DD\uD65C\uC6A9\uD488\uACFC \uC548\uBD80\uB97C \uD568\uAED8 \uC804\uD574\uC8FC\uC138\uC694."
+  destinationRegion: 2
+  urgency: 0
+  weight: 2
+  letterReward: 180
+  unlockCondition:
+    unlockedByDefault: 0
+    requiredCompletedDeliveryCount: 6

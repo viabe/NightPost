@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class LetterProgressData : ScriptableObject
+[System.Serializable]
+public class LetterProgressData
 {
     // 연결된 편지 정적 데이터 ID
     [SerializeField] private int letterID = 0;
@@ -12,4 +13,48 @@ public class LetterProgressData : ScriptableObject
     public int LetterID => letterID;
     public ELetterProgressState State => state;
     public bool IsRead => isRead;
+
+    public LetterProgressData(int letterID)
+    {
+        this.letterID = letterID;
+        this.state = ELetterProgressState.New;
+        this.isRead = false;
+    }
+    public LetterProgressData(int letterID, ELetterProgressState state, bool isRead)
+    {
+        this.letterID = letterID;
+        this.state = state;
+        this.isRead = isRead;
+    }
+    public bool StartDelivery()
+    {
+        // 현재 편지 상태가 Waiting이 아니라면
+        // 배달을 시작할 수 없으므로 false를 반환
+        if(state != ELetterProgressState.Waiting) return false;
+
+        // 편지 상태를 Delivering으로 변경한다.
+        state = ELetterProgressState.Delivering;
+
+        // 정상적으로 상태를 변경했음을 알리기 위해 true를 반환한다.
+        return true; 
+    }
+    public bool CompleteDelivery()
+    {
+        if(state != ELetterProgressState.Delivering) return false;
+        state = ELetterProgressState.Completed;
+        return true;
+    }
+    public bool MarkAsRead()
+    {
+        if (IsRead) return false;
+        isRead = true;
+        return true;
+    }
+    public bool CompleteSorting()
+    {
+        if (!isRead) return false;
+        if (state != ELetterProgressState.New) return false;
+        state = ELetterProgressState.Waiting;
+        return true;
+    }
 }

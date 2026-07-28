@@ -8,6 +8,7 @@ public class CourierTraitData
     [SerializeField] private ECourierTraitType traitType = ECourierTraitType.None;
     // 배달 시간 감소율
     [SerializeField, Range(0f, 1f)] private float timeReductionRate = 0.2f;
+
     public ECourierTraitType TraitType => traitType;
     public float TimeReductionRate => timeReductionRate;
 }
@@ -23,9 +24,12 @@ public class CourierStaticData : ScriptableObject
     // 기본 속도
     [SerializeField] private float speed = 1.0f;
     // 특성
-    [SerializeField] private CourierTraitData trait;
+    [SerializeField] private CourierTraitData trait = new();
+   
     // 이미지
     [SerializeField] private Sprite courierImage = null;
+    // 해금 조건
+    [SerializeField] private UnlockConditionData unlockCondition = new();
 
     public int CourierID => courierID;
     public string CourierName => courierName;
@@ -33,4 +37,5 @@ public class CourierStaticData : ScriptableObject
     public float Speed => speed;
     public CourierTraitData Trait => trait;
     public Sprite CourierImage => courierImage;
+    public UnlockConditionData UnlockCondition => unlockCondition;
 }
