@@ -122,4 +122,13 @@ public class UISandboxTester : MonoBehaviour
         _hud.SetMission(2, "배달 준비", Random.Range(0, 15), 15);
         _hud.SetInboxBadge(true);
     }
+
+    // ── HUDPresenter 이벤트 경로 검증(디버그 전용) ──
+    // 주의: 원칙상 UI는 GameEvents.Raise* 를 호출하지 않는다.
+    // 이건 시스템(GameBootstrap) 없이 HUDPresenter의 구독만 격리 검증하려는 임시 수단이다.
+    // 실데이터 검증은 GameBootstrap이 있는 씬에서 한다.
+    public void DebugRaiseCurrency()
+    {
+        GameEvents.RaiseCurrencyChanged(Random.Range(1000, 99999));
+    }
 }
