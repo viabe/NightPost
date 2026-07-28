@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NightPost.UI;
 using UnityEngine;
 
@@ -34,6 +35,66 @@ public class UISandboxTester : MonoBehaviour
             ConfirmText = "고용",
             OnConfirm = () => Debug.Log("[Tester] 고용 확정"),
             OnCancel = () => Debug.Log("[Tester] 취소"),
+        });
+    }
+
+    // ── 편지 겉면 ────────────────────────────
+    public void ShowEnvelope()
+    {
+        var popup = PopupManager.Instance != null
+            ? PopupManager.Instance.Get<EnvelopePopupController>(UIScreenId.EnvelopePopup)
+            : null;
+        if (popup == null) { Debug.LogWarning("[Tester] EnvelopePopup 미등록 — Id가 EnvelopePopup인지, PopupManager _popupRoot 아래에 있는지 확인"); return; }
+
+        popup.Open(new EnvelopeModel
+        {
+            LetterId = 1001,
+            Title = "감이 익었다는 소식",
+            SenderName = "김순자",
+            RegionLabel = "산간",
+            Reward = 30,
+            IsUrgent = true,
+            IsHeavy = false,
+            IsRead = false,
+            OnAssign = ShowAssignment,   // 배정하기 → Assignment 팝업 (미니 통합 테스트)
+        });
+    }
+
+    // ── 배정 (배달부 · 노선 선택) ─────────────
+    public void ShowAssignment()
+    {
+        var popup = PopupManager.Instance != null
+            ? PopupManager.Instance.Get<AssignmentPopupController>(UIScreenId.Assignment)
+            : null;
+        if (popup == null) { Debug.LogWarning("[Tester] AssignmentPopup 미등록 — Id가 Assignment인지, PopupManager _popupRoot 아래에 있는지 확인"); return; }
+
+        popup.Open(new AssignmentModel
+        {
+            LetterId = 1001,
+            LetterTitle = "감이 익었다는 소식",
+            RegionLabel = "산간",
+            IsUrgent = true,
+            Couriers = new List<CourierOption>
+            {
+                new CourierOption { CourierId = 2001, Name = "느릿 아저씨", VehicleLabel = "도보",   IsAvailable = true },
+                new CourierOption { CourierId = 2002, Name = "바퀴 청년",   VehicleLabel = "자전거", IsAvailable = true },
+                new CourierOption { CourierId = 2003, Name = "부릉 씨",     VehicleLabel = "오토바이", IsAvailable = false }, // 배달 중
+            },
+            Routes = new List<RouteOption>
+            {
+                new RouteOption { RouteId = 3001, Name = "산길 노선", DifficultyLabel = "보통",   IsUnlocked = true },
+                new RouteOption { RouteId = 3002, Name = "고개 노선", DifficultyLabel = "어려움", IsUnlocked = false }, // 잠김
+            },
+            Estimate = (courierId, routeId) =>
+            {
+                // 가짜 계산: 노선 기본 180초, 자전거(2002)면 절반, 급함이면 다시 절반
+                int sec = 180;
+                if (courierId == 2002) sec /= 2;
+                sec /= 2; // 급함 편지 가정
+                return new DeliveryEstimate { Seconds = sec, Reward = 30 };
+            },
+            OnStartDelivery = (courierId, routeId) =>
+                Debug.Log($"[Tester] 배달 시작 → courier={courierId}, route={routeId} (서비스 연결 예정)"),
         });
     }
 
