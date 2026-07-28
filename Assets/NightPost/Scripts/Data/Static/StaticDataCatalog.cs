@@ -135,7 +135,8 @@ public class StaticDataCatalog : MonoBehaviour
 
         if (replyByLetterIDDic.TryGetValue(letterID, out ReplyStaticData data)) return data;
 
-        Debug.LogWarning($"[StaticDataCatalog] 존재하지 않는 replyID ID: {letterID}");
+        Debug.LogWarning($"[StaticDataCatalog] 편지 ID {letterID}에 연결된 답장이 없습니다.");
+
 
         return null;
     }

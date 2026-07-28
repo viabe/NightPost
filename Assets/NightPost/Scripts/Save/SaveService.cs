@@ -5,18 +5,4 @@ public class SaveService : MonoBehaviour
 {
     public PlayerSaveData CurrentPlayerData { get; private set; }
 
-    public void CreateNewData()
-    {
-        CurrentPlayerData = new PlayerSaveData();
-    }
-
-    public void LoadPlayerData()
-    {
-
-    }
-
-    public void SavePlayerData()
-    {
-
-    }
 }

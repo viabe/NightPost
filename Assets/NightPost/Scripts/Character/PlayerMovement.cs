@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     private float moveDirection = 1f;
 
     public event System.Action AutoMoveCompleted;
+    public event System.Action AutoMoveCanceled;
 
     private void Awake()
     {
@@ -112,7 +113,9 @@ public class PlayerMovement : MonoBehaviour
     }
     public void CancelAutoMove()
     {
+        if (!isAutoMoving) return;
         isAutoMoving = false;
+        AutoMoveCanceled?.Invoke(); 
     }
     private void CancelManualMove()
     {

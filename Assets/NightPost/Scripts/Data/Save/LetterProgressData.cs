@@ -26,7 +26,24 @@ public class LetterProgressData
         this.state = state;
         this.isRead = isRead;
     }
+    public bool StartDelivery()
+    {
+        // 현재 편지 상태가 Waiting이 아니라면
+        // 배달을 시작할 수 없으므로 false를 반환
+        if(state != ELetterProgressState.Waiting) return false;
 
+        // 편지 상태를 Delivering으로 변경한다.
+        state = ELetterProgressState.Delivering;
+
+        // 정상적으로 상태를 변경했음을 알리기 위해 true를 반환한다.
+        return true; 
+    }
+    public bool CompleteDelivery()
+    {
+        if(state != ELetterProgressState.Delivering) return false;
+        state = ELetterProgressState.Completed;
+        return true;
+    }
     public bool MarkAsRead()
     {
         if (IsRead) return false;

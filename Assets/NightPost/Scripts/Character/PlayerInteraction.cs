@@ -11,10 +11,12 @@ public class PlayerInteraction : MonoBehaviour
     private void OnEnable()
     {
         playerMovement.AutoMoveCompleted += OnAutoMoveCompleted;
+        playerMovement.AutoMoveCanceled += CancelPendingInteraction;
     }
     private void OnDisable()
     {
         playerMovement.AutoMoveCompleted -= OnAutoMoveCompleted;
+        playerMovement.AutoMoveCanceled -= CancelPendingInteraction;
     }
     public void RequestInteraction(InteractableStation station)
     {
@@ -29,6 +31,10 @@ public class PlayerInteraction : MonoBehaviour
 
         // 시설의 InteractionPoint X좌표를 가져와 PlayerController에 자동 이동을 요청
         playerController.RequestAutoMove(station.InteractionX);
+    }
+    private void CancelPendingInteraction()
+    {
+        pendingStation = null;
     }
     private void OnAutoMoveCompleted()
     {
