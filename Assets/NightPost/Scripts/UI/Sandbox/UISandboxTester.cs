@@ -131,4 +131,21 @@ public class UISandboxTester : MonoBehaviour
     {
         GameEvents.RaiseCurrencyChanged(Random.Range(1000, 99999));
     }
+
+    // ── 편지 열람 단독 테스트(가짜 본문) ──
+    // 수신함/시스템 없이 LetterRead 레이아웃·스크롤만 빠르게 확인하는 용도.
+    public void ShowLetterRead()
+    {
+        var popup = PopupManager.Instance != null
+            ? PopupManager.Instance.Get<LetterReadController>(UIScreenId.LetterRead)
+            : null;
+        if (popup == null) { Debug.LogWarning("[Tester] LetterRead 미등록 — Id가 LetterRead인지, PopupManager _popupRoot 아래에 있는지 확인"); return; }
+
+        popup.Open(new LetterReadModel
+        {
+            Title = "감이 익었습니다",
+            Sender = "김순자",
+            Body = "올해도 감이 잘 익었습니다.\n덕분에 편지가 무사히 닿았어요.\n\n바쁘겠지만 몸 상하지 말고\n가끔은 바다도 보러 오세요.\n\n긴 글이 스크롤되는지 확인하려고\n일부러 여러 줄을 넣어 둡니다.\n잘 읽히면 성공입니다.",
+        });
+    }
 }
