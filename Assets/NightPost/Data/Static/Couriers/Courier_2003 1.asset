@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e406a660ff1b824698c6e588d967515, type: 3}
-  m_Name: Courier_2003
+  m_Name: Courier_2003 1
   m_EditorClassIdentifier: Assembly-CSharp::CourierStaticData
   courierID: 2003
   courierName: "\uC18C\uB77C"

@@ -12,6 +12,7 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
     [SerializeField] private LetterService letterService;
     [SerializeField] private DeliveryService deliveryService;
     [SerializeField] private ReplyService replyService;
+    [SerializeField] private ProgressionService progressionService;
     [SerializeField] private PlayerDataManager playerDataManager;
     [SerializeField] private StaticDataCatalog staticDataCatalog;
 
@@ -28,6 +29,10 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
     [Header("시간 설정")]
     [SerializeField, Min(0.1f)]
     private float completionCheckInterval = 0.25f;
+
+    [Header("진행도 해금 테스트")]
+    [SerializeField] private int unlockTestCourierID;
+    [SerializeField] private int unlockTestRouteID;
 
     [SerializeField, Min(1f)]
     private float timeoutSeconds = 30f;
@@ -49,9 +54,15 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
     private int replyReceivedEventCount;
     private int replyReadEventCount;
     private int unreadReplyCountChangedEventCount;
+    private int courierUnlockedEventCount;
+    private int routeUnlockedEventCount;
+    private int targetCourierUnlockedEventCount;
+    private int targetRouteUnlockedEventCount;
 
     private int lastCurrency;
     private int lastUnreadReplyCount = -1;
+    private int targetCourierUnlockedAtCompletedCount = -1;
+    private int targetRouteUnlockedAtCompletedCount = -1;
 
     private readonly HashSet<int> receivedLetterEventIDs = new();
     private readonly HashSet<int> readLetterEventIDs = new();
@@ -60,6 +71,8 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
     private readonly HashSet<int> checkedResultEventIDs = new();
     private readonly HashSet<int> receivedReplyEventIDs = new();
     private readonly HashSet<int> readReplyEventIDs = new();
+    private readonly HashSet<int> unlockedCourierEventIDs = new();
+    private readonly HashSet<int> unlockedRouteEventIDs = new();
 
     private void OnEnable()
     {
@@ -76,6 +89,9 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         GameEvents.ReplyReceived += OnReplyReceived;
         GameEvents.ReplyRead += OnReplyRead;
         GameEvents.UnreadReplyCountChanged += OnUnreadReplyCountChanged;
+
+        GameEvents.CourierUnlocked += OnCourierUnlocked;
+        GameEvents.RouteUnlocked += OnRouteUnlocked;
     }
 
     private void OnDisable()
@@ -93,6 +109,9 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         GameEvents.ReplyReceived -= OnReplyReceived;
         GameEvents.ReplyRead -= OnReplyRead;
         GameEvents.UnreadReplyCountChanged -= OnUnreadReplyCountChanged;
+
+        GameEvents.CourierUnlocked -= OnCourierUnlocked;
+        GameEvents.RouteUnlocked -= OnRouteUnlocked;
 
         if (testCoroutine != null)
         {
@@ -161,6 +180,14 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
 
         int completedCountBefore =
             saveData.CompleteDeliveryCount;
+
+        LogResult(
+            "[진행도 1] 테스트 시작 시 배달부 잠금 상태",
+            !playerDataManager.IsCourierOwned(unlockTestCourierID));
+
+        LogResult(
+            "[진행도 2] 테스트 시작 시 노선 잠금 상태",
+            !playerDataManager.IsRouteUnlocked(unlockTestRouteID));
 
         // --------------------------------------------------
         // 1. 편지 두 개를 Waiting 상태까지 준비
@@ -473,6 +500,50 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             "23. 두 결과가 아직 미확인 상태",
             !firstResult.IsChecked &&
             !secondResult.IsChecked);
+
+        LogResult(
+            "[진행도 3] 배달 2회 완료 후 배달부 해금",
+            playerDataManager.IsCourierOwned(unlockTestCourierID));
+
+        LogResult(
+            "[진행도 4] 배달 2회 완료 후 노선 해금",
+            playerDataManager.IsRouteUnlocked(unlockTestRouteID));
+
+        LogResult(
+            "[진행도 5] CourierUnlocked가 대상 배달부에 1회 발생",
+            targetCourierUnlockedEventCount == 1 &&
+            unlockedCourierEventIDs.Contains(unlockTestCourierID));
+
+        LogResult(
+            "[진행도 6] RouteUnlocked가 대상 노선에 1회 발생",
+            targetRouteUnlockedEventCount == 1 &&
+            unlockedRouteEventIDs.Contains(unlockTestRouteID));
+
+        LogResult(
+            "[진행도 7] 배달부가 완료 횟수 2에서 해금",
+            targetCourierUnlockedAtCompletedCount == 2);
+
+        LogResult(
+            "[진행도 8] 노선이 완료 횟수 2에서 해금",
+            targetRouteUnlockedAtCompletedCount == 2);
+
+        int targetCourierEventCountBeforeReevaluate =
+            targetCourierUnlockedEventCount;
+
+        int targetRouteEventCountBeforeReevaluate =
+            targetRouteUnlockedEventCount;
+
+        progressionService.EvaluateProgressUnlocks();
+
+        LogResult(
+            "[진행도 9] 재평가 시 배달부 해금 이벤트 중복 없음",
+            targetCourierUnlockedEventCount ==
+            targetCourierEventCountBeforeReevaluate);
+
+        LogResult(
+            "[진행도 10] 재평가 시 노선 해금 이벤트 중복 없음",
+            targetRouteUnlockedEventCount ==
+            targetRouteEventCountBeforeReevaluate);
 
         // --------------------------------------------------
         // 8. 첫 번째 결과만 확인
@@ -791,12 +862,23 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             return false;
         }
 
+        if (saveData.CompleteDeliveryCount != 0)
+        {
+            Debug.LogError(
+                "[ConcurrentDeliveryTest] 진행도 해금 테스트는 " +
+                "완료 배달 수가 0인 상태에서 시작해야 합니다.\n" +
+                "플레이 모드를 다시 시작한 뒤 한 번만 실행하세요.");
+            return false;
+        }
+
         // 이번 테스트는 깨끗한 상태에서 시작
         saveData.LetterProgressesList.Clear();
         saveData.ActiveDeliveryList.Clear();
         saveData.DeliveryResultsList.Clear();
         saveData.ReceivedReplyIDs.Clear();
         saveData.ReadReplyIds.Clear();
+        saveData.OwnedCourierIDs.Remove(unlockTestCourierID);
+        saveData.UnlockedRouteIDs.Remove(unlockTestRouteID);
 
         AddUniqueID(
             saveData.OwnedCourierIDs,
@@ -823,7 +905,11 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             $"LetterProgressCount: " +
             $"{saveData.LetterProgressesList.Count}\n" +
             $"ActiveDeliveryCount: " +
-            $"{saveData.ActiveDeliveryList.Count}");
+            $"{saveData.ActiveDeliveryList.Count}\n" +
+            $"Unlock Test Courier Owned: " +
+            $"{playerDataManager.IsCourierOwned(unlockTestCourierID)}\n" +
+            $"Unlock Test Route Unlocked: " +
+            $"{playerDataManager.IsRouteUnlocked(unlockTestRouteID)}");
 
         return true;
     }
@@ -835,7 +921,9 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             firstCourierID <= 0 ||
             secondCourierID <= 0 ||
             firstRouteID <= 0 ||
-            secondRouteID <= 0)
+            secondRouteID <= 0 ||
+            unlockTestCourierID <= 0 ||
+            unlockTestRouteID <= 0)
         {
             Debug.LogError(
                 "[ConcurrentDeliveryTest] 모든 테스트 ID는 1 이상이어야 합니다.");
@@ -857,6 +945,24 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             return false;
         }
 
+        if (unlockTestCourierID == firstCourierID ||
+            unlockTestCourierID == secondCourierID)
+        {
+            Debug.LogError(
+                "[ConcurrentDeliveryTest] 해금 테스트 배달부는 " +
+                "배달에 사용하는 배달부와 달라야 합니다.");
+            return false;
+        }
+
+        if (unlockTestRouteID == firstRouteID ||
+            unlockTestRouteID == secondRouteID)
+        {
+            Debug.LogError(
+                "[ConcurrentDeliveryTest] 해금 테스트 노선은 " +
+                "배달에 사용하는 노선과 달라야 합니다.");
+            return false;
+        }
+
         LetterStaticData firstLetter =
             staticDataCatalog.GetLetter(firstLetterID);
 
@@ -875,6 +981,12 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         RouteStaticData secondRoute =
             staticDataCatalog.GetRoute(secondRouteID);
 
+        CourierStaticData unlockTestCourier =
+            staticDataCatalog.GetCourier(unlockTestCourierID);
+
+        RouteStaticData unlockTestRoute =
+            staticDataCatalog.GetRoute(unlockTestRouteID);
+
         ReplyStaticData firstReply =
             staticDataCatalog.GetReplyByLetterID(firstLetterID);
 
@@ -887,6 +999,8 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             secondCourier == null ||
             firstRoute == null ||
             secondRoute == null ||
+            unlockTestCourier == null ||
+            unlockTestRoute == null ||
             firstReply == null ||
             secondReply == null)
         {
@@ -913,6 +1027,33 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
                 $"[ConcurrentDeliveryTest] 두 번째 편지와 노선 지역 불일치\n" +
                 $"Letter Region: {secondLetter.DestinationRegion}\n" +
                 $"Route Region: {secondRoute.RegionType}");
+            return false;
+        }
+
+        if (unlockTestCourier.UnlockCondition == null ||
+            unlockTestRoute.UnlockCondition == null)
+        {
+            Debug.LogError(
+                "[ConcurrentDeliveryTest] 해금 테스트 대상의 " +
+                "UnlockCondition이 없습니다.");
+            return false;
+        }
+
+        if (unlockTestCourier.UnlockCondition.IsUnlockedByDefault ||
+            unlockTestRoute.UnlockCondition.IsUnlockedByDefault)
+        {
+            Debug.LogError(
+                "[ConcurrentDeliveryTest] 해금 테스트 대상은 " +
+                "IsUnlockedByDefault가 false여야 합니다.");
+            return false;
+        }
+
+        if (unlockTestCourier.UnlockCondition.RequiredCompletedDeliveryCount != 2 ||
+            unlockTestRoute.UnlockCondition.RequiredCompletedDeliveryCount != 2)
+        {
+            Debug.LogError(
+                "[ConcurrentDeliveryTest] 해금 테스트 대상의 " +
+                "RequiredCompletedDeliveryCount는 2여야 합니다.");
             return false;
         }
 
@@ -1056,9 +1197,15 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         replyReceivedEventCount = 0;
         replyReadEventCount = 0;
         unreadReplyCountChangedEventCount = 0;
+        courierUnlockedEventCount = 0;
+        routeUnlockedEventCount = 0;
+        targetCourierUnlockedEventCount = 0;
+        targetRouteUnlockedEventCount = 0;
 
         lastCurrency = 0;
         lastUnreadReplyCount = -1;
+        targetCourierUnlockedAtCompletedCount = -1;
+        targetRouteUnlockedAtCompletedCount = -1;
 
         receivedLetterEventIDs.Clear();
         readLetterEventIDs.Clear();
@@ -1067,6 +1214,8 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         checkedResultEventIDs.Clear();
         receivedReplyEventIDs.Clear();
         readReplyEventIDs.Clear();
+        unlockedCourierEventIDs.Clear();
+        unlockedRouteEventIDs.Clear();
     }
 
     private void OnCurrencyChanged(int currentCurrency)
@@ -1168,6 +1317,36 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         lastUnreadReplyCount = unreadCount;
     }
 
+    private void OnCourierUnlocked(int courierID)
+    {
+        if (!isTestRunning) return;
+
+        courierUnlockedEventCount++;
+        unlockedCourierEventIDs.Add(courierID);
+
+        if (courierID == unlockTestCourierID)
+        {
+            targetCourierUnlockedEventCount++;
+            targetCourierUnlockedAtCompletedCount =
+                playerDataManager.GetCompletedDeliveryCount();
+        }
+    }
+
+    private void OnRouteUnlocked(int routeID)
+    {
+        if (!isTestRunning) return;
+
+        routeUnlockedEventCount++;
+        unlockedRouteEventIDs.Add(routeID);
+
+        if (routeID == unlockTestRouteID)
+        {
+            targetRouteUnlockedEventCount++;
+            targetRouteUnlockedAtCompletedCount =
+                playerDataManager.GetCompletedDeliveryCount();
+        }
+    }
+
     private void PrintFinalState(
         PlayerSaveData saveData,
         DeliveryResultData firstResult,
@@ -1216,7 +1395,21 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
             $"ReplyReceived: {replyReceivedEventCount}\n" +
             $"ReplyRead: {replyReadEventCount}\n" +
             $"UnreadReplyCountChanged: " +
-            $"{unreadReplyCountChangedEventCount}");
+            $"{unreadReplyCountChangedEventCount}\n" +
+            $"CourierUnlocked: {courierUnlockedEventCount}\n" +
+            $"RouteUnlocked: {routeUnlockedEventCount}\n" +
+            $"Target Courier Unlocked: " +
+            $"{playerDataManager.IsCourierOwned(unlockTestCourierID)}\n" +
+            $"Target Route Unlocked: " +
+            $"{playerDataManager.IsRouteUnlocked(unlockTestRouteID)}\n" +
+            $"Target Courier Event Count: " +
+            $"{targetCourierUnlockedEventCount}\n" +
+            $"Target Route Event Count: " +
+            $"{targetRouteUnlockedEventCount}\n" +
+            $"Target Courier Unlocked At Count: " +
+            $"{targetCourierUnlockedAtCompletedCount}\n" +
+            $"Target Route Unlocked At Count: " +
+            $"{targetRouteUnlockedAtCompletedCount}");
     }
 
     private void AddUniqueID(
@@ -1266,6 +1459,7 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         if (letterService == null ||
             deliveryService == null ||
             replyService == null ||
+            progressionService == null ||
             playerDataManager == null ||
             staticDataCatalog == null)
         {

@@ -8,15 +8,13 @@ public class FacilityLevelData
     [SerializeField] private int upgradeCost = 0;
     // 업그레이드 되는 효과
     [SerializeField]private EFacilityEffectType effectType = EFacilityEffectType.None;
-    // 업그레이드 값
+    // 해당 레벨에서 최종 적용되는 누적 효과값
     [SerializeField, Min(0f)] private float effectValue = 0f;
-    [SerializeField] private EVehicleType unlockedVehicle = EVehicleType.None;
 
     public int Level => level;
     public int UpgradeCost => upgradeCost;
     public EFacilityEffectType EffectType => effectType;
     public float EffectValue => effectValue;
-    public EVehicleType UnlockedVehicle => unlockedVehicle;
 }
 [CreateAssetMenu(fileName = "Facility_", menuName = "NightPost/Static Data/Facility")]
 public class FacilityStaticData : ScriptableObject

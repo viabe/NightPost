@@ -4,274 +4,341 @@ using UnityEngine;
 
 public class DeliveryService : MonoBehaviour
 {
+    // 플레이어 런타임 데이터 관리
     private PlayerDataManager playerDataManager;
-    private StaticDataCatalog staticDataCatalog;
-    public bool Initialize(PlayerDataManager dataManager,StaticDataCatalog catalog)
-    {
-        if (dataManager == null) return false;
-        if(catalog == null) return false;
 
+    // 배달부, 편지, 노선 정적 데이터 조회
+    private StaticDataCatalog staticDataCatalog;
+
+    // 누적 배달 완료 수 기반 해금 처리
+    private ProgressionService progressionService;
+
+    private FacilityService facilityService;
+
+    /// <summary>
+    /// 배달 서비스에 필요한 의존성 연결함
+    /// </summary>
+    public bool Initialize(PlayerDataManager dataManager,StaticDataCatalog catalog, ProgressionService progression, FacilityService facility)
+    {
+        // 필수 의존성 확인
+        if (dataManager == null) return false;
+        if (catalog == null) return false;
+        if (progression == null) return false;
+        if (facility == null) return false;
+
+        // 전달받은 의존성 저장
         playerDataManager = dataManager;
         staticDataCatalog = catalog;
+        progressionService = progression;
+        facilityService = facility;
+
+        // 초기화 성공
         return true;
     }
 
+    /// <summary>
+    /// 선택한 편지, 배달부, 노선으로 새 배달 시작함
+    /// </summary>
     public bool StartDelivery(int courierID, int letterID, int routeID)
     {
+        // 배달 시작 가능 여부 확인
         if (!CanStartDelivery(courierID, letterID, routeID)) return false;
 
+        // 배달부 정적 데이터 조회
         CourierStaticData courier = staticDataCatalog.GetCourier(courierID);
+        // 노선 정적 데이터 조회
         RouteStaticData route = staticDataCatalog.GetRoute(routeID);
-
-        if(courier == null || route == null) return false;
-
+        // 필수 정적 데이터 확인
+        if (courier == null || route == null) return false;
+        // 실제 배달 소요 시간 계산
         float realDeliveryTime = CalculateBaseDeliveryDuration(courier, route);
-        if(realDeliveryTime <= 0) return false;
+        // 잘못된 배달 시간 차단
+        if (realDeliveryTime <= 0) return false;
 
+        // 현재 시각을 배달 시작 시각으로 사용
         long startedAtUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        // 배달 완료 예정 시각 계산
         long completedAtUnixTime = CalculateCompleteAtUnixTime(startedAtUnixTime, realDeliveryTime);
+        // 잘못된 완료 시각 차단
         if (completedAtUnixTime <= 0) return false;
 
+        // 진행 중 배달 데이터 생성
         ActiveDeliveryData activeDeliveryData = new ActiveDeliveryData(letterID, courierID, routeID, startedAtUnixTime, completedAtUnixTime);
-        
-        if(!playerDataManager.AddActiveDelivery(activeDeliveryData)) return false;
+        // 진행 중 배달 목록에 추가
+        if (!playerDataManager.AddActiveDelivery(activeDeliveryData)) return false;
 
+        // 편지 진행 데이터 조회
         LetterProgressData letterProgress = playerDataManager.GetLetterProgress(letterID);
+        // 편지 진행 데이터 확인
         if (letterProgress == null) return false;
+        // 편지 상태를 Delivering으로 변경
         if (!letterProgress.StartDelivery()) return false;
+
+        // 편지 상태 변경 알림
         GameEvents.RaiseLetterStateChanged(letterID, ELetterProgressState.Delivering);
+        // 배달 시작 알림
         GameEvents.RaiseDeliveryStarted(letterID, courierID, routeID);
+        // 배달 시작 성공
         return true;
-    }    
+    }
+
+    /// <summary>
+    /// 배달부, 편지, 노선이 배달 시작 조건을 만족하는지 확인함
+    /// </summary>
     private bool CanStartDelivery(int courierID, int letterID, int routeID)
     {
-        // PlayerDataManager가 연결되지 않았다면
-        // 배달 조건을 확인할 수 없으므로 false를 반환
+        // 플레이어 데이터 연결 여부 확인
         if (playerDataManager == null) return false;
-        // 선택한 배달부를 플레이어가 보유하고 있지 않다면
-        // 배달을 시작할 수 없으므로 false를 반환
-        if(!playerDataManager.IsCourierOwned(courierID)) return false;
-        // 선택한 배달부가 이미 다른 배달을 진행 중이라면
-        // 중복 배정을 막기 위해 false를 반환
+        // 플레이어의 배달부 보유 여부 확인
+        if (!playerDataManager.IsCourierOwned(courierID)) return false;
+        // 배달부의 다른 배달 진행 여부 확인
         if (playerDataManager.IsCourierDelivering(courierID)) return false;
 
-        // 선택한 노선이 아직 해금되지 않았다면
-        // 이용할 수 없으므로 false를 반환
-        if(!playerDataManager.IsRouteUnlocked(routeID)) return false;
+        // 노선 해금 여부 확인
+        if (!playerDataManager.IsRouteUnlocked(routeID)) return false;
 
-        // 편지 목적지와 선택한 노선의 지역이 맞지 않다면 false 반환
+        // 편지 목적지와 노선 지역 호환 여부 확인
         if (!IsRouteCompatible(letterID, routeID)) return false;
 
         // 편지 진행 데이터를 조회
         LetterProgressData letter = playerDataManager.GetLetterProgress(letterID);
+        // 편지 진행 데이터 확인
         if (letter == null) return false;
-        // 편지 데이터가 없거나 현재 상태가 Waiting이 아니라면
-        // 배달 가능한 편지가 아니므로 false를 반환
+        // Waiting 상태 편지만 배달 가능
         if (letter.State != ELetterProgressState.Waiting) return false;
 
-        // 모든 조건을 통과했다면 true를 반환한다.
+        // 모든 배달 시작 조건 충족
         return true;
     }
-
-    private float CalculateBaseDeliveryDuration( CourierStaticData courierData,RouteStaticData routeData)
+    /// <summary>
+    /// 노선 기본 시간과 배달부 속도로 배달 시간 계산함
+    /// </summary>
+    private float
+        CalculateBaseDeliveryDuration( CourierStaticData courierData,RouteStaticData routeData)
     {
-        // 전달받은 배달부 데이터가 null이라면
-        // 배달 시간을 계산할 수 없으므로 0을 반환
-        if(courierData == null) return 0f;
+        // 배달부 데이터 확인
+        if (courierData == null) return 0f;
 
-        // 전달받은 노선 데이터가 null이라면
-        // 배달 시간을 계산할 수 없으므로 0을 반환
-        if(routeData == null) return 0f;
+        // 노선 데이터 확인
+        if (routeData == null) return 0f;
 
-        // 배달부 속도가 0 이하라면 0을 반환
+        // 배달부 속도 확인
         if (courierData.Speed <= 0f) return 0f;
 
-        // 노선의 기본 소요 시간을 배달부의 기본 속도로 나누어
-        // 실제 기본 배달 시간을 계산
+        // 노선 기본 배달 시간 확인
         if (routeData.BaseDeliveryTimeSeconds <= 0f) return 0f;
+
+        // 노선 기본 시간을 배달부 속도로 보정
         float time = routeData.BaseDeliveryTimeSeconds / courierData.Speed;
 
-        // 계산된 기본 배달 시간을 반환한다.
-        return time;
+        // 시설의 배달 시간 감소 효과를 적용한 최종 시간 반환
+        return ApplyFacilityDeliveryTimeReduction(time);
     }
-
+    /// <summary>
+    /// 시작 시각과 배달 시간으로 완료 예정 Unix 시각 계산함
+    /// </summary>
     private long CalculateCompleteAtUnixTime(long startedAtUnixTime, float deliveryDurationSeconds)
     {
-        // 배달 시작 시각이 0 이하라면 0을 반환
+        // 배달 시작 시각 확인
         if (startedAtUnixTime <= 0) return 0;
 
-        // 계산된 배달 시간이 0 이하라면
+        // 배달 소요 시간 확인
         if (deliveryDurationSeconds <= 0) return 0;
 
-        // 실수로 계산된 배달 시간을 초 단위 정수로 올림 처리
-        // 소수 시간이 버려져 배달이 일찍 완료되는 것을 방지
+        // 소수점 배달 시간을 초 단위로 올림
         long durationSeconds = (long)Math.Ceiling(deliveryDurationSeconds);
 
-        // 계산된 완료 예정 시각을 반환한다.
+        // 완료 예정 Unix 시각 반환
         return startedAtUnixTime + durationSeconds;
     }
-
+    /// <summary>
+    /// 편지 목적지와 노선 담당 지역의 일치 여부 확인함
+    /// </summary>
     private bool IsRouteCompatible(int letterID, int routeID)
     {
-        // StaticDataCatalog가 연결되지 않았다면
-        // 정적 데이터를 조회할 수 없으므로 false를 반환
-        if(staticDataCatalog == null) return false;
+        // 정적 데이터 카탈로그 연결 여부 확인
+        if (staticDataCatalog == null) return false;
 
-        // 전달받은 letterID로 편지 정적 데이터를 조회한다.
+        // 편지 정적 데이터 조회
         LetterStaticData letter = staticDataCatalog.GetLetter(letterID);
 
-        // 전달받은 routeID로 노선 정적 데이터를 조회한다.
+        // 노선 정적 데이터 조회
         RouteStaticData route = staticDataCatalog.GetRoute(routeID);
 
-        // 편지 또는 노선 데이터가 존재하지 않는다면
-        // 호환 여부를 판단할 수 없으므로 false를 반환
+        // 편지 또는 노선 데이터 확인
         if (letter == null || route == null) return false;
 
-        // 편지의 목적 지역과 노선의 담당 지역이 같은지 비교해
-        // 그 결과를 반환
+        // 편지 목적지와 노선 지역 비교
         return letter.DestinationRegion == route.RegionType;
     }
 
+    /// <summary>
+    /// 완료 시각에 도달한 배달을 완료 상태로 처리함
+    /// </summary>
     private bool CompleteDelivery(ActiveDeliveryData deliveryData,long currentUnixTime)
     {
-        // PlayerDataManager 또는 StaticDataCatalog가 연결되지 않았다면
-        // 완료 처리를 진행할 수 없으므로 false를 반환
-        if(playerDataManager == null || staticDataCatalog == null) return false;
+        // 필수 의존성 확인
+        if (playerDataManager == null || staticDataCatalog == null) return false;
 
-        // 전달받은 진행 중 배달 데이터가 없다면
-        // 처리할 배달이 없으므로 false를 반환
-        if(deliveryData == null) return false;
-
-        // 현재 시각이 아직 배달 완료 예정 시각에 도달하지 않았다면
-        // 완료 처리하지 않고 false를 반환
-        if (!IsDeliveryCompleted(deliveryData, currentUnixTime)) return false;
-
-        // 배달 데이터의 LetterID를 이용해
-        // 편지 정적 데이터를 조회
-        LetterStaticData letter = staticDataCatalog.GetLetter(deliveryData.LetterID);
-
-        // 같은 LetterID를 이용해
-        // 편지 진행 데이터를 조회
-        LetterProgressData letterProgressData = playerDataManager.GetLetterProgress(deliveryData.LetterID);
-
-        // 편지 정적 데이터 또는 진행 데이터를 찾지 못했다면
-        // 정상적인 완료 처리를 할 수 없으므로 false를 반환
-        if (letter == null || letterProgressData == null) return false;
-
-        // 편지 진행 상태가 Delivering이 아니라면
-        // 현재 완료할 수 있는 편지가 아니므로 false를 반환
-        if(letterProgressData.State != ELetterProgressState.Delivering) return false;
-
-        // 편지의 기본 보상과 현재 완료 시각을 이용해
-        // DeliveryResultData를 생성
-        DeliveryResultData deliveryResult = new DeliveryResultData(deliveryData.LetterID, letter.LetterReward, deliveryData.CompleteAtUnixTime);
-        // 생성한 배달 결과를 PlayerDataManager에 추가한다.
-        // 추가에 실패하면 false를 반환
-        if(!playerDataManager.AddDeliveryResult(deliveryResult))return false;
-
-        // 편지 진행 상태를 Delivering에서 Completed로 변경한다.
-        // 상태 변경에 실패하면 false를 반환
-        if(!letterProgressData.CompleteDelivery()) return false;
-
-        // 완료된 배달을 진행 중 배달 목록에서 제거한다.
-        // 제거에 실패하면 false를 반환
-        if(!playerDataManager.RemoveActiveDelivery(deliveryData)) return false;
-        if (!playerDataManager.IncreaseCompletedDeliveryCount()) return false;
-        GameEvents.RaiseLetterStateChanged(deliveryData.LetterID, ELetterProgressState.Completed);
-        GameEvents.RaiseDeliveryCompleted(deliveryData.LetterID);
-        // 배달 완료 처리가 모두 성공했으므로 true를 반환
-        return true; 
-    }
-    private bool IsDeliveryCompleted(ActiveDeliveryData deliveryData, long currentUnixTime)
-    {
-        // 전달받은 진행 중 배달 데이터가 null이라면
-        // 완료 여부를 판단할 수 없으므로 false를 반환
+        // 진행 중 배달 데이터 확인
         if (deliveryData == null) return false;
 
-        // 현재 Unix 시각이 0 이하라면
-        // 유효하지 않은 시간이므로 false를 반환
+        // 배달 완료 시각 도달 여부 확인
+        if (!IsDeliveryCompleted(deliveryData, currentUnixTime)) return false;
+
+        // 편지 정적 데이터 조회
+        LetterStaticData letter = staticDataCatalog.GetLetter(deliveryData.LetterID);
+
+        // 편지 진행 데이터 조회
+        LetterProgressData letterProgressData = playerDataManager.GetLetterProgress(deliveryData.LetterID);
+
+        // 편지 관련 데이터 확인
+        if (letter == null || letterProgressData == null) return false;
+
+        // 배달 결과 데이터 생성
+        if (letterProgressData.State != ELetterProgressState.Delivering) return false;
+
+        // 배달 결과 목록에 추가
+        DeliveryResultData deliveryResult = new DeliveryResultData(deliveryData.LetterID, letter.LetterReward, deliveryData.CompleteAtUnixTime);
+        // 배달 결과 목록에 추가
+        if (!playerDataManager.AddDeliveryResult(deliveryResult))return false;
+
+        // 편지 상태를 Completed로 변경
+        if (!letterProgressData.CompleteDelivery()) return false;
+
+        // 진행 중 배달 목록에서 제거
+        if (!playerDataManager.RemoveActiveDelivery(deliveryData)) return false;
+        // 누적 완료 배달 수 증가
+        if (!playerDataManager.IncreaseCompletedDeliveryCount()) return false;
+        // 편지 상태 변경 알림
+        GameEvents.RaiseLetterStateChanged(deliveryData.LetterID, ELetterProgressState.Completed);
+        // 배달 완료 알림
+        GameEvents.RaiseDeliveryCompleted(deliveryData.LetterID);
+        progressionService.EvaluateProgressUnlocks();
+
+        // 배달 완료 처리 성공
+        return true; 
+    }
+
+    /// <summary>
+    /// 현재 시각이 배달 완료 예정 시각에 도달했는지 확인함
+    /// </summary>
+    private bool IsDeliveryCompleted(ActiveDeliveryData deliveryData, long currentUnixTime)
+    {
+        // 진행 중 배달 데이터 확인
+        if (deliveryData == null) return false;
+
+        // 현재 Unix 시각 확인
         if (currentUnixTime <= 0) return false;
 
-        // 배달 완료 예정 시각이 0 이하라면
-        // 정상적인 배달 데이터가 아니므로 false를 반환
+        // 배달 완료 예정 시각 확인
         if (deliveryData.CompleteAtUnixTime <= 0) return false;
 
-        // 현재 시각이 배달 완료 예정 시각과 같거나 지났는지
-        // 비교한 결과를 반환
+        // 현재 시각과 완료 예정 시각 비교
         return currentUnixTime >= deliveryData.CompleteAtUnixTime;
     }
+
+    /// <summary>
+    /// 진행 중 배달 목록에서 완료된 배달을 찾아 처리함
+    /// </summary>
     public void ProcessCompletedDeliveries()
     {
-        // PlayerDataManager가 연결되지 않았다면
-        // 진행 중인 배달을 조회할 수 없으므로 종료
+        // 플레이어 데이터 연결 여부 확인
         if (playerDataManager == null) return;
-        // PlayerDataManager에서 현재 진행 중인 배달 목록을 가져옴
+        // 현재 진행 중 배달 목록 조회
         IReadOnlyList<ActiveDeliveryData> activeDeliveryDatas = playerDataManager.GetActiveDeliveries();
 
-        // 진행 중인 배달 목록이 null이거나 비어 있다면
-        // 완료 처리할 배달이 없으므로 종료.
+        // 완료 검사 대상 존재 여부 확인
         if (activeDeliveryDatas == null || activeDeliveryDatas.Count == 0) return;
 
-        // 여러 배달을 같은 기준 시각으로 검사할 수 있도록
-        // 현재 UTC Unix 시각을 한 번만 가져옴
+        // 모든 배달에 사용할 현재 시각 조회
         long currentUnixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        // 완료된 배달을 처리하면서 목록에서 제거하므로
-        // 목록의 마지막 항목부터 첫 번째 항목까지 역순으로 순회
-        for(int i = activeDeliveryDatas.Count - 1; i >= 0; i--)
+        // 목록 제거에 대비한 역순 순회
+        for (int i = activeDeliveryDatas.Count - 1; i >= 0; i--)
         {
+            // 현재 검사할 배달 데이터 조회
             ActiveDeliveryData deliveryData = activeDeliveryDatas[i];
-
+            // null 데이터 건너뜀
             if (deliveryData == null) continue;
+            // 완료 시각에 도달한 배달 처리
             if (currentUnixTime >= deliveryData.CompleteAtUnixTime)
             {
                 CompleteDelivery(deliveryData, currentUnixTime);
             }
         }
     }
-
+    /// <summary>
+    /// 배달 결과를 확인하고 보상과 답장을 지급함
+    /// </summary>
     public bool CheckDeliveryResult(int letterID)
     {
-        // PlayerDataManager가 연결되지 않았다면
-        // 결과 확인과 보상 지급을 할 수 없으므로 false를 반환
+        // 플레이어 데이터 연결 여부 확인
         if (playerDataManager == null) return false;
 
-        // letterID에 해당하는 배달 결과를 조회
+        // 편지 ID에 해당하는 배달 결과 조회
         DeliveryResultData deliveryResult = playerDataManager.GetDeliveryResult(letterID);
 
-        // 배달 결과가 없다면 false를 반환한다.
+        // 배달 결과 존재 여부 확인
         if (deliveryResult == null) return false;
 
-        // 이미 확인한 결과라면
-        // 보상 중복 지급을 막기 위해 false를 반환
+        // 이미 확인한 결과의 중복 처리 차단
         if (deliveryResult.IsChecked) return false;
 
-        // 결과에 저장된 RewardAmount를 플레이어 재화에 추가
-        // 재화 추가에 실패하면 false를 반환
+        // 연결된 답장 등록
         if (!RegisterReceivedReply(letterID)) return false;
+        // 배달 보상 재화 지급
         if (!playerDataManager.AddCurrency(deliveryResult.RewardAmount)) return false;
 
-        // 배달 결과를 확인한 상태로 변경
-        // 상태 변경에 실패하면 false를 반환
-        if(!deliveryResult.MarkAsChecked()) return false;
+        // 배달 결과를 확인 상태로 변경
+        if (!deliveryResult.MarkAsChecked()) return false;
 
+        // 배달 결과 확인 알림
         GameEvents.RaiseDeliveryResultChecked(letterID);
-        // 보상 지급과 확인 처리가 완료됐으므로 true를 반환
+        // 결과 확인과 보상 지급 성공
         return true;
     }
-
+    /// <summary>
+    /// 완료한 편지에 연결된 답장을 수신 목록에 등록함
+    /// </summary>
     private bool RegisterReceivedReply(int letterID)
     {
-        // PlayerDataManager 또는 StaticDataCatalog가 연결되지 않았다면
-        // 답장을 등록할 수 없으므로 false를 반환
-        if(playerDataManager == null || staticDataCatalog == null) return false;
-        // letterID에 연결된 ReplyStaticData를 조회
+        // 필수 의존성 확인
+        if (playerDataManager == null || staticDataCatalog == null) return false;
+        // 편지 ID에 연결된 답장 조회
         ReplyStaticData reply = staticDataCatalog.GetReplyByLetterID(letterID);
-        // 연결된 답장이 없다면 등록할 수 없으므로 false를 반환
+        // 연결된 답장 존재 여부 확인
         if (reply == null) return false;
-        // 조회한 답장의 ReplyID를
-        // PlayerDataManager.AddReceivedReply()에 전달
+        // 답장 수신 목록에 등록
         return playerDataManager.AddReceivedReply(reply.ReplyID);
 
     }
+    /// <summary>
+    /// 시설의 배달 시간 감소 효과를 기본 배달 시간에 적용함
+    /// </summary>
+    private float ApplyFacilityDeliveryTimeReduction(float baseDeliveryDuration)
+    {
+        // 기본 배달 시간이 0 이하이면 0 반환
+        if(baseDeliveryDuration <= 0) return 0;
+        // FacilityService 연결 여부 확인
+        if (facilityService == null) return baseDeliveryDuration;
+
+        // 모든 시설의 배달 시간 감소 효과값 조회
+        float facilityTimeReduction = facilityService.GetTotalFacilityEffectValue(EFacilityEffectType.DeliveryTimeReduction);
+        // 감소 효과가 0 이하이면 기본 배달 시간 반환
+        if (facilityTimeReduction <= 0) return baseDeliveryDuration;
+
+        // 감소율을 0부터 1 사이로 제한
+        facilityTimeReduction = Mathf.Clamp01(facilityTimeReduction);
+
+        // 기본 배달 시간에 감소율 적용
+        float finalDeliveryDuration = baseDeliveryDuration * (1f - facilityTimeReduction);
+
+        // 최종 배달 시간이 1초 미만이면 1초로 보정
+        if (finalDeliveryDuration <= 1) return 1;
+
+        // 최종 배달 시간 반환
+        return finalDeliveryDuration;
+    }
+
 }
