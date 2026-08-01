@@ -46,6 +46,20 @@ public class PlayerSaveData : ScriptableObject
         currency += amount;
         return true;
     }
+    /// <summary>
+    /// 지정한 금액만큼 플레이어의 재화를 차감함
+    /// </summary>
+    public bool SpendCurrency(int amount)
+    {
+        // 차감 금액이 음수이면 실패 처리
+        if (amount < 0) return false;
+        // 현재 재화가 차감 금액보다 적으면 실패 처리
+        if (currency < amount) return false;
+        // 현재 재화에서 금액 차감
+        currency -= amount;
+        // 차감 성공 반환
+        return true;
+    }
     public void IncreaseCompletedDeliveryCount()
     {
         completedDeliveryCount++;

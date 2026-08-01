@@ -9,17 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e406a660ff1b824698c6e588d967515, type: 3}
-  m_Name: Courier_2003
-  m_EditorClassIdentifier: Assembly-CSharp::CourierStaticData
-  courierID: 2003
-  courierName: "\uC18C\uB77C"
-  transportation: 4
-  speed: 0.9
-  trait:
-    traitType: 4
-    timeReductionRate: 0.2
-  courierImage: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: da2ac3f27b23e9d439b6546a34a11f1f, type: 3}
+  m_Name: Route_3000 1
+  m_EditorClassIdentifier: Assembly-CSharp::RouteStaticData
+  routeID: 2999
+  routeName: "\uC624\uB798\uB41C \uACE8\uBAA9\uAE38"
+  regionType: 1
+  baseDeliveryTimeSeconds: 3
+  difficulty: 1
   unlockCondition:
     unlockedByDefault: 0
     requiredCompletedDeliveryCount: 2
