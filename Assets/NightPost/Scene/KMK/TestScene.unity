@@ -426,9 +426,11 @@ GameObject:
   - component: {fileID: 611496138}
   - component: {fileID: 611496134}
   - component: {fileID: 611496132}
+  - component: {fileID: 611496141}
   - component: {fileID: 611496133}
   - component: {fileID: 611496136}
   - component: {fileID: 611496137}
+  - component: {fileID: 611496140}
   m_Layer: 0
   m_Name: GameFlowManager
   m_TagString: Untagged
@@ -468,11 +470,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ebf5cd5bb7cb65f4fac8fa83d85953c8, type: 2}
   - {fileID: 11400000, guid: 1f243b1eb21921143884e98330570706, type: 2}
   - {fileID: 11400000, guid: 8176f8e9abb44814db640d9fe2cb235b, type: 2}
+  - {fileID: 11400000, guid: 3310ad73cc231d243857ea77f7d1c533, type: 2}
   routeStaticDatas:
   - {fileID: 11400000, guid: 2855a13963807cf459818f29c5b20f3e, type: 2}
   - {fileID: 11400000, guid: 244be57b077bae447b970502b9f51b1a, type: 2}
   - {fileID: 11400000, guid: 2b3879045d0bc3b479bd608f47e9a24d, type: 2}
   - {fileID: 11400000, guid: f23c0f72a6e52724d8cfdc51fbe27da9, type: 2}
+  - {fileID: 11400000, guid: 8eb4a6cfbfa338c4a83ef4a18074b2d9, type: 2}
   facilityStaticDatas:
   - {fileID: 11400000, guid: 44f9122188a0d3e4e9b6c00f6dbd60cf, type: 2}
   - {fileID: 11400000, guid: ae12f5a37209f3342b9ba91093ed6c93, type: 2}
@@ -517,6 +521,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5259e4e44bcf3064c977603fc9bdc2a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LetterService
+  baseLetterCapacity: 5
 --- !u!4 &611496135
 Transform:
   m_ObjectHideFlags: 0
@@ -587,8 +592,34 @@ MonoBehaviour:
   letterService: {fileID: 611496134}
   deliveryService: {fileID: 611496133}
   replyService: {fileID: 611496136}
+  progressionService: {fileID: 611496140}
+  facilityService: {fileID: 611496141}
   gameFlowController: {fileID: 611496138}
   offlineProgressService: {fileID: 611496137}
+--- !u!114 &611496140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611496131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01a5294e1749d354aa5e7f0f64079dfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionService
+--- !u!114 &611496141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 611496131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ad19e0ffaf2964c8121744f914bd31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FacilityService
 --- !u!1 &627146911
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,8 +630,13 @@ GameObject:
   m_Component:
   - component: {fileID: 627146915}
   - component: {fileID: 627146917}
+  - component: {fileID: 627146921}
+  - component: {fileID: 627146924}
   - component: {fileID: 627146918}
   - component: {fileID: 627146920}
+  - component: {fileID: 627146925}
+  - component: {fileID: 627146923}
+  - component: {fileID: 627146922}
   - component: {fileID: 627146919}
   m_Layer: 0
   m_Name: Tester
@@ -654,6 +690,7 @@ MonoBehaviour:
   letterService: {fileID: 611496134}
   deliveryService: {fileID: 611496133}
   replyService: {fileID: 611496136}
+  progressionService: {fileID: 611496140}
   playerDataManager: {fileID: 1684119126}
   staticDataCatalog: {fileID: 611496132}
   firstLetterID: 1001
@@ -663,6 +700,8 @@ MonoBehaviour:
   secondCourierID: 2002
   secondRouteID: 3001
   completionCheckInterval: 0.25
+  unlockTestCourierID: 1999
+  unlockTestRouteID: 2999
   timeoutSeconds: 30
 --- !u!114 &627146919
 MonoBehaviour:
@@ -693,6 +732,96 @@ MonoBehaviour:
   playerDataManager: {fileID: 1684119126}
   staticDataCatalog: {fileID: 611496132}
   replyID: 5001
+--- !u!114 &627146921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ff41bf688036a245abfdabb0bffbdec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FacilitySystemTester
+  gameBootstrap: {fileID: 611496139}
+  facilityService: {fileID: 611496141}
+  letterService: {fileID: 611496134}
+  deliveryService: {fileID: 611496133}
+  playerDataManager: {fileID: 1684119126}
+  staticDataCatalog: {fileID: 611496132}
+  facilityID: 4002
+  letterID: 1001
+  courierID: 2001
+  routeID: 3001
+--- !u!114 &627146922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93d3dfb72cced847bcef82828f7e8fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameFlowFacilityTester
+  gameBootstrap: {fileID: 611496139}
+  gameFlowController: {fileID: 611496138}
+  facilityService: {fileID: 611496141}
+  playerDataManager: {fileID: 1684119126}
+  facilityID: 4002
+--- !u!114 &627146923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4389caf5d7d497140a3d76c5e77662be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SortingSystemTester
+  gameBootstrap: {fileID: 611496139}
+  staticDataCatalog: {fileID: 611496132}
+  playerDataManager: {fileID: 1684119126}
+  letterService: {fileID: 611496134}
+  gameFlowController: {fileID: 611496138}
+  testLetterID: 1
+--- !u!114 &627146924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 235a04e7ac990024bbd692e66344b6ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LetterCapacityTester
+  gameBootstrap: {fileID: 611496139}
+  staticDataCatalog: {fileID: 611496132}
+  playerDataManager: {fileID: 1684119126}
+  letterService: {fileID: 611496134}
+--- !u!114 &627146925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6bf66cb50a06324b9f6c0859d1a7108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ManualRouteUnlockTester
+  gameBootstrap: {fileID: 611496139}
+  staticDataCatalog: {fileID: 611496132}
+  playerDataManager: {fileID: 1684119126}
+  progressionService: {fileID: 611496140}
+  gameFlowController: {fileID: 611496138}
 --- !u!1 &864554574
 GameObject:
   m_ObjectHideFlags: 0

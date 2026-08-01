@@ -85,22 +85,50 @@ public class ProgressionService : MonoBehaviour
             // 해금 조건을 충족한 배달부를 플레이어의 보유 목록에 추가함
             playerDataManager.AddOwnedCourier(courierStaticData.CourierID);
         }
-
-        // 등록된 전체 노선 정적 데이터를 순회함
-        foreach (RouteStaticData routeStaticData in staticDataCatalog.Routes())
-        {
-            // 유효하지 않은 노선 데이터는 건너뜀
-            if (routeStaticData == null) continue;
-            // 해금 조건이 없는 노선은 건너뜀
-            if (routeStaticData.UnlockCondition == null) continue;
-            // 기본 해금 대상은 진행도 해금 검사에서 제외함
-            if (routeStaticData.UnlockCondition.IsUnlockedByDefault) continue;
-            // 이미 해금된 노선은 중복 추가하지 않음
-            if (playerDataManager.IsRouteUnlocked(routeStaticData.RouteID)) continue;
-            // 완료한 배달 횟수가 요구 조건보다 적다면 해금하지 않음
-            if (completedDeliveryCount < routeStaticData.UnlockCondition.RequiredCompletedDeliveryCount) continue;
-            // 해금 조건을 충족한 노선을 플레이어의 해금 목록에 추가함
-            playerDataManager.AddUnlockedRoute(routeStaticData.RouteID);
-        }
     }
+
+    /// <summary>
+    /// 지정한 노선이 플레이어의 진행 조건을 충족해 수동 해금 가능한지 확인함
+    /// </summary>
+    public bool CanUnlockRoute(int routeID)
+    {
+        // 정적 데이터 카탈로그 또는 플레이어 데이터 매니저가 등록되지 않았다면 해금할 수 없음
+        if (staticDataCatalog == null || playerDataManager == null) return false;
+        // 유효하지 않은 노선 ID라면 해금할 수 없음
+        if(routeID <= 0) return false;
+
+        // 지정한 ID의 노선 정적 데이터를 조회함
+        RouteStaticData routeStaticData = staticDataCatalog.GetRoute(routeID);
+
+        // 해당하는 노선 데이터가 없다면 해금할 수 없음
+        if(routeStaticData == null) return false;
+
+        // 노선의 해금 조건이 없다면 해금할 수 없음
+        if(routeStaticData.UnlockCondition == null) return false;
+
+        // 기본 해금 노선은 수동 해금 대상이 아니므로 해금할 수 없음
+        if(routeStaticData.UnlockCondition.IsUnlockedByDefault) return false;
+
+        // 이미 해금된 노선이라면 다시 해금할 수 없음
+        if(playerDataManager.IsRouteUnlocked(routeID)) return false;
+
+        // 현재까지 완료한 배달 횟수를 조회함
+        int completedDeliveryCount = playerDataManager.GetCompletedDeliveryCount();
+
+        // 완료한 배달 횟수가 노선의 요구 조건 이상인지 반환함
+        return completedDeliveryCount >= routeStaticData.UnlockCondition.RequiredCompletedDeliveryCount;
+    }
+    /// <summary>
+    /// 진행 조건을 충족한 잠긴 노선을 플레이어의 해금 목록에 추가함
+    /// </summary>
+    public bool UnlockRoute(int routeID)
+    {
+        // 지정한 노선이 현재 수동 해금 가능한 상태가 아니라면 해금하지 않음
+        if(!CanUnlockRoute(routeID)) return false;
+        // 플레이어 데이터 매니저에 지정한 노선의 해금을 요청함
+        // 노선 해금 처리 결과를 반환함
+        return playerDataManager.AddUnlockedRoute(routeID);
+    }
+
+
 }

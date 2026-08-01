@@ -14,21 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FacilityStaticData
   facilityID: 4002
   facilityName: "\uBC30\uB2EC \uCC28\uACE0"
-  description: "\uC0C8\uB85C\uC6B4 \uC774\uB3D9 \uC218\uB2E8\uC744 \uC0AC\uC6A9\uD560
-    \uC218 \uC788\uAC8C \uD569\uB2C8\uB2E4."
+  description: "\uBC30\uB2EC \uC900\uBE44 \uB3D9\uC120\uC744 \uAC1C\uC120\uD574 \uC804\uCCB4
+    \uBC30\uB2EC \uC2DC\uAC04\uC744 \uC904\uC785\uB2C8\uB2E4."
   levelData:
   - level: 1
     upgradeCost: 0
-    effectType: 4
-    effectValue: 0
-    unlockedVehicle: 2
+    effectType: 2
+    effectValue: 0.05
   - level: 2
     upgradeCost: 1000
-    effectType: 4
-    effectValue: 0
-    unlockedVehicle: 3
+    effectType: 2
+    effectValue: 0.1
   - level: 3
     upgradeCost: 3000
-    effectType: 4
-    effectValue: 0
-    unlockedVehicle: 4
+    effectType: 2
+    effectValue: 0.15

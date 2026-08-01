@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace NightPost.UI
@@ -75,8 +75,8 @@ namespace NightPost.UI
             LetterProgressData progress = _playerData != null ? _playerData.GetLetterProgress(letterID) : null;
             if (progress != null && progress.State == ELetterProgressState.New)
             {
-                if (!_flow.CompleteSelectedLetterSorting())
-                    Debug.LogWarning("[DeliveryFlow] 분류 완료 실패");
+/*                if (! _flow.CompleteSelectedLetterSorting())
+                    Debug.LogWarning("[DeliveryFlow] 분류 완료 실패");*/
             }
             OpenAssignment(letterID);
         }

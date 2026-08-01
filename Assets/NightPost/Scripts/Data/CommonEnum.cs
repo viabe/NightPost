@@ -65,7 +65,7 @@ public enum ELetterProgressState
 }
 public enum EFacilityEffectType
 {
-    None,
-    DeliveryTimeReduction,
-    LetterCapacityIncrease
+    None = 0,
+    DeliveryTimeReduction = 2,
+    LetterCapacityIncrease = 3
 }

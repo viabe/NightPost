@@ -105,7 +105,7 @@ public static class StaticDataCSVImporter
             int csvLine = rowIndex + 1;
 
             if (IsEmptyRow(row)) continue;
-            if(row.Count < 10)
+            if (row.Count < 10)
             {
                 LogColumnError(LetterCsvPath, csvLine, 10, row.Count);
                 continue;
@@ -151,12 +151,12 @@ public static class StaticDataCSVImporter
 
         int importedCount = 0;
 
-        for(int rowIndex = 1; rowIndex < rows.Count; rowIndex++)
+        for (int rowIndex = 1; rowIndex < rows.Count; rowIndex++)
         {
             List<string> row = rows[rowIndex];
             int csvLine = rowIndex + 1;
             if (IsEmptyRow(row)) continue;
-            if(row.Count < 9)
+            if (row.Count < 9)
             {
                 LogColumnError(CourierCsvPath, csvLine, 9, row.Count);
                 continue;
@@ -169,7 +169,7 @@ public static class StaticDataCSVImporter
             if (!TryParseBool(row[7], CourierCsvPath, csvLine, "unlockedByDefault", out bool unlockedByDefault)) continue;
             if (!TryParseInt(row[8], CourierCsvPath, csvLine, "requiredCompletedDeliveryCount", out int requiredCompletedDeliveryCount)) continue;
 
-            CourierStaticData asset = GetOrCreateAsset<CourierStaticData>( CourierOutputFolder, $"Courier_{courierID}.asset");
+            CourierStaticData asset = GetOrCreateAsset<CourierStaticData>(CourierOutputFolder, $"Courier_{courierID}.asset");
 
             SerializedObject serializedObject = new SerializedObject(asset);
             serializedObject.Update();
@@ -181,7 +181,7 @@ public static class StaticDataCSVImporter
             SerializedProperty traitProperty = serializedObject.FindProperty("trait");
             if (traitProperty == null)
             {
-                Debug.LogError( $"[StaticDataCsvImporter] " +$"CourierStaticData의 trait 필드를 찾을 수 없습니다. " +$"CSV {csvLine}행");
+                Debug.LogError($"[StaticDataCsvImporter] " + $"CourierStaticData의 trait 필드를 찾을 수 없습니다. " + $"CSV {csvLine}행");
                 continue;
             }
             traitProperty.FindPropertyRelative("traitType").intValue = (int)traitType;
@@ -209,24 +209,24 @@ public static class StaticDataCSVImporter
 
         int importedCount = 0;
 
-        for(int rowIndex = 1; rowIndex < rows.Count; rowIndex++)
+        for (int rowIndex = 1; rowIndex < rows.Count; rowIndex++)
         {
             List<string> row = rows[rowIndex];
             int csvLine = rowIndex + 1;
             if (IsEmptyRow(row)) continue;
-            if(row.Count < 7)
+            if (row.Count < 7)
             {
-                LogColumnError(RouteCsvPath,csvLine,7,row.Count);
+                LogColumnError(RouteCsvPath, csvLine, 7, row.Count);
                 continue;
             }
-            if (!TryParseInt(row[0], RouteCsvPath, csvLine,"routeID",out int routeID)) continue;
+            if (!TryParseInt(row[0], RouteCsvPath, csvLine, "routeID", out int routeID)) continue;
             if (!TryParseEnum(row[2], RouteCsvPath, csvLine, "regionType", out ERegionType regionType)) continue;
             if (!TryParseFloat(row[3], RouteCsvPath, csvLine, "baseDeliveryTimeSeconds", out float baseDeliveryTimeSeconds)) continue;
             if (!TryParseEnum(row[4], RouteCsvPath, csvLine, "difficulty", out ERouteDifficulty difficulty)) continue;
             if (!TryParseBool(row[5], RouteCsvPath, csvLine, "unlockedByDefault", out bool unlockedByDefault)) continue;
             if (!TryParseInt(row[6], RouteCsvPath, csvLine, "requiredCompletedDeliveryCount", out int requiredCompletedDeliveryCount)) continue;
 
-            RouteStaticData asset = GetOrCreateAsset<RouteStaticData>( RouteOutputFolder,$"Route_{routeID}.asset");
+            RouteStaticData asset = GetOrCreateAsset<RouteStaticData>(RouteOutputFolder, $"Route_{routeID}.asset");
 
             SerializedObject serializedObject = new SerializedObject(asset);
 
@@ -240,7 +240,7 @@ public static class StaticDataCSVImporter
 
             serializedObject.FindProperty("difficulty").intValue = (int)difficulty;
 
-            ApplyUnlockCondition(serializedObject.FindProperty("unlockCondition"),unlockedByDefault,requiredCompletedDeliveryCount);
+            ApplyUnlockCondition(serializedObject.FindProperty("unlockCondition"), unlockedByDefault, requiredCompletedDeliveryCount);
 
             ApplySerializedObject(serializedObject, asset);
 
@@ -288,7 +288,7 @@ public static class StaticDataCSVImporter
             serializedObject.FindProperty("replyBody").stringValue = DecodeNewLines(row[4]);
             serializedObject.FindProperty("replyImage").objectReferenceValue = LoadSprite(row[5]);
 
-            ApplySerializedObject(serializedObject,asset);
+            ApplySerializedObject(serializedObject, asset);
 
             importedCount++;
         }
@@ -301,21 +301,21 @@ public static class StaticDataCSVImporter
     {
         List<List<string>> rows = ReadCSV(FacilityCsvPath);
 
-        if (rows == null)return 0;
+        if (rows == null) return 0;
 
         EnsureAssetFolder(FacilityOutputFolder);
 
         Dictionary<int, FacilityImportData> facilityGroups = new Dictionary<int, FacilityImportData>();
 
-        for(int rowIndex = 1; rowIndex < rows.Count; rowIndex++)
+        for (int rowIndex = 1; rowIndex < rows.Count; rowIndex++)
         {
             List<string> row = rows[rowIndex];
             int csvLine = rowIndex + 1;
 
             if (IsEmptyRow(row)) continue;
-            if(row.Count < 8)
+            if (row.Count < 7)
             {
-                LogColumnError(FacilityCsvPath, csvLine, 8, row.Count);
+                LogColumnError(FacilityCsvPath, csvLine, 7, row.Count);
                 continue;
             }
 
@@ -324,7 +324,6 @@ public static class StaticDataCSVImporter
             if (!TryParseInt(row[4], FacilityCsvPath, csvLine, "upgradeCost", out int upgradeCost)) continue;
             if (!TryParseEnum(row[5], FacilityCsvPath, csvLine, "effectType", out EFacilityEffectType effectType)) continue;
             if (!TryParseFloat(row[6], FacilityCsvPath, csvLine, "effectValue", out float effectValue)) continue;
-            if (!TryParseEnum(row[7], FacilityCsvPath, csvLine, "unlockedVehicle", out EVehicleType unlockedVehicle)) continue;
 
             if (!facilityGroups.TryGetValue(facilityID, out FacilityImportData facilityData))
             {
@@ -356,17 +355,16 @@ public static class StaticDataCSVImporter
                     Level = level,
                     UpgradeCost = upgradeCost,
                     EffectType = effectType,
-                    EffectValue = effectValue,
-                    UnlockedVehicle = unlockedVehicle
+                    EffectValue = effectValue
                 });
         }
 
         int importedCount = 0;
-        foreach(FacilityImportData facilityImportData in facilityGroups.Values)
+        foreach (FacilityImportData facilityImportData in facilityGroups.Values)
         {
             facilityImportData.Levels.Sort((left, right) => left.Level.CompareTo(right.Level));
 
-            FacilityStaticData asset = GetOrCreateAsset<FacilityStaticData>(FacilityOutputFolder,$"Facility_{facilityImportData.FacilityID}.asset");
+            FacilityStaticData asset = GetOrCreateAsset<FacilityStaticData>(FacilityOutputFolder, $"Facility_{facilityImportData.FacilityID}.asset");
 
             SerializedObject serializedObject = new SerializedObject(asset);
 
@@ -380,7 +378,7 @@ public static class StaticDataCSVImporter
 
             levelDataProperty.arraySize = facilityImportData.Levels.Count;
 
-            for(int index = 0; index < facilityImportData.Levels.Count; index++)
+            for (int index = 0; index < facilityImportData.Levels.Count; index++)
             {
                 FacilityLevelImportData level = facilityImportData.Levels[index];
                 SerializedProperty levelProperty = levelDataProperty.GetArrayElementAtIndex(index);
@@ -388,12 +386,11 @@ public static class StaticDataCSVImporter
                 levelProperty.FindPropertyRelative("upgradeCost").intValue = level.UpgradeCost;
                 levelProperty.FindPropertyRelative("effectType").intValue = (int)level.EffectType;
                 levelProperty.FindPropertyRelative("effectValue").floatValue = level.EffectValue;
-                levelProperty.FindPropertyRelative("unlockedVehicle").intValue = (int)level.UnlockedVehicle;
             }
             ApplySerializedObject(serializedObject, asset);
             importedCount++;
         }
-        
+
         return importedCount;
     }
     #endregion
@@ -420,7 +417,7 @@ public static class StaticDataCSVImporter
     {
         if (!File.Exists(csvPath))
         {
-            Debug.LogError( $"[StaticDataCsvImporter]" + $"CSV 파일을 찾을 수 없습니다: {csvPath}");
+            Debug.LogError($"[StaticDataCsvImporter]" + $"CSV 파일을 찾을 수 없습니다: {csvPath}");
 
             return null;
         }
@@ -431,23 +428,23 @@ public static class StaticDataCSVImporter
         }
         catch (Exception e)
         {
-            Debug.LogError( $"[StaticDataCsvImporter] " + $"CSV 읽기 실패: {csvPath}\n" + e);
+            Debug.LogError($"[StaticDataCsvImporter] " + $"CSV 읽기 실패: {csvPath}\n" + e);
 
             return null;
         }
     }
 
-    private static List<List<string>> ParseCsv(string csvText,string csvPath)
+    private static List<List<string>> ParseCsv(string csvText, string csvPath)
     {
-        List<List<string>> rows =new List<List<string>>();
+        List<List<string>> rows = new List<List<string>>();
 
-        List<string> currentRow =new List<string>();
+        List<string> currentRow = new List<string>();
 
-        StringBuilder currentValue =new StringBuilder();
+        StringBuilder currentValue = new StringBuilder();
 
         bool insideQuotes = false;
 
-        for(int index = 0; index < csvText.Length; index++)
+        for (int index = 0; index < csvText.Length; index++)
         {
             char currentCharacter = csvText[index];
             if (currentCharacter == '"')
@@ -462,7 +459,7 @@ public static class StaticDataCSVImporter
                 continue;
             }
 
-            if(currentCharacter == ',' && !insideQuotes)
+            if (currentCharacter == ',' && !insideQuotes)
             {
                 currentRow.Add(currentValue.ToString());
                 currentValue.Clear();
@@ -470,7 +467,7 @@ public static class StaticDataCSVImporter
             }
 
             bool isLineBreak = currentCharacter == '\n' || currentCharacter == '\r';
-            if(isLineBreak && !insideQuotes)
+            if (isLineBreak && !insideQuotes)
             {
                 if (currentCharacter == '\r' && index + 1 < csvText.Length && csvText[index + 1] == '\n')
                 {
@@ -492,16 +489,16 @@ public static class StaticDataCSVImporter
 
         if (insideQuotes)
         {
-            Debug.LogError( $"[StaticDataCsvImporter] " + $"닫히지 않은 큰따옴표가 있습니다: {csvPath}");
+            Debug.LogError($"[StaticDataCsvImporter] " + $"닫히지 않은 큰따옴표가 있습니다: {csvPath}");
             return null;
         }
 
-        if(currentValue.Length > 0 || currentRow.Count > 0)
+        if (currentValue.Length > 0 || currentRow.Count > 0)
         {
-            currentRow.Add(currentValue.ToString() );
+            currentRow.Add(currentValue.ToString());
             rows.Add(currentRow);
         }
-        if (rows.Count > 0&& rows[0].Count > 0)
+        if (rows.Count > 0 && rows[0].Count > 0)
         {
             rows[0][0] = rows[0][0].TrimStart('\uFEFF');
         }
@@ -510,32 +507,32 @@ public static class StaticDataCSVImporter
     }
     #endregion
     #region 타입 변환
-    private static bool TryParseInt( string value, string csvPath, int csvLine,string columnName,out int result)
+    private static bool TryParseInt(string value, string csvPath, int csvLine, string columnName, out int result)
     {
-        if(int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out result)) return true;
-        Debug.LogError($"[StaticDataCsvImporter] " + $"{csvPath} {csvLine}행의 " + $"{columnName} 값을 int로 변환할 수 없습니다: " +$"'{value}'");
+        if (int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out result)) return true;
+        Debug.LogError($"[StaticDataCsvImporter] " + $"{csvPath} {csvLine}행의 " + $"{columnName} 값을 int로 변환할 수 없습니다: " + $"'{value}'");
 
         return false;
     }
-    private static bool TryParseFloat( string value, string csvPath, int csvLine, string columnName, out float result)
+    private static bool TryParseFloat(string value, string csvPath, int csvLine, string columnName, out float result)
     {
         if (float.TryParse(value.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out result)) return true;
 
-        Debug.LogError( $"[StaticDataCsvImporter] " +  $"{csvPath} {csvLine}행의 " +  $"{columnName} 값을 float로 변환할 수 없습니다: " + $"'{value}'");
+        Debug.LogError($"[StaticDataCsvImporter] " + $"{csvPath} {csvLine}행의 " + $"{columnName} 값을 float로 변환할 수 없습니다: " + $"'{value}'");
 
         return false;
     }
-    private static bool TryParseBool( string value, string csvPath, int csvLine, string columnName,out bool result)
+    private static bool TryParseBool(string value, string csvPath, int csvLine, string columnName, out bool result)
     {
         if (bool.TryParse(value.Trim(), out result)) return true;
 
-        Debug.LogError($"[StaticDataCsvImporter] " +$"{csvPath} {csvLine}행의 " +$"{columnName} 값을 bool로 변환할 수 없습니다: " +$"'{value}'");
+        Debug.LogError($"[StaticDataCsvImporter] " + $"{csvPath} {csvLine}행의 " + $"{columnName} 값을 bool로 변환할 수 없습니다: " + $"'{value}'");
 
         return false;
     }
     private static bool TryParseEnum<TEnum>(string value, string csvPath, int csvLine, string columnName, out TEnum result) where TEnum : struct, Enum
     {
-        if (Enum.TryParse(value.Trim(),true, out result)) return true;
+        if (Enum.TryParse(value.Trim(), true, out result)) return true;
 
         Debug.LogError($"[StaticDataCsvImporter] " + $"{csvPath} {csvLine}행의 " + $"{columnName} 값을 " + $"{typeof(TEnum).Name}으로 변환할 수 없습니다: " + $"'{value}'");
 
@@ -545,17 +542,17 @@ public static class StaticDataCSVImporter
     #region SerializedObject 공통 처리
     private static void ApplyUnlockCondition(SerializedProperty unlockProperty, bool unlockedByDefault, int requiredCompletedDeliveryCount)
     {
-        if(unlockProperty == null)
+        if (unlockProperty == null)
         {
-            Debug.LogError("[StaticDataCsvImporter] " +"unlockCondition 필드를 찾을 수 없습니다.");
+            Debug.LogError("[StaticDataCsvImporter] " + "unlockCondition 필드를 찾을 수 없습니다.");
             return;
         }
 
         unlockProperty.FindPropertyRelative("unlockedByDefault").boolValue = unlockedByDefault;
         unlockProperty.FindPropertyRelative("requiredCompletedDeliveryCount").intValue = requiredCompletedDeliveryCount;
     }
-    
-    private static void ApplySerializedObject(SerializedObject serializedObject,UnityEngine.Object asset)
+
+    private static void ApplySerializedObject(SerializedObject serializedObject, UnityEngine.Object asset)
     {
         // SerializedProperty의 변경사항을 실제 SO에 적용
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
@@ -570,16 +567,16 @@ public static class StaticDataCSVImporter
 
         string[] folderNames = folderPath.Split('/');
 
-        if(folderNames.Length == 0 || folderNames[0] != "Assets")
+        if (folderNames.Length == 0 || folderNames[0] != "Assets")
         {
             throw new ArgumentException($"Unity Asset 경로가 아닙니다: {folderPath}");
         }
 
         string currentPath = "Assets";
-        for(int index = 1; index < folderNames.Length; index++)
+        for (int index = 1; index < folderNames.Length; index++)
         {
             string nextPath = $"{currentPath}/{folderNames[index]}";
-            if(!AssetDatabase.IsValidFolder(nextPath))
+            if (!AssetDatabase.IsValidFolder(nextPath))
             {
                 AssetDatabase.CreateFolder(currentPath, folderNames[index]);
             }
@@ -589,11 +586,11 @@ public static class StaticDataCSVImporter
 
     private static Sprite LoadSprite(string assetPath)
     {
-        if(string.IsNullOrWhiteSpace(assetPath)) return null;
+        if (string.IsNullOrWhiteSpace(assetPath)) return null;
         Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath.Trim());
-        if(sprite == null)
+        if (sprite == null)
         {
-            Debug.LogWarning( $"[StaticDataCsvImporter] " +$"Sprite를 찾을 수 없습니다: {assetPath}");
+            Debug.LogWarning($"[StaticDataCsvImporter] " + $"Sprite를 찾을 수 없습니다: {assetPath}");
         }
         return sprite;
     }
@@ -602,7 +599,7 @@ public static class StaticDataCSVImporter
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log( $"[StaticDataCsvImporter] {message}");
+        Debug.Log($"[StaticDataCsvImporter] {message}");
     }
     #endregion
     #region 기타 공통 함수
@@ -611,7 +608,7 @@ public static class StaticDataCSVImporter
         if (row == null || row.Count == 0) return true;
         foreach (string value in row)
         {
-            if(!string.IsNullOrWhiteSpace (value)) return false;
+            if (!string.IsNullOrWhiteSpace(value)) return false;
         }
         return true;
     }
@@ -620,9 +617,9 @@ public static class StaticDataCSVImporter
         if (string.IsNullOrEmpty(value)) return string.Empty;
         return value.Replace("\\r\\n", "\n").Replace("\\n", "\n");
     }
-    private static void LogColumnError(string csvPath,int csvLine,int requiredColumnCount,int currentColumnCount)
+    private static void LogColumnError(string csvPath, int csvLine, int requiredColumnCount, int currentColumnCount)
     {
-        Debug.LogError($"[StaticDataCsvImporter] " +$"{csvPath} {csvLine}행의 컬럼이 부족합니다. " +$"필요: {requiredColumnCount}, " +$"현재: {currentColumnCount}");
+        Debug.LogError($"[StaticDataCsvImporter] " + $"{csvPath} {csvLine}행의 컬럼이 부족합니다. " + $"필요: {requiredColumnCount}, " + $"현재: {currentColumnCount}");
     }
     private static bool ContainsFacilityLevel(List<FacilityLevelImportData> levels, int level)
     {
@@ -651,7 +648,6 @@ public static class StaticDataCSVImporter
         public int UpgradeCost;
         public EFacilityEffectType EffectType;
         public float EffectValue;
-        public EVehicleType UnlockedVehicle;
     }
 
     #endregion

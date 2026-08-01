@@ -1,10 +1,10 @@
-﻿facilityID,facilityName,description,level,upgradeCost,effectType,effectValue,unlockedVehicle
-4001,분류대,편지 분류 효율을 높입니다.,1,0,SortingTimeReduction,0.0,None
-4001,분류대,편지 분류 효율을 높입니다.,2,500,SortingTimeReduction,0.1,None
-4001,분류대,편지 분류 효율을 높입니다.,3,1500,SortingTimeReduction,0.2,None
-4002,배달 차고,새로운 이동 수단을 사용할 수 있게 합니다.,1,0,VehicleUnlock,0.0,Bicycle
-4002,배달 차고,새로운 이동 수단을 사용할 수 있게 합니다.,2,1000,VehicleUnlock,0.0,Motorcycle
-4002,배달 차고,새로운 이동 수단을 사용할 수 있게 합니다.,3,3000,VehicleUnlock,0.0,Truck
-4003,편지 보관함,우체국에 보관할 수 있는 편지 수를 늘립니다.,1,0,LetterCapacityIncrease,5,None
-4003,편지 보관함,우체국에 보관할 수 있는 편지 수를 늘립니다.,2,800,LetterCapacityIncrease,10,None
-4003,편지 보관함,우체국에 보관할 수 있는 편지 수를 늘립니다.,3,2000,LetterCapacityIncrease,15,None
+﻿facilityID,facilityName,description,level,upgradeCost,effectType,effectValue
+4001,분류대,분류 작업 공간을 확장해 대기 편지 처리 한도를 늘립니다.,1,0,LetterCapacityIncrease,1.0
+4001,분류대,분류 작업 공간을 확장해 대기 편지 처리 한도를 늘립니다.,2,500,LetterCapacityIncrease,2.0
+4001,분류대,분류 작업 공간을 확장해 대기 편지 처리 한도를 늘립니다.,3,1500,LetterCapacityIncrease,3.0
+4002,배달 차고,배달 준비 동선을 개선해 전체 배달 시간을 줄입니다.,1,0,DeliveryTimeReduction,0.05
+4002,배달 차고,배달 준비 동선을 개선해 전체 배달 시간을 줄입니다.,2,1000,DeliveryTimeReduction,0.10
+4002,배달 차고,배달 준비 동선을 개선해 전체 배달 시간을 줄입니다.,3,3000,DeliveryTimeReduction,0.15
+4003,편지 보관함,보관 공간을 확장해 우체국의 편지 보유 한도를 늘립니다.,1,0,LetterCapacityIncrease,2.0
+4003,편지 보관함,보관 공간을 확장해 우체국의 편지 보유 한도를 늘립니다.,2,800,LetterCapacityIncrease,4.0
+4003,편지 보관함,보관 공간을 확장해 우체국의 편지 보유 한도를 늘립니다.,3,2000,LetterCapacityIncrease,6.0

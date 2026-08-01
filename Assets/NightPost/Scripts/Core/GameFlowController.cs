@@ -14,6 +14,7 @@ public class GameFlowController : MonoBehaviour
     // 시설 조회 및 업그레이드를 담당하는 서비스임
     private FacilityService facilityService;
     private SortingService sortingService;
+    private ProgressionService progressionService;
 
     // 현재 선택한 편지 ID임
     private int selectedLetterID;
@@ -27,10 +28,11 @@ public class GameFlowController : MonoBehaviour
     /// <summary>
     /// 게임 진행에 필요한 서비스와 데이터 매니저를 등록함
     /// </summary>
-    public bool Initialize(LetterService letter, SortingService sorting, DeliveryService delivery, ReplyService reply, FacilityService facility, PlayerDataManager dataManager)
+    public bool Initialize(LetterService letter, SortingService sorting, DeliveryService delivery, ReplyService reply, FacilityService facility, ProgressionService progression, PlayerDataManager dataManager)
     {
         // 필요한 참조 중 하나라도 없다면 초기화하지 않음
-        if (letter == null || delivery == null || reply == null || facility == null || dataManager == null || sorting == null) return false;
+        if (letter == null || delivery == null || reply == null || facility == null || dataManager == null
+            || sorting == null || progression == null) return false;
 
         // 편지 서비스를 저장함
         letterService = letter;
@@ -42,6 +44,8 @@ public class GameFlowController : MonoBehaviour
         replyService = reply;
         // 시설 서비스를 저장함
         facilityService = facility;
+        // 전달받은 진행도 서비스를 내부 필드에 저장함
+        progressionService = progression;
         // 플레이어 데이터 매니저를 저장함
         playerDataManager = dataManager;
 
@@ -230,5 +234,19 @@ public class GameFlowController : MonoBehaviour
         // 선택한 편지 ID와 지역·긴급도·무게 선택값을 분류 서비스에 전달함
         // 분류 판정 및 상태 변경 결과를 반환함
         return sortingService.SubmitSorting(selectedLetterID, selectedRegion, selectedUrgency, selectedWeight);
+    }
+
+    /// <summary>
+    /// 진행 조건을 충족한 지정 노선의 수동 해금을 요청함
+    /// </summary>
+    public bool UnlockRoute(int routeID)
+    {
+        // 진행도 서비스가 등록되지 않았다면 해금하지 않음
+        if(progressionService == null) return false;
+        // 유효하지 않은 노선 ID라면 해금하지 않음
+        if(routeID <= 0) return false;
+        // 진행도 서비스에 지정한 노선의 수동 해금을 요청함
+        // 노선 해금 처리 결과를 반환함
+        return progressionService.UnlockRoute(routeID);
     }
 }

@@ -85,9 +85,9 @@ public class GameBootstrap : MonoBehaviour
             replyService == null || gameFlowController == null || offlineProgressService == null || progressionService == null ||
             facilityService == null) return false;
 
-        bool isInit = letterService.Initialize(playerDataManager, staticDataCatalog);
+        bool isInit = facilityService.Initialize(staticDataCatalog, playerDataManager);
         if (!isInit) return false;
-        isInit = facilityService.Initialize(staticDataCatalog, playerDataManager);
+        isInit = letterService.Initialize(playerDataManager, staticDataCatalog, facilityService);
         if (!isInit) return false;
         isInit = progressionService.Initialize(staticDataCatalog, playerDataManager);
         if (!isInit) return false;
@@ -98,7 +98,7 @@ public class GameBootstrap : MonoBehaviour
         if (!isInit) return false;
         isInit = replyService.Initialize(playerDataManager, staticDataCatalog);
         if (!isInit) return false;
-        isInit = gameFlowController.Initialize(letterService, sortingService, deliveryService, replyService, facilityService, playerDataManager);
+        isInit = gameFlowController.Initialize(letterService, sortingService, deliveryService, replyService, facilityService, progressionService, playerDataManager);
         if (!isInit) return false;
         isInit = offlineProgressService.Initialize(deliveryService);
         if(!isInit) return false;
