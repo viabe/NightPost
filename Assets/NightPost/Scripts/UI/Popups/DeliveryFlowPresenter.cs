@@ -29,6 +29,7 @@ namespace NightPost.UI
             if (letters == null || letters.Count == 0)
             {
                 Debug.Log("[DeliveryFlow] 배달 가능한 편지가 없습니다. (DebugReceiveCatalogLetters로 시드 가능)");
+                ToastController.Instance?.Show("새로 온 편지가 없어요.");
                 return;
             }
             OpenEnvelope(letters[0].LetterID);
@@ -64,7 +65,12 @@ namespace NightPost.UI
         private void OnAssignRequested(int letterID)
         {
             if (_flow == null) return;
-            if (!_flow.SelectLetter(letterID)) { Debug.LogWarning("[DeliveryFlow] 편지 선택 실패"); return; }
+            if (!_flow.SelectLetter(letterID))
+            {
+                Debug.LogWarning("[DeliveryFlow] 편지 선택 실패");
+                ToastController.Instance?.Show("이 편지는 지금 배정할 수 없어요.");
+                return;
+            }
 
             LetterProgressData progress = _playerData != null ? _playerData.GetLetterProgress(letterID) : null;
             if (progress != null && progress.State == ELetterProgressState.New)
@@ -139,12 +145,21 @@ namespace NightPost.UI
             return new DeliveryEstimate { Seconds = seconds, Reward = letter.LetterReward };
         }
 
-        private void OnStartDelivery(int courierId, int routeId)
+        // 성공 시 true를 돌려주면 배정 팝업이 닫힌다. 실패면 false → 팝업 유지 + 토스트 안내.
+        private bool OnStartDelivery(int courierId, int routeId)
         {
-            if (_flow == null) return;
+            if (_flow == null) return false;
             bool ok = _flow.StartSelectedLetterDelivery(courierId, routeId);
-            if (ok) Debug.Log($"[DeliveryFlow] 배달 시작 성공 (courier={courierId}, route={routeId})");
-            else Debug.LogWarning($"[DeliveryFlow] 배달 시작 실패 — 보유/배달중/노선해금/지역/Waiting 상태 확인 (courier={courierId}, route={routeId})");
+            if (ok)
+            {
+                Debug.Log($"[DeliveryFlow] 배달 시작 성공 (courier={courierId}, route={routeId})");
+            }
+            else
+            {
+                Debug.LogWarning($"[DeliveryFlow] 배달 시작 실패 — 보유/배달중/노선해금/지역/Waiting 상태 확인 (courier={courierId}, route={routeId})");
+                ToastController.Instance?.Show("지금은 배달을 시작할 수 없어요.");
+            }
+            return ok;
         }
 
         /// <summary>[샌드박스 디버그] 세이브에 편지가 없을 때 카탈로그 앞쪽 편지 몇 통을 수신시킨다.</summary>

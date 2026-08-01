@@ -137,11 +137,9 @@ namespace NightPost.UI
         private void OnStartClicked()
         {
             if (!_hasCourier || !_hasRoute) return; // 방어(버튼이 비활성이라 보통 안 걸림)
-            var cb = Model.OnStartDelivery;
-            int courierId = _selectedCourierId;
-            int routeId = _selectedRouteId;
-            CloseSelf();
-            cb?.Invoke(courierId, routeId);
+            // 성공했을 때만 닫는다. 실패면 팝업을 유지해 다른 배달부/노선으로 재시도할 수 있게 한다.
+            bool ok = Model.OnStartDelivery != null && Model.OnStartDelivery(_selectedCourierId, _selectedRouteId);
+            if (ok) CloseSelf();
         }
 
         private void ClearItems(List<AssignmentOptionItem> items)
@@ -189,7 +187,7 @@ namespace NightPost.UI
         public List<RouteOption> Routes;     // 편지 지역에 맞는 노선(잠김이면 IsUnlocked=false)
 
         public Func<int, int, DeliveryEstimate> Estimate; // (courierId, routeId) → 예상 시간·보상
-        public Action<int, int> OnStartDelivery;          // (courierId, routeId) → 배달 시작
+        public Func<int, int, bool> OnStartDelivery;      // (courierId, routeId) → 배달 시작. 성공 시 true면 팝업 닫힘
     }
 
     /// <summary>배달부 선택 항목(표시용).</summary>

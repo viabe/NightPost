@@ -94,7 +94,10 @@ public class UISandboxTester : MonoBehaviour
                 return new DeliveryEstimate { Seconds = sec, Reward = 30 };
             },
             OnStartDelivery = (courierId, routeId) =>
-                Debug.Log($"[Tester] 배달 시작 → courier={courierId}, route={routeId} (서비스 연결 예정)"),
+            {
+                Debug.Log($"[Tester] 배달 시작 → courier={courierId}, route={routeId} (서비스 연결 예정)");
+                return true; // 가짜 테스트라 항상 성공 처리
+            },
         });
     }
 

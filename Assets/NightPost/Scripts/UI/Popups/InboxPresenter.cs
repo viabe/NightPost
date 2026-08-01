@@ -73,10 +73,20 @@ namespace NightPost.UI
         private void OpenReply(int replyId)
         {
             if (_flow == null) return;
-            if (!_flow.SelectReply(replyId)) { Debug.LogWarning($"[Inbox] 답장 선택 실패 replyId={replyId}"); return; }
+            if (!_flow.SelectReply(replyId))
+            {
+                Debug.LogWarning($"[Inbox] 답장 선택 실패 replyId={replyId}");
+                ToastController.Instance?.Show("답장을 열 수 없어요.");
+                return;
+            }
 
             ReplyStaticData reply = _flow.OpenSelectedReply();
-            if (reply == null) { Debug.LogWarning("[Inbox] 답장 열기 실패"); return; }
+            if (reply == null)
+            {
+                Debug.LogWarning("[Inbox] 답장 열기 실패");
+                ToastController.Instance?.Show("답장을 열 수 없어요.");
+                return;
+            }
 
             LetterReadController reader = GetReader();
             if (reader == null) { Debug.LogWarning("[Inbox] LetterRead 팝업 미등록 — Id가 LetterRead인지 확인"); return; }
