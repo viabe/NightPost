@@ -9,6 +9,7 @@ using UnityEngine;
 public class UISandboxTester : MonoBehaviour
 {
     [SerializeField] private HUDController _hud;
+    [SerializeField] private PlayerDataManager _playerData;   // 실제 재화 테스트용
 
     // ── 팝업 ────────────────────────────────
     public void ShowConfirmInfo()
@@ -133,6 +134,14 @@ public class UISandboxTester : MonoBehaviour
     public void DebugRaiseCurrency()
     {
         GameEvents.RaiseCurrencyChanged(Random.Range(1000, 99999));
+    }
+
+    // 실제 세이브 재화를 더한다(데이터 변경 + CurrencyChanged 발생).
+    // 시설 업그레이드처럼 GetCurrency()를 실제로 검사하는 기능 테스트에 사용.
+    public void DebugAddCurrency()
+    {
+        if (_playerData == null) { Debug.LogWarning("[Tester] PlayerDataManager 참조가 비어 있습니다."); return; }
+        _playerData.AddCurrency(5000);
     }
 
     // ── 편지 열람 단독 테스트(가짜 본문) ──

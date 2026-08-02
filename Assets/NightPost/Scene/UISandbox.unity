@@ -658,6 +658,7 @@ GameObject:
   - component: {fileID: 238753318}
   - component: {fileID: 238753317}
   - component: {fileID: 238753321}
+  - component: {fileID: 238753322}
   m_Layer: 0
   m_Name: Presenters
   m_TagString: Untagged
@@ -677,10 +678,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45917cca3df51344f94d18549c56a10c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.DeliveryFlowPresenter
-  _flow: {fileID: 2067793749}
+  _flow: {fileID: 1919217345}
   _playerData: {fileID: 1349023751}
-  _catalog: {fileID: 2067793747}
-  _letterService: {fileID: 2067793748}
+  _catalog: {fileID: 1919217343}
+  _letterService: {fileID: 1919217344}
 --- !u!114 &238753318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,9 +708,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f29642db8197694ca156ad20e800d5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.MorningReportPresenter
-  _flow: {fileID: 2067793749}
+  _flow: {fileID: 0}
   _playerData: {fileID: 1349023751}
-  _catalog: {fileID: 2067793747}
+  _catalog: {fileID: 0}
 --- !u!4 &238753320
 Transform:
   m_ObjectHideFlags: 0
@@ -738,9 +739,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.InboxPresenter
   _hud: {fileID: 128156315}
-  _flow: {fileID: 2067793749}
+  _flow: {fileID: 1919217345}
   _playerData: {fileID: 1349023751}
-  _catalog: {fileID: 2067793747}
+  _catalog: {fileID: 1919217343}
+--- !u!114 &238753322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 238753316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd1ca98f63c10e4292f298048983c86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.FacilityPresenter
+  _flow: {fileID: 1919217345}
+  _facilityService: {fileID: 1919217342}
+  _catalog: {fileID: 1919217343}
+  _playerData: {fileID: 1349023751}
 --- !u!1 &242862786
 GameObject:
   m_ObjectHideFlags: 0
@@ -924,10 +941,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ed0e6de94f38454893ab9cf66465d54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ReplyEventFlowTester
-  gameBootstrap: {fileID: 2067793750}
-  replyService: {fileID: 2067793745}
+  gameBootstrap: {fileID: 0}
+  replyService: {fileID: 0}
   playerDataManager: {fileID: 1349023751}
-  staticDataCatalog: {fileID: 2067793747}
+  staticDataCatalog: {fileID: 0}
   replyID: 5001
 --- !u!114 &245443841
 MonoBehaviour:
@@ -941,12 +958,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f241350290e74c42b7507993c7061e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ConcurrentDeliveryFlowTester
-  gameBootstrap: {fileID: 2067793750}
-  letterService: {fileID: 2067793748}
-  deliveryService: {fileID: 2067793746}
-  replyService: {fileID: 2067793745}
+  gameBootstrap: {fileID: 0}
+  letterService: {fileID: 0}
+  deliveryService: {fileID: 0}
+  replyService: {fileID: 0}
+  progressionService: {fileID: 0}
   playerDataManager: {fileID: 1349023751}
-  staticDataCatalog: {fileID: 2067793747}
+  staticDataCatalog: {fileID: 0}
   firstLetterID: 1001
   firstCourierID: 2001
   firstRouteID: 3000
@@ -954,6 +972,8 @@ MonoBehaviour:
   secondCourierID: 2002
   secondRouteID: 3001
   completionCheckInterval: 0.25
+  unlockTestCourierID: 0
+  unlockTestRouteID: 0
   timeoutSeconds: 30
 --- !u!114 &245443842
 MonoBehaviour:
@@ -1290,6 +1310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UISandboxTester
   _hud: {fileID: 128156315}
+  _playerData: {fileID: 0}
 --- !u!4 &489068904
 Transform:
   m_ObjectHideFlags: 0
@@ -2453,7 +2474,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 489068903}
         m_TargetAssemblyTypeName: UISandboxTester, Assembly-CSharp
-        m_MethodName: DebugRaiseCurrency
+        m_MethodName: DebugAddCurrency
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2894,14 +2915,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 489068903}
-        m_TargetAssemblyTypeName: UISandboxTester, Assembly-CSharp
-        m_MethodName: ShowEnvelope
-        m_Mode: 1
+      - m_Target: {fileID: 238753322}
+        m_TargetAssemblyTypeName: NightPost.UI.FacilityPresenter, Assembly-CSharp
+        m_MethodName: OpenFacility
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 4002
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3049,6 +3070,213 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1046.4896, y: 290.2443, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1919217337
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1919217347}
+  - component: {fileID: 1919217346}
+  - component: {fileID: 1919217345}
+  - component: {fileID: 1919217344}
+  - component: {fileID: 1919217343}
+  - component: {fileID: 1919217342}
+  - component: {fileID: 1919217341}
+  - component: {fileID: 1919217340}
+  - component: {fileID: 1919217339}
+  - component: {fileID: 1919217338}
+  m_Layer: 0
+  m_Name: GameFlowManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1919217338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01a5294e1749d354aa5e7f0f64079dfd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionService
+--- !u!114 &1919217339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5d032b189eba22449365ad9ad1f6a5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OfflineProgressService
+  processInterval: 1
+--- !u!114 &1919217340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5557a6ec8ed3cf04692733844c8b3289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReplyService
+--- !u!114 &1919217341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 139b68f9db9eab449a6f993962ba377c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DeliveryService
+--- !u!114 &1919217342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ad19e0ffaf2964c8121744f914bd31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FacilityService
+--- !u!114 &1919217343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa8100e73008b144a120bd4c7297194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StaticDataCatalog
+  letterStaticDatas:
+  - {fileID: 11400000, guid: c8caefdca97e0414ab9a09815f4891d2, type: 2}
+  - {fileID: 11400000, guid: c0ee6696a7230774fb4f1ef2d9ce5f6b, type: 2}
+  - {fileID: 11400000, guid: 0a4380df9eeb9664183d82e24858bea3, type: 2}
+  - {fileID: 11400000, guid: de53d6fb358b9a2419262da8f0d38372, type: 2}
+  - {fileID: 11400000, guid: 1622779c73b33bf42a18a2b8cede3bd6, type: 2}
+  - {fileID: 11400000, guid: 6e0a397d526dea64a996e416de737d35, type: 2}
+  - {fileID: 11400000, guid: ce7cb5b54989af54186993eca1b0c369, type: 2}
+  - {fileID: 11400000, guid: 73b77d4f85c5156449a6580053600ba6, type: 2}
+  - {fileID: 11400000, guid: 1b37cfea6e31a1a4a885c57871784eac, type: 2}
+  - {fileID: 11400000, guid: bc5bef76838b4c44d9984dee5fa98efb, type: 2}
+  - {fileID: 11400000, guid: 7bf6a694cdcb397499b44c997c2dd1b0, type: 2}
+  - {fileID: 11400000, guid: 144ba274e728a394c9a66c9b71c26c86, type: 2}
+  - {fileID: 11400000, guid: f92e2489481c94246b6c91c2db81b09f, type: 2}
+  - {fileID: 11400000, guid: 574bfad4b9019e94894df041b40c7aa8, type: 2}
+  - {fileID: 11400000, guid: 5c6e2a49ef035554ba9ff82bd3a17725, type: 2}
+  courierStaticDatas:
+  - {fileID: 11400000, guid: ebf5cd5bb7cb65f4fac8fa83d85953c8, type: 2}
+  - {fileID: 11400000, guid: 1f243b1eb21921143884e98330570706, type: 2}
+  - {fileID: 11400000, guid: 8176f8e9abb44814db640d9fe2cb235b, type: 2}
+  - {fileID: 11400000, guid: 3310ad73cc231d243857ea77f7d1c533, type: 2}
+  routeStaticDatas:
+  - {fileID: 11400000, guid: 2855a13963807cf459818f29c5b20f3e, type: 2}
+  - {fileID: 11400000, guid: 244be57b077bae447b970502b9f51b1a, type: 2}
+  - {fileID: 11400000, guid: 2b3879045d0bc3b479bd608f47e9a24d, type: 2}
+  - {fileID: 11400000, guid: f23c0f72a6e52724d8cfdc51fbe27da9, type: 2}
+  - {fileID: 11400000, guid: 8eb4a6cfbfa338c4a83ef4a18074b2d9, type: 2}
+  facilityStaticDatas:
+  - {fileID: 11400000, guid: 44f9122188a0d3e4e9b6c00f6dbd60cf, type: 2}
+  - {fileID: 11400000, guid: ae12f5a37209f3342b9ba91093ed6c93, type: 2}
+  - {fileID: 11400000, guid: 86cf1770398bc65449e66e98fd05cdb0, type: 2}
+  replyStaticDatas:
+  - {fileID: 11400000, guid: 78e2199ab0217d94faa7e4cb11d8e76f, type: 2}
+  - {fileID: 11400000, guid: e1aaf7d58ff363744982e6f8847f790f, type: 2}
+  - {fileID: 11400000, guid: 634ea4e996c060547ac71045facd987c, type: 2}
+  - {fileID: 11400000, guid: d1a02e9ecb0a4d84da94aecf602fdd36, type: 2}
+  - {fileID: 11400000, guid: 1b022bf4f1ba7324f83e51da1d258704, type: 2}
+  - {fileID: 11400000, guid: ad9e56403e4296a4e872609bdc8f99f4, type: 2}
+  - {fileID: 11400000, guid: db0fb01a91763eb47b032f59dfed3573, type: 2}
+  - {fileID: 11400000, guid: 4f65fc6c5ce2ff74f94991b61a5a756a, type: 2}
+  - {fileID: 11400000, guid: 3c526793684b92e4b9706c0116ef6ca7, type: 2}
+  - {fileID: 11400000, guid: 29de427f2ee0af948b0071fc0fa68508, type: 2}
+  - {fileID: 11400000, guid: 0968fc967392c7942a7afe022b2e5112, type: 2}
+  - {fileID: 11400000, guid: 8dc22da8138f70c4cb0dcd99f5889e99, type: 2}
+  - {fileID: 11400000, guid: aa9b0ed9d9403db48a4ec63fca21d3a7, type: 2}
+  - {fileID: 11400000, guid: c226eecee4836bd4cb9924ddf13221e2, type: 2}
+  - {fileID: 11400000, guid: 81ce3e0bfe97fbf47ac1959ce54af3c1, type: 2}
+--- !u!114 &1919217344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5259e4e44bcf3064c977603fc9bdc2a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LetterService
+  baseLetterCapacity: 5
+--- !u!114 &1919217345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f04ea4f360a319e46b532da1377dc1db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameFlowController
+--- !u!114 &1919217346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c5a19d7faf56f540b5742f1248a9196, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameBootstrap
+  defaultSaveDataTemplate: {fileID: 11400000, guid: 2fed5a4503d224b46b38003f2f0b8583, type: 2}
+  staticDataCatalog: {fileID: 1919217343}
+  playerDataManager: {fileID: 1349023751}
+  letterService: {fileID: 1919217344}
+  deliveryService: {fileID: 1919217341}
+  replyService: {fileID: 1919217340}
+  progressionService: {fileID: 1919217338}
+  facilityService: {fileID: 1919217342}
+  gameFlowController: {fileID: 1919217345}
+  offlineProgressService: {fileID: 1919217339}
+--- !u!4 &1919217347
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919217337}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3351,182 +3579,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2060905178}
   m_CullTransparentMesh: 1
---- !u!1 &2067793743
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2067793751}
-  - component: {fileID: 2067793750}
-  - component: {fileID: 2067793749}
-  - component: {fileID: 2067793748}
-  - component: {fileID: 2067793747}
-  - component: {fileID: 2067793746}
-  - component: {fileID: 2067793745}
-  - component: {fileID: 2067793744}
-  m_Layer: 0
-  m_Name: GameFlowManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2067793744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5d032b189eba22449365ad9ad1f6a5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OfflineProgressService
-  processInterval: 1
---- !u!114 &2067793745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5557a6ec8ed3cf04692733844c8b3289, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ReplyService
---- !u!114 &2067793746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 139b68f9db9eab449a6f993962ba377c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DeliveryService
---- !u!114 &2067793747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7aa8100e73008b144a120bd4c7297194, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StaticDataCatalog
-  letterStaticDatas:
-  - {fileID: 11400000, guid: c8caefdca97e0414ab9a09815f4891d2, type: 2}
-  - {fileID: 11400000, guid: c0ee6696a7230774fb4f1ef2d9ce5f6b, type: 2}
-  - {fileID: 11400000, guid: 0a4380df9eeb9664183d82e24858bea3, type: 2}
-  - {fileID: 11400000, guid: de53d6fb358b9a2419262da8f0d38372, type: 2}
-  - {fileID: 11400000, guid: 1622779c73b33bf42a18a2b8cede3bd6, type: 2}
-  - {fileID: 11400000, guid: 6e0a397d526dea64a996e416de737d35, type: 2}
-  - {fileID: 11400000, guid: ce7cb5b54989af54186993eca1b0c369, type: 2}
-  - {fileID: 11400000, guid: 73b77d4f85c5156449a6580053600ba6, type: 2}
-  - {fileID: 11400000, guid: 1b37cfea6e31a1a4a885c57871784eac, type: 2}
-  - {fileID: 11400000, guid: bc5bef76838b4c44d9984dee5fa98efb, type: 2}
-  - {fileID: 11400000, guid: 7bf6a694cdcb397499b44c997c2dd1b0, type: 2}
-  - {fileID: 11400000, guid: 144ba274e728a394c9a66c9b71c26c86, type: 2}
-  - {fileID: 11400000, guid: f92e2489481c94246b6c91c2db81b09f, type: 2}
-  - {fileID: 11400000, guid: 574bfad4b9019e94894df041b40c7aa8, type: 2}
-  - {fileID: 11400000, guid: 5c6e2a49ef035554ba9ff82bd3a17725, type: 2}
-  courierStaticDatas:
-  - {fileID: 11400000, guid: ebf5cd5bb7cb65f4fac8fa83d85953c8, type: 2}
-  - {fileID: 11400000, guid: 1f243b1eb21921143884e98330570706, type: 2}
-  - {fileID: 11400000, guid: 8176f8e9abb44814db640d9fe2cb235b, type: 2}
-  routeStaticDatas:
-  - {fileID: 11400000, guid: 2855a13963807cf459818f29c5b20f3e, type: 2}
-  - {fileID: 11400000, guid: 244be57b077bae447b970502b9f51b1a, type: 2}
-  - {fileID: 11400000, guid: 2b3879045d0bc3b479bd608f47e9a24d, type: 2}
-  - {fileID: 11400000, guid: f23c0f72a6e52724d8cfdc51fbe27da9, type: 2}
-  facilityStaticDatas:
-  - {fileID: 11400000, guid: 44f9122188a0d3e4e9b6c00f6dbd60cf, type: 2}
-  - {fileID: 11400000, guid: ae12f5a37209f3342b9ba91093ed6c93, type: 2}
-  - {fileID: 11400000, guid: 86cf1770398bc65449e66e98fd05cdb0, type: 2}
-  replyStaticDatas:
-  - {fileID: 11400000, guid: 78e2199ab0217d94faa7e4cb11d8e76f, type: 2}
-  - {fileID: 11400000, guid: e1aaf7d58ff363744982e6f8847f790f, type: 2}
-  - {fileID: 11400000, guid: 634ea4e996c060547ac71045facd987c, type: 2}
-  - {fileID: 11400000, guid: d1a02e9ecb0a4d84da94aecf602fdd36, type: 2}
-  - {fileID: 11400000, guid: 1b022bf4f1ba7324f83e51da1d258704, type: 2}
-  - {fileID: 11400000, guid: ad9e56403e4296a4e872609bdc8f99f4, type: 2}
-  - {fileID: 11400000, guid: db0fb01a91763eb47b032f59dfed3573, type: 2}
-  - {fileID: 11400000, guid: 4f65fc6c5ce2ff74f94991b61a5a756a, type: 2}
-  - {fileID: 11400000, guid: 3c526793684b92e4b9706c0116ef6ca7, type: 2}
-  - {fileID: 11400000, guid: 29de427f2ee0af948b0071fc0fa68508, type: 2}
-  - {fileID: 11400000, guid: 0968fc967392c7942a7afe022b2e5112, type: 2}
-  - {fileID: 11400000, guid: 8dc22da8138f70c4cb0dcd99f5889e99, type: 2}
-  - {fileID: 11400000, guid: aa9b0ed9d9403db48a4ec63fca21d3a7, type: 2}
-  - {fileID: 11400000, guid: c226eecee4836bd4cb9924ddf13221e2, type: 2}
-  - {fileID: 11400000, guid: 81ce3e0bfe97fbf47ac1959ce54af3c1, type: 2}
---- !u!114 &2067793748
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5259e4e44bcf3064c977603fc9bdc2a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LetterService
---- !u!114 &2067793749
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f04ea4f360a319e46b532da1377dc1db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameFlowController
---- !u!114 &2067793750
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c5a19d7faf56f540b5742f1248a9196, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameBootstrap
-  defaultSaveDataTemplate: {fileID: 11400000, guid: 2fed5a4503d224b46b38003f2f0b8583, type: 2}
-  staticDataCatalog: {fileID: 2067793747}
-  playerDataManager: {fileID: 1349023751}
-  letterService: {fileID: 2067793748}
-  deliveryService: {fileID: 2067793746}
-  replyService: {fileID: 2067793745}
-  gameFlowController: {fileID: 2067793749}
-  offlineProgressService: {fileID: 2067793744}
---- !u!4 &2067793751
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2067793743}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3538,7 +3590,7 @@ SceneRoots:
   - {fileID: 128156313}
   - {fileID: 1569792720}
   - {fileID: 1858819476}
-  - {fileID: 2067793751}
+  - {fileID: 1919217347}
   - {fileID: 238753320}
   - {fileID: 855564467}
   - {fileID: 245443843}
