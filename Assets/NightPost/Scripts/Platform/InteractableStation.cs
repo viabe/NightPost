@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public abstract class InteractableStation : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] private float interactionOffsetX;
+    [SerializeField] private float interactionOffsetX = 0.5f;
     [SerializeField] private PlayerInteraction playerInteraction;
 
     // 플레이어가 시설과 상호작용할 때 서 있어야 하는 위치를 외부에 제공

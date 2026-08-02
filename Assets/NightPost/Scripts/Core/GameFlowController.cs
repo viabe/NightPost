@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 // 편지 확인, 분류, 배달, 결과 확인, 답장 열람으로 이어지는 게임 진행 흐름을 관리함
 public class GameFlowController : MonoBehaviour
@@ -15,6 +16,10 @@ public class GameFlowController : MonoBehaviour
     private FacilityService facilityService;
     private SortingService sortingService;
     private ProgressionService progressionService;
+    // 현재 플레이어 진행 상태를 아침 보고서 형태로 집계하는 서비스임
+    private MorningReportService morningReportService;
+    // 편지와 답장의 수집 상태를 도감 항목으로 구성하는 서비스임
+    private CollectionService collectionService;
 
     // 현재 선택한 편지 ID임
     private int selectedLetterID;
@@ -28,11 +33,14 @@ public class GameFlowController : MonoBehaviour
     /// <summary>
     /// 게임 진행에 필요한 서비스와 데이터 매니저를 등록함
     /// </summary>
-    public bool Initialize(LetterService letter, SortingService sorting, DeliveryService delivery, ReplyService reply, FacilityService facility, ProgressionService progression, PlayerDataManager dataManager)
+    public bool Initialize(LetterService letter, SortingService sorting, DeliveryService delivery, ReplyService reply, FacilityService facility, ProgressionService progression, MorningReportService morningReport, CollectionService collection, PlayerDataManager dataManager)
     {
         // 필요한 참조 중 하나라도 없다면 초기화하지 않음
         if (letter == null || delivery == null || reply == null || facility == null || dataManager == null
             || sorting == null || progression == null) return false;
+        // 아침 배달 보고서 서비스가 없다면 초기화하지 않음
+        if (morningReport == null) return false;
+        if (collection == null) return false;
 
         // 편지 서비스를 저장함
         letterService = letter;
@@ -46,8 +54,12 @@ public class GameFlowController : MonoBehaviour
         facilityService = facility;
         // 전달받은 진행도 서비스를 내부 필드에 저장함
         progressionService = progression;
+        // 전달받은 아침 배달 보고서 서비스를 저장함
+        morningReportService = morningReport;
         // 플레이어 데이터 매니저를 저장함
         playerDataManager = dataManager;
+        // 전달받은 편지·답장 도감 서비스를 저장함
+        collectionService = collection;
 
         // 필요한 참조 등록이 완료되었음을 반환함
         return true;
@@ -96,7 +108,24 @@ public class GameFlowController : MonoBehaviour
         // 배달 시작 처리가 완료되었음을 반환함
         return true;
     }
+    /// <summary>
+    /// 현재 선택한 편지와 지정한 배달부·노선의 배달 예상 정보를 반환함
+    /// </summary>
+    public DeliveryPreviewData GetSelectedLetterDeliveryPreview(int courierID,int routeID)
+    {
+        // 배달 서비스가 등록되지 않았다면 예상 정보를 조회하지 않음
+        if(deliveryService == null) return null;
 
+        // 현재 선택한 편지가 없다면 예상 정보를 조회하지 않음
+        if(selectedLetterID <= 0) return null;
+
+        // 유효하지 않은 배달부 또는 노선 ID라면 예상 정보를 조회하지 않음
+        if (courierID <= 0 || routeID <= 0) return null;
+
+        // 현재 선택한 편지와 배달부·노선 정보를 배달 서비스에 전달함
+        // 계산된 배달 예상 정보를 반환함
+        return deliveryService.GetDeliveryPreview(selectedLetterID, courierID, routeID);
+    }
     /// <summary>
     /// 지정한 편지의 미확인 배달 결과를 현재 선택 결과로 저장함
     /// </summary>
@@ -248,5 +277,41 @@ public class GameFlowController : MonoBehaviour
         // 진행도 서비스에 지정한 노선의 수동 해금을 요청함
         // 노선 해금 처리 결과를 반환함
         return progressionService.UnlockRoute(routeID);
+    }
+
+    /// <summary>
+    /// 현재 플레이어 진행 상태를 집계한 아침 배달 보고서를 반환함
+    /// </summary>
+    public MorningReportData GetMorningReport()
+    {
+        // 아침 배달 보고서 서비스가 등록되지 않았다면 보고서를 반환하지 않음
+        if(morningReportService == null) return null;
+        // 아침 배달 보고서 서비스에 현재 진행 상태 집계를 요청함
+        // 생성된 아침 배달 보고서 데이터를 반환함
+        return morningReportService.CreateMorningReport();
+    }
+
+    /// <summary>
+    /// 전체 편지의 수신·읽음·배달 완료 상태를 도감 항목 목록으로 반환함
+    /// </summary>
+    public IReadOnlyList<LetterCollectionEntryData> GetLetterCollectionEntries()
+    {
+        // 편지·답장 도감 서비스가 등록되지 않았다면 빈 목록을 반환함
+        if(collectionService == null) return System.Array.Empty<LetterCollectionEntryData>();
+        // 도감 서비스에 전체 편지 도감 항목 생성을 요청함
+        // 생성된 편지 도감 항목 목록을 반환함
+        return collectionService.GetLetterCollectionEntries();
+    }
+
+    /// <summary>
+    /// 전체 답장의 수신·읽음 상태를 도감 항목 목록으로 반환함
+    /// </summary>
+    public IReadOnlyList<ReplyCollectionEntryData> GetReplyCollectionEntries()
+    {
+        // 편지·답장 도감 서비스가 등록되지 않았다면 빈 목록을 반환함
+        if (collectionService == null) return System.Array.Empty<ReplyCollectionEntryData>();
+        // 도감 서비스에 전체 답장 도감 항목 생성을 요청함
+        // 생성된 답장 도감 항목 목록을 반환함
+        return collectionService.GetReplyCollectionEntries();
     }
 }

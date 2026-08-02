@@ -22,6 +22,9 @@ public class GameBootstrap : MonoBehaviour
     // 실제 게임 실행 중 사용하는 저장 데이터
     private PlayerSaveData runtimeSaveData;
     private SortingService sortingService;
+    private MorningReportService morningReportService;
+    // 편지와 답장의 수집 상태를 도감 항목으로 구성하는 서비스임
+    private CollectionService collectionService;
 
     // 전체 초기화 완료 여부
     private bool isInitialized;
@@ -91,6 +94,12 @@ public class GameBootstrap : MonoBehaviour
         if (!isInit) return false;
         isInit = progressionService.Initialize(staticDataCatalog, playerDataManager);
         if (!isInit) return false;
+        morningReportService = new MorningReportService();
+        isInit = morningReportService.Initialize(playerDataManager, staticDataCatalog, letterService, progressionService);
+        if (!isInit) return false;
+        collectionService = new CollectionService();
+        isInit = collectionService.Initialize(staticDataCatalog, playerDataManager);
+        if (!isInit) return false;
         sortingService = new SortingService();
         isInit = sortingService.Initialize(staticDataCatalog, letterService);
         if (!isInit) return false;
@@ -98,7 +107,7 @@ public class GameBootstrap : MonoBehaviour
         if (!isInit) return false;
         isInit = replyService.Initialize(playerDataManager, staticDataCatalog);
         if (!isInit) return false;
-        isInit = gameFlowController.Initialize(letterService, sortingService, deliveryService, replyService, facilityService, progressionService, playerDataManager);
+        isInit = gameFlowController.Initialize(letterService, sortingService, deliveryService, replyService, facilityService, progressionService, morningReportService, collectionService, playerDataManager);
         if (!isInit) return false;
         isInit = offlineProgressService.Initialize(deliveryService);
         if(!isInit) return false;

@@ -35,7 +35,55 @@ public class DeliveryService : MonoBehaviour
         // 초기화 성공
         return true;
     }
+    /// <summary>
+    /// 지정한 편지·배달부·노선 조합의 배달 예상 정보를 반환함
+    /// </summary>
+    public DeliveryPreviewData GetDeliveryPreview(int letterID,int courierID,int routeID)
+    {
+        // 플레이어 데이터 매니저, 정적 데이터 카탈로그,
+        // 시설 서비스 중 하나라도 등록되지 않았다면 예상 정보를 생성하지 않음
+        if(staticDataCatalog == null || playerDataManager == null || facilityService == null) return null;
 
+        // 편지, 배달부, 노선 ID 중 하나라도 유효하지 않다면 예상 정보를 생성하지 않음
+        if(letterID <= 0 || routeID <= 0 || courierID <= 0) return null;
+
+        // 지정한 편지의 정적 데이터를 조회함
+        LetterStaticData letterStaticData = staticDataCatalog.GetLetter(letterID);
+
+        // 지정한 배달부의 정적 데이터를 조회함
+        CourierStaticData courierStaticData = staticDataCatalog.GetCourier(courierID);
+
+        // 지정한 노선의 정적 데이터를 조회함
+        RouteStaticData routeStaticData = staticDataCatalog.GetRoute(routeID);
+
+        // 편지, 배달부, 노선 데이터 중 하나라도 없다면 예상 정보를 생성하지 않음
+        if(letterStaticData == null ||  courierStaticData == null || routeStaticData == null) return null; 
+
+        // 배달부 속도 또는 노선 기본 배달 시간이 0 이하라면 예상 정보를 생성하지 않음
+        if(courierStaticData.Speed <= 0 || routeStaticData.BaseDeliveryTimeSeconds <= 0) return null;
+
+        // 노선에 설정된 기본 배달 시간을 저장함
+        float routeBaseDuration = routeStaticData.BaseDeliveryTimeSeconds;
+
+        // 노선 기본 시간을 배달부 속도로 나눈 배달부 적용 시간을 계산함
+        float courierAdjustedDuration = routeBaseDuration / courierStaticData.Speed;
+
+        // 모든 시설에서 제공하는 배달 시간 감소율을 조회함
+        float facilityReductionRate = GetFacilityDeliveryTimeReductionRate();
+
+        // 배달부 적용 시간에 시설 감소 효과를 적용해 최종 예상 시간을 계산함
+        float estimatedDuration = ApplyFacilityDeliveryTimeReduction(courierAdjustedDuration);
+
+        // 편지 목적 지역과 선택한 노선 지역이 일치하는지 확인함
+        bool isRegionMatched = IsRouteCompatible(letterID, routeID);
+
+        // 현재 편지·배달부·노선 조합으로 실제 배달을 시작할 수 있는지 확인함
+        bool canStartDelivery = CanStartDelivery(courierID, letterID, routeID);
+
+        // 계산한 배달 예상 정보를 생성해 반환함
+        DeliveryPreviewData deliveryPreviewData = new DeliveryPreviewData(letterID, courierID, routeID, routeBaseDuration, courierAdjustedDuration, facilityReductionRate, estimatedDuration, letterStaticData.LetterReward, isRegionMatched, canStartDelivery);
+        return deliveryPreviewData;
+    }
     /// <summary>
     /// 선택한 편지, 배달부, 노선으로 새 배달 시작함
     /// </summary>
@@ -314,6 +362,22 @@ public class DeliveryService : MonoBehaviour
 
     }
     /// <summary>
+    /// 모든 시설에서 제공하는 배달 시간 감소율을 0부터 1 사이로 보정해 반환함
+    /// </summary>
+    private float GetFacilityDeliveryTimeReductionRate()
+    {
+        // 시설 서비스가 등록되지 않았다면 감소 효과가 없으므로 0을 반환함
+        if(facilityService == null) return 0.0f;
+        // 모든 시설의 배달 시간 감소 효과값을 조회함
+        float totalReductionRate = facilityService.GetTotalFacilityEffectValue(EFacilityEffectType.DeliveryTimeReduction);
+
+        // 조회한 감소 효과값이 0 이하라면 0을 반환함
+        if (totalReductionRate <= 0.0f) return 0.0f;
+
+        // 감소율이 100%를 초과하지 않도록 0부터 1 사이로 보정해 반환함
+        return Mathf.Clamp01(totalReductionRate);
+    }
+    /// <summary>
     /// 시설의 배달 시간 감소 효과를 기본 배달 시간에 적용함
     /// </summary>
     private float ApplyFacilityDeliveryTimeReduction(float baseDeliveryDuration)
@@ -324,12 +388,9 @@ public class DeliveryService : MonoBehaviour
         if (facilityService == null) return baseDeliveryDuration;
 
         // 모든 시설의 배달 시간 감소 효과값 조회
-        float facilityTimeReduction = facilityService.GetTotalFacilityEffectValue(EFacilityEffectType.DeliveryTimeReduction);
+        float facilityTimeReduction = GetFacilityDeliveryTimeReductionRate();
         // 감소 효과가 0 이하이면 기본 배달 시간 반환
         if (facilityTimeReduction <= 0) return baseDeliveryDuration;
-
-        // 감소율을 0부터 1 사이로 제한
-        facilityTimeReduction = Mathf.Clamp01(facilityTimeReduction);
 
         // 기본 배달 시간에 감소율 적용
         float finalDeliveryDuration = baseDeliveryDuration * (1f - facilityTimeReduction);
