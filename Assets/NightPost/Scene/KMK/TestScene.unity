@@ -629,7 +629,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 627146915}
+  - component: {fileID: 627146926}
+  - component: {fileID: 627146927}
   - component: {fileID: 627146917}
+  - component: {fileID: 627146928}
   - component: {fileID: 627146921}
   - component: {fileID: 627146924}
   - component: {fileID: 627146918}
@@ -822,6 +825,55 @@ MonoBehaviour:
   playerDataManager: {fileID: 1684119126}
   progressionService: {fileID: 611496140}
   gameFlowController: {fileID: 611496138}
+--- !u!114 &627146926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bd67cc5b84e9f94a82f9eded4f87688, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DeliveryPreviewTester
+  gameBootstrap: {fileID: 611496139}
+  staticDataCatalog: {fileID: 611496132}
+  playerDataManager: {fileID: 1684119126}
+  letterService: {fileID: 611496134}
+  gameFlowController: {fileID: 611496138}
+--- !u!114 &627146927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 626c2ef5a5db1ac468df6ddc9f537a43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MorningReportTester
+  gameFlowController: {fileID: 611496138}
+  playerDataManager: {fileID: 1684119126}
+  staticDataCatalog: {fileID: 611496132}
+  letterService: {fileID: 611496134}
+  progressionService: {fileID: 611496140}
+--- !u!114 &627146928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 627146911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c6aa0d6898679846bb40e884e667358, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectionServiceTester
+  gameFlowController: {fileID: 611496138}
+  staticDataCatalog: {fileID: 611496132}
+  playerDataManager: {fileID: 1684119126}
 --- !u!1 &864554574
 GameObject:
   m_ObjectHideFlags: 0
@@ -1508,6 +1560,10 @@ MonoBehaviour:
   interactionOffsetX: 0.5
   playerInteraction: {fileID: 1684119125}
   isInteractable: 1
+  onInteractionRequested:
+    m_PersistentCalls:
+      m_Calls: []
+    m_CallsDirty: 1
 --- !u!50 &1854325794
 Rigidbody2D:
   serializedVersion: 5
