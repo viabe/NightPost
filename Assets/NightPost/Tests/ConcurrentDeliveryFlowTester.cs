@@ -226,10 +226,7 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         // --------------------------------------------------
 
         bool firstStartResult =
-            deliveryService.StartDelivery(
-                firstCourierID,
-                firstLetterID,
-                firstRouteID);
+            deliveryService.StartDelivery(firstLetterID,firstCourierID,firstRouteID);
 
         LogResult(
             $"4. 첫 번째 배달 시작 " +
@@ -246,9 +243,8 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
         // --------------------------------------------------
 
         bool sameCourierStartResult =
-            deliveryService.StartDelivery(
+            deliveryService.StartDelivery(secondLetterID,
                 firstCourierID,
-                secondLetterID,
                 secondRouteID);
 
         LogResult(
@@ -261,8 +257,8 @@ public class ConcurrentDeliveryFlowTester : MonoBehaviour
 
         bool secondStartResult =
             deliveryService.StartDelivery(
-                secondCourierID,
                 secondLetterID,
+                secondCourierID,
                 secondRouteID);
 
         LogResult(

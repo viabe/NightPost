@@ -13,7 +13,16 @@ public class FacilityProgressData
         this.facilityID = facilityID;
         currentLevel = 0;
     }
-
+    /// <summary>
+    /// 저장 데이터에서 불러온 시설 진행 상태를 복원함
+    /// </summary>
+    public FacilityProgressData(int facilityID, int currentLevel)
+    {
+        // 전달받은 시설 ID를 저장함
+        this.facilityID = facilityID;
+        // 전달받은 현재 시설 레벨을 저장함
+        this.currentLevel = currentLevel;
+    }
     public int FacilityID => facilityID;
     public int CurrentLevel => currentLevel;
     public bool IncreaseLevel(int maxLevel)

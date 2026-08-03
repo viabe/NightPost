@@ -223,10 +223,7 @@ public class FacilitySystemTester : MonoBehaviour
         }
 
         bool deliveryStarted =
-            deliveryService.StartDelivery(
-                courierID,
-                letterID,
-                routeID);
+            deliveryService.StartDelivery(letterID, courierID, routeID);
 
         LogResult(
             "18. 시설 효과가 적용된 배달 시작 성공",

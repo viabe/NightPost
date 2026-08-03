@@ -164,7 +164,83 @@ public class LetterService : MonoBehaviour
         // 확인 가능한 편지 목록을 반환함
         return availableLetters;
     }
+    /// <summary>
+    /// 현재 플레이어가 보유한 미분류 상태의 편지 목록을 반환함
+    /// </summary>
+    public IReadOnlyList<LetterStaticData> GetUnsortedLetters()
+    {
+        // 조회 결과를 저장할 미분류 편지 목록을 생성함
+        List<LetterStaticData> unsortedLetters = new();
 
+        // 서비스 초기화가 완료되지 않았다면 빈 목록을 반환함
+        if (staticDataCatalog == null || playerDataManager == null) return unsortedLetters;
+
+        // 플레이어가 보유한 전체 편지 진행 데이터를 조회함
+        IReadOnlyList<LetterProgressData> progressDatas = playerDataManager.GetLetterProgresses();
+
+        // 편지 진행 데이터 목록이 없다면 빈 목록을 반환함
+        if (progressDatas == null) return unsortedLetters;
+
+        // 전체 편지 진행 데이터를 순회함
+        foreach (LetterProgressData progress in progressDatas)
+        {
+            // 유효하지 않은 편지 진행 데이터는 제외함
+            if(progress == null) continue;
+
+            // New 상태가 아닌 편지는 미분류 목록에서 제외함
+            if (progress.State != ELetterProgressState.New) continue;
+
+            // 진행 데이터와 연결된 편지 정적 데이터를 조회함
+            LetterStaticData letterData = staticDataCatalog.GetLetter(progress.LetterID);
+
+            // 연결된 편지 정적 데이터가 없다면 제외함
+            if(letterData  == null) continue;
+
+            // 미분류 편지 목록에 정적 데이터를 추가함
+            unsortedLetters.Add(letterData);
+        }
+
+        // 미분류 편지 목록을 반환함
+        return unsortedLetters;
+    }
+    /// <summary>
+    /// 현재 플레이어가 보유한 배달 대기 상태의 편지 목록을 반환함
+    /// </summary>
+    public IReadOnlyList<LetterStaticData> GetWaitingLetters()
+    {
+        // 조회 결과를 저장할 배달 대기 편지 목록을 생성함
+        List<LetterStaticData> waitingLetters = new();
+        // 서비스 초기화가 완료되지 않았다면 빈 목록을 반환함
+        if (staticDataCatalog == null || playerDataManager == null) return waitingLetters;
+
+        // 플레이어가 보유한 전체 편지 진행 데이터를 조회함
+        IReadOnlyList<LetterProgressData> progressDatas = playerDataManager.GetLetterProgresses();
+
+        // 편지 진행 데이터 목록이 없다면 빈 목록을 반환함
+        if (progressDatas == null) return waitingLetters;
+
+        // 전체 편지 진행 데이터를 순회함
+        foreach (LetterProgressData progress in progressDatas)
+        {
+            // 유효하지 않은 편지 진행 데이터는 제외함
+            if(progress == null) continue;
+
+            // Waiting 상태가 아닌 편지는 배달 대기 목록에서 제외함
+            if (progress.State != ELetterProgressState.Waiting) continue;
+
+            // 진행 데이터와 연결된 편지 정적 데이터를 조회함
+            LetterStaticData letterData = staticDataCatalog.GetLetter(progress.LetterID);
+
+            // 연결된 편지 정적 데이터가 없다면 제외함
+            if (letterData == null) continue;
+
+            // 배달 대기 편지 목록에 정적 데이터를 추가함
+            waitingLetters.Add(letterData);
+        }
+
+        // 배달 대기 편지 목록을 반환함
+        return waitingLetters;
+    }
     /// <summary>
     /// 지정한 편지의 진행 데이터를 반환함
     /// </summary>

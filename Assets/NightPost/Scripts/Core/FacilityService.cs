@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class FacilityService : MonoBehaviour
 {
@@ -208,14 +209,20 @@ public class FacilityService : MonoBehaviour
         // 효과 종류가 None이면 0 반환
         if (effectType == EFacilityEffectType.None) return 0.0f;
 
+        // 정적 데이터 카탈로그에서 전체 시설 목록 조회
+        IReadOnlyList<FacilityStaticData> facilities = staticDataCatalog.Facilities();
+
+        // 전체 시설 목록이 없거나 비어 있다면 0 반환
+        if (facilities == null || facilities.Count == 0) return 0.0f;
+
         // 전체 효과값을 저장할 변수 선언
         float totalFacilityEffectValue = 0.0f;
 
         // StaticDataCatalog의 전체 시설 목록 순회
-        foreach(FacilityStaticData facilityStaticData in staticDataCatalog.Facilities())
+        foreach (FacilityStaticData facilityStaticData in facilities)
         {
             // null 시설 데이터 건너뜀
-            if(facilityStaticData == null) continue;
+            if(facilityStaticData == null || facilityStaticData.FacilityID <= 0) continue;
 
             // 현재 시설에서 요청한 효과값 조회
             // 조회한 효과값을 전체 효과값에 합산
@@ -224,5 +231,59 @@ public class FacilityService : MonoBehaviour
 
         // 합산된 전체 효과값 반환
         return totalFacilityEffectValue;
+    }
+    /// <summary>
+    /// 시설 화면에 표시할 전체 시설 정적 데이터 목록을 반환함
+    /// </summary>
+    public IReadOnlyList<FacilityStaticData> GetFacilities()
+    {
+        // 화면에 제공할 시설 정적 데이터 목록을 생성함
+        List<FacilityStaticData> facilityList = new();
+
+        // 정적 데이터 카탈로그가 없다면 빈 목록을 반환함
+        if(staticDataCatalog == null) return facilityList;
+
+        // 정적 데이터 카탈로그에서 전체 시설 목록을 조회함
+        IReadOnlyList<FacilityStaticData> facilities = staticDataCatalog.Facilities();
+
+        // 전체 시설 목록이 없다면 빈 목록을 반환함
+        if(facilities == null) return facilityList;
+
+        // 전체 시설 정적 데이터를 순회함
+        foreach (FacilityStaticData facility in facilities)
+        {
+            // 유효하지 않은 시설 데이터는 제외함
+            if(facility == null || facility.FacilityID <= 0) continue;
+
+            // 화면에 제공할 시설 목록에 추가함
+            facilityList.Add(facility);
+        }
+
+        // 유효한 전체 시설 정적 데이터 목록을 반환함
+        return facilityList; 
+    }
+
+    /// <summary>
+    /// 지정한 시설의 현재 레벨을 반환함
+    /// </summary>
+    public int GetCurrentFacilityLevel(int facilityID)
+    {
+        // 플레이어 데이터 관리자가 없다면 0을 반환함
+        if(playerDataManager == null) return 0;
+
+        // 유효하지 않은 시설 ID라면 0을 반환함
+        if(facilityID <= 0) return 0;
+
+        // 지정한 시설의 진행 데이터를 조회함
+        FacilityProgressData facilityProgressData = playerDataManager.GetFacilityProgress(facilityID);
+
+        // 시설 진행 데이터가 없다면 아직 업그레이드되지 않은 시설이므로 0을 반환함
+        if(facilityProgressData == null) return 0;
+
+        // 현재 레벨이 0보다 작다면 잘못된 데이터이므로 0을 반환함
+        if(facilityProgressData.CurrentLevel < 0)return 0;
+
+        // 시설의 현재 레벨을 반환함
+        return facilityProgressData.CurrentLevel;
     }
 }
