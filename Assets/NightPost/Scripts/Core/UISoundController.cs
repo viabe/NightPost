@@ -6,7 +6,7 @@ public class UISoundController : MonoBehaviour
     [SerializeField] private AudioSource uiAudioSource;
     [SerializeField] private List<UISoundTrackData> uiSoundTracks = new();
 
-    private Dictionary<EUISoundType, AudioClip> uiSoundClipDict = new();
+    private Dictionary<ESFXType, AudioClip> uiSoundClipDict = new();
 
     /// <summary>
     /// 등록된 UI 효과음을 검사하고 빠르게 조회할 수 있도록 초기화함
@@ -29,7 +29,7 @@ public class UISoundController : MonoBehaviour
             if(soundTrack == null) continue;
 
             // None 타입은 실제 효과음으로 등록하지 않음
-            if(soundTrack.SoundType == EUISoundType.None) continue;
+            if(soundTrack.SoundType == ESFXType.None) continue;
 
             // AudioClip이 등록되지 않은 데이터는 제외함
             if(soundTrack.AudioClip == null) continue;
@@ -54,13 +54,13 @@ public class UISoundController : MonoBehaviour
     /// <summary>
     /// 지정한 종류의 UI 효과음을 한 번 재생함
     /// </summary>
-    public bool PlayUISound(EUISoundType soundType)
+    public bool PlayUISound(ESFXType soundType)
     {
         // UI 효과음 재생에 사용할 AudioSource가 없다면 초기화하지 않음
         if (uiAudioSource == null) return false;
 
         // None 타입이라면 재생하지 않음
-        if(soundType == EUISoundType.None) return false;
+        if(soundType == ESFXType.None) return false;
 
         // 지정한 효과음 타입에 해당하는 AudioClip을 조회함
         if (!uiSoundClipDict.TryGetValue(soundType, out AudioClip audioClip)) return false;
