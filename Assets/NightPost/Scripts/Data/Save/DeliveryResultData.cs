@@ -19,6 +19,24 @@ public class DeliveryResultData
         this.completedAtUnixTime = completedAtUnixTime;
         this.isChecked = false;
     }
+    /// <summary>
+    /// 저장 데이터에서 불러온 배달 결과 상태를 복원함
+    /// </summary>
+    public DeliveryResultData(int letterID, int rewardAmount, long completedAtUnixTime, bool isChecked)
+    {
+        // 전달받은 완료 편지 ID를 저장함
+        this.letterID = letterID;
+
+        // 전달받은 실제 지급 보상을 저장함
+        this.rewardAmount = rewardAmount;
+
+        // 전달받은 배달 완료 시각을 저장함
+        this.completedAtUnixTime = completedAtUnixTime;
+
+        // 전달받은 결과 확인 여부를 저장함
+        this.isChecked = isChecked;
+
+    }
     public bool MarkAsChecked()
     {
         // 이미 확인한 배달 결과라면

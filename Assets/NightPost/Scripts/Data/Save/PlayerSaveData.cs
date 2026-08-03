@@ -94,4 +94,75 @@ public class PlayerSaveData : ScriptableObject
         readReplyIDs.Add(replyID);
         return true;
     }
+
+    /// <summary>
+    /// 저장소에서 불러온 플레이어 진행 데이터를 현재 런타임 데이터에 복원함
+    /// </summary>
+    public bool RestoreData(int currency, int completedDeliveryCount, IReadOnlyList<int> ownedCourierIDs, IReadOnlyList<int> unlockedRouteIDs, IReadOnlyList<LetterProgressData> letterProgresses, IReadOnlyList<ActiveDeliveryData> activeDeliveries, IReadOnlyList<DeliveryResultData> deliveryResults, IReadOnlyList<FacilityProgressData> facilityProgresses, IReadOnlyList<int> receivedReplyIDs, IReadOnlyList<int> readReplyIDs, long lastSaveUnixTime)
+    {
+        // 재화가 음수라면 복원하지 않음
+        if (currency < 0) return false;
+
+        // 완료 배달 횟수가 음수라면 복원하지 않음
+        if(completedDeliveryCount < 0) return false;
+
+        // 마지막 저장 시각이 음수라면 복원하지 않음
+        if(lastSaveUnixTime < 0) return false;
+
+        // 전달받은 목록 중 하나라도 없다면 복원하지 않음
+        if (ownedCourierIDs == null || unlockedRouteIDs == null || letterProgresses == null) return false;
+        if (activeDeliveries == null || deliveryResults == null || facilityProgresses == null) return false;
+        if (receivedReplyIDs == null || readReplyIDs == null) return false;
+
+        // 전달받은 재화를 현재 데이터에 저장함
+        this.currency = currency;
+
+        // 전달받은 완료 배달 횟수를 현재 데이터에 저장함
+        this.completedDeliveryCount = completedDeliveryCount;
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 보유 배달부 목록을 새 목록으로 복사함
+        this.ownedCourierIDs = new List<int>(ownedCourierIDs);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 해금 노선 목록을 새 목록으로 복사함
+        this.unlockedRouteIDs = new List<int>(unlockedRouteIDs);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 편지 진행 목록을 새 목록으로 복사함
+        letterProgressList = new List<LetterProgressData>(letterProgresses);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 진행 중 배달 목록을 새 목록으로 복사함
+        activeDeliveryList = new List<ActiveDeliveryData>(activeDeliveries);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 배달 결과 목록을 새 목록으로 복사함
+        deliveryResultsList = new List<DeliveryResultData>(deliveryResults);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 시설 진행 목록을 새 목록으로 복사함
+        facilityProgressesList = new List<FacilityProgressData>(facilityProgresses);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 수신 답장 목록을 새 목록으로 복사함
+        this.receivedReplyIDs = new List<int>(receivedReplyIDs);
+
+        // 외부 목록과 같은 참조를 사용하지 않도록 읽은 답장 목록을 새 목록으로 복사함
+        this.readReplyIDs = new List<int>(readReplyIDs);
+
+        // 전달받은 마지막 저장 시각을 현재 데이터에 저장함
+        this.lastSaveUnixTime = lastSaveUnixTime;
+
+        // 전체 데이터 복원이 완료되었음을 반환함
+        return true;
+    }
+
+    /// <summary>
+    /// 마지막 저장 시각을 지정한 Unix 시각으로 변경함
+    /// </summary>
+    public bool SetLastSaveUnixTime(long unixTime)
+    {
+        // 전달받은 Unix 시각이 음수라면 변경하지 않음
+        if(unixTime < 0) return false;
+
+        // 전달받은 Unix 시각을 마지막 저장 시각으로 저장함
+        lastSaveUnixTime = unixTime;
+
+        // 마지막 저장 시각 변경이 완료되었음을 반환함
+        return true;
+    }
 }
