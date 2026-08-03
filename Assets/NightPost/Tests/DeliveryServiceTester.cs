@@ -152,10 +152,7 @@ public class DeliveryServiceTester : MonoBehaviour
     {
         if (!EnsureReady()) return;
 
-        bool result = deliveryService.StartDelivery(
-            courierID,
-            letterID,
-            routeID);
+        bool result = deliveryService.StartDelivery(letterID, courierID, routeID);
 
         LogResult(
             $"배달 시작 Courier={courierID}, " +
@@ -174,10 +171,7 @@ public class DeliveryServiceTester : MonoBehaviour
     {
         if (!EnsureReady()) return;
 
-        bool startResult = deliveryService.StartDelivery(
-            courierID,
-            letterID,
-            routeID);
+        bool startResult = deliveryService.StartDelivery(letterID, courierID, routeID);
 
         // 이미 배달 중이므로 false가 나와야 테스트 성공
         bool testPassed = !startResult;
@@ -472,10 +466,7 @@ public class DeliveryServiceTester : MonoBehaviour
 
         // 1. 배달 시작
         bool startResult =
-            deliveryService.StartDelivery(
-                courierID,
-                letterID,
-                routeID);
+            deliveryService.StartDelivery(letterID,courierID,routeID);
 
         LogResult(
             "1. 배달 시작",
@@ -488,10 +479,7 @@ public class DeliveryServiceTester : MonoBehaviour
 
         // 2. 동일 배달부 중복 시작 차단
         bool duplicateStartResult =
-            deliveryService.StartDelivery(
-                courierID,
-                letterID,
-                routeID);
+            deliveryService.StartDelivery(letterID, courierID, routeID);
 
         LogResult(
             "2. 중복 배달 시작 차단",

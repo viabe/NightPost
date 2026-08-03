@@ -78,7 +78,7 @@ public class DeliveryService : MonoBehaviour
         bool isRegionMatched = IsRouteCompatible(letterID, routeID);
 
         // 현재 편지·배달부·노선 조합으로 실제 배달을 시작할 수 있는지 확인함
-        bool canStartDelivery = CanStartDelivery(courierID, letterID, routeID);
+        bool canStartDelivery = CanStartDelivery(letterID, courierID, routeID);
 
         // 계산한 배달 예상 정보를 생성해 반환함
         DeliveryPreviewData deliveryPreviewData = new DeliveryPreviewData(letterID, courierID, routeID, routeBaseDuration, courierAdjustedDuration, facilityReductionRate, estimatedDuration, letterStaticData.LetterReward, isRegionMatched, canStartDelivery);
@@ -229,10 +229,10 @@ public class DeliveryService : MonoBehaviour
     /// <summary>
     /// 선택한 편지, 배달부, 노선으로 새 배달 시작함
     /// </summary>
-    public bool StartDelivery(int courierID, int letterID, int routeID)
+    public bool StartDelivery(int letterID, int courierID, int routeID)
     {
         // 배달 시작 가능 여부 확인
-        if (!CanStartDelivery(courierID, letterID, routeID)) return false;
+        if (!CanStartDelivery(letterID, courierID, routeID)) return false;
 
         // 배달부 정적 데이터 조회
         CourierStaticData courier = staticDataCatalog.GetCourier(courierID);
@@ -275,7 +275,7 @@ public class DeliveryService : MonoBehaviour
     /// <summary>
     /// 배달부, 편지, 노선이 배달 시작 조건을 만족하는지 확인함
     /// </summary>
-    private bool CanStartDelivery(int courierID, int letterID, int routeID)
+    private bool CanStartDelivery(int letterID, int courierID, int routeID)
     {
         // 플레이어 데이터 연결 여부 확인
         if (playerDataManager == null) return false;

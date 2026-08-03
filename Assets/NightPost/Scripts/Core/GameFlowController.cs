@@ -98,7 +98,7 @@ public class GameFlowController : MonoBehaviour
         // 유효하지 않은 배달부 또는 노선 ID라면 배달을 시작하지 않음
         if (courierID <= 0 || routeID <= 0) return false;
         // 현재 선택한 편지의 배달 시작을 요청함
-        bool startResult = deliveryService.StartDelivery(courierID, selectedLetterID, routeID);
+        bool startResult = deliveryService.StartDelivery(selectedLetterID, courierID, routeID);
         // 배달 시작에 실패했다면 선택 상태를 유지하고 종료함
         if (!startResult) return false;
 
