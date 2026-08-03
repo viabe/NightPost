@@ -69,3 +69,18 @@ public enum EFacilityEffectType
     DeliveryTimeReduction = 2,
     LetterCapacityIncrease = 3
 }
+public enum EBGMType
+{
+    None,
+    Morning,
+    Day,
+    Night
+}
+public enum EUISoundType
+{
+    None,
+    Click,
+    Confirm,
+    Cancel,
+    Notification
+}
