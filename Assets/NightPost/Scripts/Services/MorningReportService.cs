@@ -141,4 +141,39 @@ public class MorningReportService
         // 생성한 아침 배달 보고서 데이터를 반환함
         return new MorningReportData(uncheckedDeliveryCount, claimableRewardAmount, unreadReplyCount, unlockableRouteCount, currentLetterCount, maxLetterCapacity);
     }
+
+    /// <summary>
+    /// 아직 확인하지 않은 배달 결과 목록을 아침 보고 화면에 제공함
+    /// </summary>
+    public IReadOnlyList<DeliveryResultData> GetUncheckedDeliveryResults()
+    {
+        // 반환할 미확인 배달 결과 목록을 생성함
+        List<DeliveryResultData> reportResults = new();
+
+        // 플레이어 데이터 관리자가 없다면 빈 목록을 반환함
+        if(playerDataManager == null) return reportResults;
+
+        // 플레이어 데이터 관리자에서 미확인 배달 결과 목록을 조회함
+        IReadOnlyList<DeliveryResultData> uncheckedResults = playerDataManager.GetUncheckedDeliveryResults();
+
+        // 조회한 목록이 없다면 빈 목록을 반환함
+        if(uncheckedResults == null) return reportResults;
+
+        // 조회한 전체 미확인 배달 결과를 순회함
+        foreach (DeliveryResultData deliveryResult in uncheckedResults)
+        {
+            // 유효하지 않은 배달 결과는 제외함
+            if(deliveryResult == null || deliveryResult.LetterID <= 0) continue;
+
+            // 방어적으로 이미 확인된 배달 결과는 제외함
+            if (deliveryResult.IsChecked) continue;
+
+            // 아침 보고 화면에 제공할 결과 목록에 추가함
+            reportResults.Add(deliveryResult);
+        }
+
+        // 미확인 배달 결과 목록을 반환함
+        return reportResults;
+    }
+
 }

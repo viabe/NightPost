@@ -85,6 +85,148 @@ public class DeliveryService : MonoBehaviour
         return deliveryPreviewData;
     }
     /// <summary>
+    /// 플레이어가 보유하고 있으며 현재 배달 중이 아닌 배달부 목록을 반환함
+    /// </summary>
+    public IReadOnlyList<CourierStaticData> GetAvailableCouriers()
+    {
+        // 조회 결과를 저장할 사용 가능한 배달부 목록을 생성함
+        List<CourierStaticData> availableCouriers = new();
+
+        // 플레이어 데이터 매니저 또는 정적 데이터 카탈로그가 없다면 빈 목록을 반환함
+        if(playerDataManager == null || staticDataCatalog == null) return availableCouriers;
+
+        // 정적 데이터 카탈로그에서 전체 배달부 목록을 조회함
+        IReadOnlyList<CourierStaticData> couriers = staticDataCatalog.Couriers();
+
+        // 전체 배달부 목록이 없다면 빈 목록을 반환함
+        if(couriers == null) return availableCouriers;
+
+        // 전체 배달부 정적 데이터를 순회함
+        foreach (CourierStaticData courier in couriers)
+        {
+            // 유효하지 않은 배달부 정적 데이터는 제외함
+            if(courier == null) continue;
+
+            // 플레이어가 보유하지 않은 배달부는 제외함
+            if(!playerDataManager.IsCourierOwned(courier.CourierID)) continue;
+
+            // 현재 다른 배달을 진행 중인 배달부는 제외함
+            if (playerDataManager.IsCourierDelivering(courier.CourierID)) continue;
+
+            // 사용 가능한 배달부 목록에 추가함
+            availableCouriers.Add(courier);
+        }
+
+        // 사용 가능한 배달부 목록을 반환함
+        return availableCouriers;
+    }
+    /// <summary>
+    /// 플레이어가 현재 해금한 노선 목록을 반환함
+    /// </summary>
+    public IReadOnlyList<RouteStaticData> GetUnlockedRoutes()
+    {
+        // 조회 결과를 저장할 해금 노선 목록을 생성함
+        List<RouteStaticData> availableRoutes = new();
+
+        // 플레이어 데이터 매니저 또는 정적 데이터 카탈로그가 없다면 빈 목록을 반환함
+        if(playerDataManager == null || staticDataCatalog == null) return availableRoutes;
+
+        // 정적 데이터 카탈로그에서 전체 노선 목록을 조회함
+        IReadOnlyList<RouteStaticData> routes = staticDataCatalog.Routes();
+
+        // 전체 노선 목록이 없다면 빈 목록을 반환함
+        if(routes == null) return availableRoutes;
+
+        // 전체 노선 정적 데이터를 순회함
+        foreach (RouteStaticData route in routes)
+        {
+            // 유효하지 않은 노선 정적 데이터는 제외함
+            if(route == null || route.RouteID <= 0) continue;
+
+            // 플레이어가 해금하지 않은 노선은 제외함
+            if(!playerDataManager.IsRouteUnlocked(route.RouteID)) continue;
+
+            // 해금된 노선 목록에 추가함
+            availableRoutes.Add(route);
+        }
+
+        // 해금된 노선 목록을 반환함
+        return availableRoutes;
+    }
+    /// <summary>
+    /// 지정한 편지의 목적 지역과 일치하며 현재 해금된 노선 목록을 반환함
+    /// </summary>
+    public IReadOnlyList<RouteStaticData> GetCompatibleRoutes(int letterID)
+    {
+        // 조회 결과를 저장할 호환 노선 목록을 생성함
+        List<RouteStaticData> availableRoutes = new();
+
+        // 플레이어 데이터 매니저 또는 정적 데이터 카탈로그가 없다면 빈 목록을 반환함
+        if (playerDataManager == null || staticDataCatalog == null) return availableRoutes;
+
+        // 유효하지 않은 편지 ID라면 빈 목록을 반환함
+        if(letterID <= 0) return availableRoutes;
+
+        // 지정한 편지의 정적 데이터를 조회함
+        LetterStaticData letterData = staticDataCatalog.GetLetter(letterID);
+
+        // 편지 정적 데이터가 없다면 빈 목록을 반환함
+        if(letterData == null) return availableRoutes;
+
+        // 현재 플레이어가 해금한 전체 노선 목록을 조회함
+        IReadOnlyList<RouteStaticData> unlockedRoutes = GetUnlockedRoutes();
+
+        // 해금된 노선 목록이 없다면 빈 목록을 반환함
+        if(unlockedRoutes == null) return availableRoutes;
+
+        // 해금된 전체 노선을 순회함
+        foreach (RouteStaticData route in unlockedRoutes)
+        {
+            // 유효하지 않은 노선 데이터는 제외함
+            if(route == null || route.RouteID <= 0) continue;
+
+            // 노선의 담당 지역이 편지의 목적 지역과 다르다면 제외함
+            if (route.RegionType != letterData.DestinationRegion) continue;
+
+            // 편지의 목적 지역과 일치하는 노선을 호환 목록에 추가함
+            availableRoutes.Add(route);
+        }
+
+        // 선택한 편지와 호환되는 노선 목록을 반환함
+        return availableRoutes;
+    }
+
+    /// <summary>
+    /// 현재 플레이어가 진행 중인 전체 배달 데이터를 반환함
+    /// </summary>
+    public IReadOnlyList<ActiveDeliveryData> GetActiveDeliveries()
+    {
+        // 조회 결과를 저장할 진행 중 배달 목록을 생성함
+        List<ActiveDeliveryData> activeDeliveries = new();
+
+        // 플레이어 데이터 매니저가 없다면 빈 배달 목록을 반환함
+        if (playerDataManager == null) return activeDeliveries;
+
+        // 플레이어 데이터 매니저에서 현재 진행 중인 배달 목록을 조회함
+        IReadOnlyList<ActiveDeliveryData> progressDeliveryList = playerDataManager.GetActiveDeliveries();
+
+        // 진행 중 배달 목록이 없다면 빈 배달 목록을 반환함
+        if (progressDeliveryList == null) return activeDeliveries;
+
+        // 전체 진행 중 배달 데이터를 순회함
+        foreach (ActiveDeliveryData activeDelivery in progressDeliveryList)
+        {
+            // 유효하지 않은 진행 중 배달 데이터는 제외함
+            if (activeDelivery == null) continue;
+
+            // 외부에 반환할 목록에 진행 중 배달 데이터를 추가함
+            activeDeliveries.Add(activeDelivery);
+        }
+
+        // 생성한 진행 중 배달 목록을 반환함
+        return activeDeliveries;
+    }
+    /// <summary>
     /// 선택한 편지, 배달부, 노선으로 새 배달 시작함
     /// </summary>
     public bool StartDelivery(int courierID, int letterID, int routeID)
