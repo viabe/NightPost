@@ -105,7 +105,9 @@ namespace NightPost.UI
 
         public void Close()
         {
-            if (!_isOpen) return;
+            // _isOpen 여부와 무관하게 항상 닫는다.
+            // (에디터에서 패널을 켜둔 채 실행하면 Open()을 거치지 않아 _isOpen이 false인데,
+            //  여기서 early return 하면 닫기 버튼이 아무 반응도 없는 것처럼 보인다)
             _isOpen = false;
             _isSubmitting = false;
 

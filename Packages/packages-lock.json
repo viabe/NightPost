@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "com.gilzoide.sqlite-net": {
-      "version": "file:C:/Users/kkjmo/Downloads/unity-sqlite-net-main",
+      "version": "file:unity-sqlite-net-main",
       "depth": 0,
-      "source": "local",
+      "source": "embedded",
       "dependencies": {}
     },
     "com.unity.2d.animation": {
