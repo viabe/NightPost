@@ -3,9 +3,9 @@
 [System.Serializable]
 public class UISoundTrackData
 {
-    [SerializeField] private EUISoundType soundType;
+    [SerializeField] private ESFXType soundType;
     [SerializeField] private AudioClip audioClip;
 
-    public EUISoundType SoundType => soundType;
+    public ESFXType SoundType => soundType;
     public AudioClip AudioClip => audioClip;
 }

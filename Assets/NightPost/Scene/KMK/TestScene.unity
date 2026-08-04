@@ -1221,7 +1221,7 @@ MonoBehaviour:
   bgmAudioSource: {fileID: 1043255804}
   bgmTracks:
   - bgmType: 1
-    audioClip: {fileID: 8300000, guid: 27323a735510c1b47803fb9191576a44, type: 3}
+    audioClip: {fileID: 8300000, guid: 471700d34a68c01488c66c4fdbd696f9, type: 3}
   - bgmType: 2
     audioClip: {fileID: 8300000, guid: d99c90ed72bdf0d47851d6d33b950132, type: 3}
   - bgmType: 3
