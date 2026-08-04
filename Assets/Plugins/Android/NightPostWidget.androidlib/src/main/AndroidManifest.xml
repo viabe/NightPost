@@ -1,0 +1,20 @@
+xml version=1.0 encoding=utf-8
+manifest xmlnsandroid=httpschemas.android.comapkresandroid
+
+    application
+        receiver
+            androidname=com.nightpost.widget.NightPostWidgetProvider
+            androidexported=true
+            androidlabel=밤에 오는 편지
+
+            intent-filter
+                action androidname=android.appwidget.action.APPWIDGET_UPDATE 
+            intent-filter
+
+            meta-data
+                androidname=android.appwidget.provider
+                androidresource=@xmlnight_post_widget_info 
+        receiver
+    application
+
+manifest

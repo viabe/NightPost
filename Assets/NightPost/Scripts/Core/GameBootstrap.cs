@@ -77,7 +77,7 @@ public class GameBootstrap : MonoBehaviour
             Debug.LogWarning("[GameBootStrap] UI 효과음 초기화 실패");
         }
         // 새 게임 시작 시 기본 해금 대상으로 설정된 배달부와 노선을 저장 데이터에 등록
-        if (isNewGame) progressionService.ApplyDefaultUnlocks();
+        progressionService.ApplyDefaultUnlocks();
 
         // 불러온 저장 데이터의 누적 배달 완료 수를 기준으로 추가로 해금될 배달부와 노선을 검사
         progressionService.EvaluateProgressUnlocks();
@@ -133,7 +133,6 @@ public class GameBootstrap : MonoBehaviour
             Debug.LogError("[GameBootStrap] 오프라인 진행 반영 후 저장 실패");
         }
     }
-
     /// <summary>
     /// 게임에서 사용하는 각 서비스에
     /// 필요한 의존성을 전달하고 초기화한다.
@@ -153,7 +152,7 @@ public class GameBootstrap : MonoBehaviour
         if (!isInit) return false;
         isInit = letterService.Initialize(playerDataManager, staticDataCatalog, facilityService);
         if (!isInit) return false;
-        isInit = progressionService.Initialize(staticDataCatalog, playerDataManager);
+        isInit = progressionService.Initialize(staticDataCatalog, playerDataManager, letterService);
         if (!isInit) return false;
         morningReportService = new MorningReportService();
         isInit = morningReportService.Initialize(playerDataManager, staticDataCatalog, letterService, progressionService);
