@@ -9,15 +9,14 @@ namespace NightPost.UI
     ///   - 행 클릭 → GameFlowController로 답장 열기(읽음 처리) → LetterRead 본문 표시
     ///   - ReplyReceived/ReplyRead 구독 → 수신함이 열려 있으면 목록 갱신(미열람 점 등)
     ///
-    /// 받은 답장 전체 목록은 카탈로그의 모든 답장 중 IsReplyReceived인 것으로 구한다
-    /// (도메인에 "받은 답장 전체 조회" API가 없어 이렇게 필터링).
+    /// 받은 답장 목록은 ReplyService.GetReceivedReplies()로 조회한다.
     /// </summary>
     public class InboxPresenter : MonoBehaviour
     {
         [SerializeField] private HUDController _hud;         // 수신함 버튼 이벤트 소스
         [SerializeField] private GameFlowController _flow;
-        [SerializeField] private PlayerDataManager _playerData;
-        [SerializeField] private StaticDataCatalog _catalog;
+        [SerializeField] private PlayerDataManager _playerData; // 읽음 여부 조회
+        [SerializeField] private ReplyService _replyService;    // 받은 답장 목록 조회
 
         private void OnEnable()
         {
@@ -51,20 +50,23 @@ namespace NightPost.UI
         private InboxModel BuildModel()
         {
             List<InboxRow> rows = new();
-            if (_catalog != null && _playerData != null)
+            if (_replyService != null)
             {
-                foreach (ReplyStaticData reply in _catalog.Replies())
+                foreach (ReplyStaticData reply in _replyService.GetReceivedReplies())
                 {
                     if (reply == null) continue;
-                    if (!_playerData.IsReplyReceived(reply.ReplyID)) continue;
                     rows.Add(new InboxRow
                     {
                         ReplyId = reply.ReplyID,
                         SenderName = reply.SenderName,
                         Title = reply.ReplyTitle,
-                        IsRead = _playerData.IsReplyRead(reply.ReplyID),
+                        IsRead = _playerData != null && _playerData.IsReplyRead(reply.ReplyID),
                     });
                 }
+            }
+            else
+            {
+                Debug.LogError("[Inbox] ReplyService 미연결", this);
             }
             return new InboxModel { Rows = rows, OnOpenReply = OpenReply };
         }
