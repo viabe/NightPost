@@ -7,17 +7,22 @@ public class ProgressionService : MonoBehaviour
     private StaticDataCatalog staticDataCatalog;
     // 플레이어의 보유 배달부와 해금 노선 데이터를 관리하는 매니저임
     private PlayerDataManager playerDataManager;
+    // 해금 조건을 충족한 편지를 플레이어에게 수신시키는 서비스임
+    private LetterService letterService;
+
     /// <summary>
     /// 진행도 해금 처리에 필요한 정적 데이터 카탈로그와 플레이어 데이터 매니저를 등록함
     /// </summary>
-    public bool Initialize(StaticDataCatalog catalog, PlayerDataManager dataManager)
+    public bool Initialize(StaticDataCatalog catalog, PlayerDataManager dataManager, LetterService service)
     {
         // 필요한 참조 중 하나라도 없다면 초기화하지 않음
-        if (catalog == null || dataManager == null) return false;
+        if (catalog == null || dataManager == null || service == null) return false;
         // 정적 데이터 카탈로그를 저장함
         staticDataCatalog = catalog;
         // 플레이어 데이터 매니저를 저장함
         playerDataManager = dataManager;
+        // 편지 수신 서비스를 저장함
+        letterService = service;
         // 필요한 참조 등록이 완료되었음을 반환함
         return true;
     }
@@ -28,7 +33,7 @@ public class ProgressionService : MonoBehaviour
     public void ApplyDefaultUnlocks()
     {
         // 필요한 참조가 등록되지 않았다면 기본 해금을 처리하지 않음
-        if (staticDataCatalog == null || playerDataManager == null) return;
+        if (staticDataCatalog == null || playerDataManager == null || letterService == null) return;
         // 등록된 전체 배달부 정적 데이터를 순회함
         foreach (CourierStaticData courierStaticData in staticDataCatalog.Couriers())
         {
@@ -58,7 +63,27 @@ public class ProgressionService : MonoBehaviour
             // 기본 해금 노선을 플레이어의 해금 목록에 추가함
             playerDataManager.AddUnlockedRoute(routeStaticData.RouteID);
         }
+        // 등록된 전체 편지 정적 데이터를 순회함
+        foreach (LetterStaticData letterStaticData in staticDataCatalog.Letters())
+        {
+            // 유효하지 않은 편지 데이터는 건너뜀
+            if (letterStaticData == null) continue;
+            // 해금 조건이 없는 편지는 건너뜀
+            if (letterStaticData.UnlockCondition == null) continue;
+            // 기본 수신 대상이 아닌 편지는 건너뜀
+            if (!letterStaticData.UnlockCondition.IsUnlockedByDefault) continue;
 
+            // 기본 수신 편지를 편지 진행 데이터에 추가함
+            bool isReceived = letterService.ReceiveLetter(letterStaticData.LetterID);
+
+            // 편지 수신 결과를 확인함
+            if (!isReceived)
+            {
+                Debug.LogWarning($"[ProgressionService] 기본 편지 수신 실패: {letterStaticData.LetterID}");
+                continue;
+            }
+            Debug.Log($"[ProgressionService] 기본 편지 수신 성공: {letterStaticData.LetterID}");
+        }
     }
     /// <summary>
     /// 완료한 배달 횟수를 기준으로 새롭게 충족된 배달부와 노선의 해금 조건을 확인함
@@ -66,7 +91,7 @@ public class ProgressionService : MonoBehaviour
     public void EvaluateProgressUnlocks()
     {
         // 필요한 참조가 등록되지 않았다면 진행도 해금을 처리하지 않음
-        if (staticDataCatalog == null || playerDataManager == null) return;
+        if (staticDataCatalog == null || playerDataManager == null || letterService == null) return;
         // 현재까지 완료한 배달 횟수를 조회함
         int completedDeliveryCount = playerDataManager.GetCompletedDeliveryCount();
         // 등록된 전체 배달부 정적 데이터를 순회함
@@ -84,6 +109,20 @@ public class ProgressionService : MonoBehaviour
             if (completedDeliveryCount < courierStaticData.UnlockCondition.RequiredCompletedDeliveryCount) continue;
             // 해금 조건을 충족한 배달부를 플레이어의 보유 목록에 추가함
             playerDataManager.AddOwnedCourier(courierStaticData.CourierID);
+        }
+        // 등록된 전체 편지 정적 데이터를 순회함
+        foreach (LetterStaticData letterStaticData in staticDataCatalog.Letters())
+        {
+            // 유효하지 않은 편지 데이터는 건너뜀
+            if (letterStaticData == null) continue;
+            // 해금 조건이 없는 편지는 건너뜀
+            if (letterStaticData.UnlockCondition == null) continue;
+            // 기본 수신 대상은 진행도 수신 검사에서 제외함
+            if (letterStaticData.UnlockCondition.IsUnlockedByDefault) continue;
+            // 완료한 배달 횟수가 요구 조건보다 적다면 수신하지 않음
+            if (completedDeliveryCount < letterStaticData.UnlockCondition.RequiredCompletedDeliveryCount) continue;
+            // 조건을 충족한 편지를 편지 진행 데이터에 추가함
+            letterService.ReceiveLetter(letterStaticData.LetterID);
         }
     }
 
