@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 396710830}
   - component: {fileID: 396710829}
   - component: {fileID: 396710828}
+  - component: {fileID: 396710832}
   m_Layer: 5
   m_Name: RightButt
   m_TagString: Untagged
@@ -255,6 +256,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 396710826}
   m_CullTransparentMesh: 1
+--- !u!114 &396710832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396710826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 1043255806}
+  soundType: 30
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &422970929
 GameObject:
   m_ObjectHideFlags: 0
@@ -1201,11 +1218,81 @@ MonoBehaviour:
   m_GameObject: {fileID: 1043255803}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c5a0fb14d5182a49b803bba28678997, type: 3}
+  m_Script: {fileID: 11500000, guid: baad941be5e348144a0c2c8d81994b43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UISoundController
-  uiAudioSource: {fileID: 1043255808}
-  uiSoundTracks: []
+  sfxAudioSource: {fileID: 1043255808}
+  sfxTracks:
+  - soundType: 1
+    audioClip: {fileID: 8300000, guid: 5fee8a40ac164e04fa687fce74255139, type: 3}
+  - soundType: 2
+    audioClip: {fileID: 8300000, guid: 9b81124e12e2a974fb4625098a4fe29b, type: 3}
+  - soundType: 3
+    audioClip: {fileID: 8300000, guid: ee381d8028ddbba4097d6bac0b12ebf7, type: 3}
+  - soundType: 4
+    audioClip: {fileID: 8300000, guid: 00bae0153d4acd74cbfd3df78de53582, type: 3}
+  - soundType: 5
+    audioClip: {fileID: 8300000, guid: 46369b5ebcac39c41941ac120da492ae, type: 3}
+  - soundType: 6
+    audioClip: {fileID: 8300000, guid: 0b929d41d9267124b8de9b0ad2f01302, type: 3}
+  - soundType: 7
+    audioClip: {fileID: 8300000, guid: 644073052f852744d8443c5e534d1465, type: 3}
+  - soundType: 8
+    audioClip: {fileID: 8300000, guid: 3512f600e3b72ea45aa61cf6f395ece2, type: 3}
+  - soundType: 9
+    audioClip: {fileID: 8300000, guid: 0e71c24b9dec8f249ac3d6cb2539204e, type: 3}
+  - soundType: 10
+    audioClip: {fileID: 8300000, guid: 16c4fe0c18c19d04ba49c02844989310, type: 3}
+  - soundType: 11
+    audioClip: {fileID: 8300000, guid: 1e073730f48906e42a2cc77c9f1a1b57, type: 3}
+  - soundType: 12
+    audioClip: {fileID: 8300000, guid: d4156ca1e844f534ea75acbabcd7959b, type: 3}
+  - soundType: 13
+    audioClip: {fileID: 8300000, guid: 240341d363a6e1447b71bc5c79859099, type: 3}
+  - soundType: 14
+    audioClip: {fileID: 8300000, guid: 6db92c7542df14048a2c57ee6cd6fe18, type: 3}
+  - soundType: 15
+    audioClip: {fileID: 8300000, guid: b57955c3bdd300847820c8bb5e4ce3f0, type: 3}
+  - soundType: 16
+    audioClip: {fileID: 8300000, guid: a0b1313c762d1e44ca6f6dcabec1848f, type: 3}
+  - soundType: 17
+    audioClip: {fileID: 8300000, guid: 02390515b57fb7542b0cb34111fbcdf4, type: 3}
+  - soundType: 18
+    audioClip: {fileID: 8300000, guid: 1e4b9179467d7e84396776c4ebb1de6c, type: 3}
+  - soundType: 19
+    audioClip: {fileID: 8300000, guid: 4fc74a0746665554ea4d6b7827429e75, type: 3}
+  - soundType: 20
+    audioClip: {fileID: 8300000, guid: 1e0ff40b77883c1438ea0742f41e5116, type: 3}
+  - soundType: 21
+    audioClip: {fileID: 8300000, guid: 9e550d750df99b4428cf0ed1a002477e, type: 3}
+  - soundType: 22
+    audioClip: {fileID: 8300000, guid: cfd9a72ced3462948b57c35c2341137b, type: 3}
+  - soundType: 23
+    audioClip: {fileID: 8300000, guid: b5091a31dcf91f04283efb9064c82a7e, type: 3}
+  - soundType: 24
+    audioClip: {fileID: 8300000, guid: f216648a324645645b3f769d70ba99be, type: 3}
+  - soundType: 25
+    audioClip: {fileID: 8300000, guid: 26bd1df639629864abee975f357064ff, type: 3}
+  - soundType: 26
+    audioClip: {fileID: 8300000, guid: c35c8df392e18ed44aded31edff69544, type: 3}
+  - soundType: 27
+    audioClip: {fileID: 8300000, guid: 2da774a009775e941a66eae281b7e507, type: 3}
+  - soundType: 28
+    audioClip: {fileID: 8300000, guid: 20bac51f2ff4ad64c908542ceafd1860, type: 3}
+  - soundType: 29
+    audioClip: {fileID: 8300000, guid: 14d729f7d1873fd48a3c8bc5c61344d1, type: 3}
+  - soundType: 30
+    audioClip: {fileID: 8300000, guid: 4dffb08c8d6c833458de868ca9036ecb, type: 3}
+  - soundType: 31
+    audioClip: {fileID: 8300000, guid: 59e9c2484e915bc47a3d86c8e436270c, type: 3}
+  - soundType: 32
+    audioClip: {fileID: 8300000, guid: fb4070904d6f4874e88cc9d8843bb016, type: 3}
+  - soundType: 33
+    audioClip: {fileID: 8300000, guid: 358451e4c68cc814e87f4e0924889b87, type: 3}
+  - soundType: 34
+    audioClip: {fileID: 8300000, guid: 4681edac2754c9144b64164924395bad, type: 3}
+  - soundType: 35
+    audioClip: {fileID: 8300000, guid: e93ced44e87849642b9d84684b314836, type: 3}
 --- !u!114 &1043255807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1222,10 +1309,13 @@ MonoBehaviour:
   bgmTracks:
   - bgmType: 1
     audioClip: {fileID: 8300000, guid: 471700d34a68c01488c66c4fdbd696f9, type: 3}
+    bgmVolume: 0.6
   - bgmType: 2
-    audioClip: {fileID: 8300000, guid: d99c90ed72bdf0d47851d6d33b950132, type: 3}
+    audioClip: {fileID: 8300000, guid: d147b63e082b5914eb9f8da0f0837325, type: 3}
+    bgmVolume: 0.6
   - bgmType: 3
     audioClip: {fileID: 8300000, guid: d147b63e082b5914eb9f8da0f0837325, type: 3}
+    bgmVolume: 0.7
 --- !u!82 &1043255808
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1414,6 +1504,7 @@ GameObject:
   - component: {fileID: 1646480824}
   - component: {fileID: 1646480823}
   - component: {fileID: 1646480822}
+  - component: {fileID: 1646480825}
   - component: {fileID: 1646480821}
   m_Layer: 5
   m_Name: LeftButt
@@ -1538,6 +1629,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1646480819}
   m_CullTransparentMesh: 1
+--- !u!114 &1646480825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1646480819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 1043255806}
+  soundType: 29
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &1684119118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1832,6 +1939,8 @@ GameObject:
   - component: {fileID: 1854325795}
   - component: {fileID: 1854325794}
   - component: {fileID: 1854325798}
+  - component: {fileID: 1854325800}
+  - component: {fileID: 1854325799}
   m_Layer: 0
   m_Name: SortStattion
   m_TagString: Untagged
@@ -1932,7 +2041,7 @@ Transform:
   m_GameObject: {fileID: 1854325792}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -4.63, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1984,6 +2093,51 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1854325799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854325792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1685f21b596a7f744a7ff9d9599a4107, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SFXPlayer
+  sfxController: {fileID: 1043255806}
+  soundType: 27
+  soundVolume: 1
+--- !u!114 &1854325800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854325792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4743bd836662744f804b56cf5294a8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIInteractionStation
+  interactionOffsetX: 0.5
+  playerInteraction: {fileID: 1684119125}
+  isInteractable: 1
+  onInteractionRequested:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1854325799}
+        m_TargetAssemblyTypeName: SFXPlayer, Assembly-CSharp
+        m_MethodName: PlaySound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

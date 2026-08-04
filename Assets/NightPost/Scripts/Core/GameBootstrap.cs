@@ -22,7 +22,7 @@ public class GameBootstrap : MonoBehaviour
 
     [Header("오디오")]
     [SerializeField] private BGMController bgmController;
-    [SerializeField] private UISoundController uiSoundController;
+    [SerializeField] private SFXController uiSoundController;
     [SerializeField, Min(1.0f)] private float bgmTimeCheckIntervalSeconds = 60.0f;
 
     // 현재 시간에 맞는 BGM을 주기적으로 검사하는 코루틴임
