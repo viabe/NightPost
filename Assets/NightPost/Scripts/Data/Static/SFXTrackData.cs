@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class UISoundTrackData
+public class SFXTrackData
 {
     [SerializeField] private ESFXType soundType;
     [SerializeField] private AudioClip audioClip;
