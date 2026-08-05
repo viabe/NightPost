@@ -1,59 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="12dp"
-    android:background="#0B1B33">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/widget_title_text"
+    <!-- 기존 배경 크기와 표시 방식을 유지함 -->
+    <ImageView
+        android:id="@+id/widget_background_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="밤에 오는 편지"
-        android:textColor="#F4D6A0"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:gravity="center" />
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/widget_background_night" />
 
+    <!-- 아이콘과 문구를 중앙 영역보다 조금 위에 배치함 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="60dp"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center_horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
+        <!-- 대기·배달 중·도착 아이콘을 표시함 -->
+        <ImageView
+            android:id="@+id/widget_state_icon"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/widget_icon_waiting" />
+
+        <!-- 현재 배달 상태를 표시함 -->
         <TextView
             android:id="@+id/widget_status_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="-5dp"
+            android:gravity="center"
+            android:maxLines="1"
             android:text="배달 대기"
-            android:textColor="#FFF4DE"
-            android:textSize="22sp"
+            android:textColor="#FFF0C2"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:gravity="center" />
+            android:shadowColor="#E60A1630"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="3.5" />
 
+        <!-- 현재 상태에 해당하는 편지 수를 표시함 -->
         <TextView
             android:id="@+id/widget_count_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="준비된 편지 2통"
-            android:textColor="#E8D9BF"
-            android:textSize="13sp"
-            android:gravity="center" />
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="준비된 편지 0통"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:shadowColor="#E60A1630"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="3.0" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/widget_launch_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="게임 열기  ›"
-        android:textColor="#DAB77A"
-        android:textSize="11sp"
-        android:gravity="end" />
-
-</LinearLayout>
+</FrameLayout>

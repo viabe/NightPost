@@ -15,6 +15,7 @@ public class GameBootstrap : MonoBehaviour
     [SerializeField] private ProgressionService progressionService;
     [SerializeField] private FacilityService facilityService;
     [SerializeField] private SaveService saveService;
+    [SerializeField] private WidgetService widgetService;
 
     [Header("게임 흐름")]
     [SerializeField] private GameFlowController gameFlowController;
@@ -126,6 +127,9 @@ public class GameBootstrap : MonoBehaviour
         // 마지막 저장 시점 이후 완료된 배달을 처리하고 주기적인 완료 검사를 시작함
         offlineProgressService.CheckOffline();
 
+        // 오프라인 진행이 반영된 현재 배달 상태를 위젯에 표시함
+        widgetService.RefreshWidget();
+
         // 오프라인 진행이 반영된 현재 데이터를 SQLite에 저장함
         // 저장에 실패했다면 오류 로그를 출력함
         if (!saveService.SaveAll())
@@ -146,7 +150,8 @@ public class GameBootstrap : MonoBehaviour
         // 필수 컴포넌트가 하나라도 연결되지 않았다면 서비스 초기화 실패
         if (staticDataCatalog == null || letterService == null || deliveryService == null || playerDataManager == null ||
             replyService == null || gameFlowController == null || offlineProgressService == null || progressionService == null ||
-            facilityService == null) return false;
+            facilityService == null || widgetService == null) return false;
+
 
         bool isInit = facilityService.Initialize(staticDataCatalog, playerDataManager);
         if (!isInit) return false;
@@ -171,6 +176,8 @@ public class GameBootstrap : MonoBehaviour
         if (!isInit) return false;
         isInit = offlineProgressService.Initialize(deliveryService);
         if(!isInit) return false;
+        isInit = widgetService.Initialize(playerDataManager);
+        if (!isInit) return false;
 
         return true;
     }
