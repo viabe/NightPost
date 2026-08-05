@@ -77,8 +77,8 @@ namespace NightPost.UI
                 Description = facility != null ? facility.Description : string.Empty,
                 CurrentLevel = currentLevel,
                 MaxLevel = facility != null ? facility.MaxLevel : 0,
-                CurrentEffectText = EffectText(current, isCurrent: true),
-                NextEffectText = isMax ? string.Empty : EffectText(next, isCurrent: false),
+                CurrentEffectText = UILabels.FacilityEffect(current, isCurrent: true),
+                NextEffectText = isMax ? string.Empty : UILabels.FacilityEffect(next, isCurrent: false),
                 UpgradeCost = isMax ? 0 : next.UpgradeCost,
                 IsMax = isMax,
                 CanUpgrade = _facilityService != null && _facilityService.CanUpgradeFacility(facilityId),
@@ -92,27 +92,6 @@ namespace NightPost.UI
             if (_flow == null) return;
             if (!_flow.UpgradeSelectedFacility())
                 Debug.LogWarning("[Facility] 업그레이드 실패(재화 부족·최대 레벨 등)");
-        }
-
-        // EffectType별 문구 규칙 (명세서 v1.2 §9)
-        private static string EffectText(FacilityLevelData data, bool isCurrent)
-        {
-            if (data == null) return "효과 없음";
-            switch (data.EffectType)
-            {
-                case EFacilityEffectType.DeliveryTimeReduction:
-                {
-                    int pct = Mathf.RoundToInt(data.EffectValue * 100f);
-                    return isCurrent ? $"배달 시간 {pct}% 감소" : $"업그레이드 후 {pct}% 감소";
-                }
-                case EFacilityEffectType.LetterCapacityIncrease:
-                {
-                    int n = Mathf.FloorToInt(data.EffectValue);
-                    return isCurrent ? $"편지 보유 한도 +{n}통" : $"업그레이드 후 +{n}통";
-                }
-                default:
-                    return "적용 효과 없음";
-            }
         }
 
         private FacilityDetailController GetPopup()
