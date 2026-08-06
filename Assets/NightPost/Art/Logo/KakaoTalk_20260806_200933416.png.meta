@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2a126acc23a975d48973b06746d4f14d
+guid: 10c8471f02847e34097a34548124e9d6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6133247238970584898
-    second: "\uB77C\uBCA82_0"
+      213: 5206440925380326108
+    second: KakaoTalk_20260806_200933416_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,13 +46,13 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 40, y: 20, z: 40, w: 20}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -126,23 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\uB77C\uBCA82_0"
+      name: KakaoTalk_20260806_200933416_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 158
-        height: 79
+        x: 414
+        y: 266
+        width: 471
+        height: 271
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 24fac765edbad1550800000000000000
-      internalID: 6133247238970584898
+      spriteID: cd2b95dcf6ef04840800000000000000
+      internalID: 5206440925380326108
       vertices: []
       indices: 
       edges: []
@@ -151,8 +151,8 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    spriteID: 
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\uB77C\uBCA82_0": 6133247238970584898
+      KakaoTalk_20260806_200933416_0: 5206440925380326108
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
