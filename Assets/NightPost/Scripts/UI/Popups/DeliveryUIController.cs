@@ -19,13 +19,45 @@ namespace NightPost.UI
     /// </summary>
     public class DeliveryUIController : MonoBehaviour
     {
+        /// <summary>배달대 화면의 탭. 배정 / 진행 중 / 결과.</summary>
+        public enum ETab { Assign = 0, Active = 1, Result = 2 }
+
         [Header("의존성")]
         [SerializeField] private DeliveryService _deliveryService;
         [SerializeField] private LetterService _letterService;
         [SerializeField] private PlayerController _playerController;
+        [Tooltip("진행 중/결과 탭에서 편지·배달부·노선 이름을 조회한다.")]
+        [SerializeField] private StaticDataCatalog _catalog;
+        [Tooltip("결과 탭에서 미확인 결과를 조회한다.")]
+        [SerializeField] private PlayerDataManager _playerData;
+        [Tooltip("결과 탭에서 보상을 수령한다.")]
+        [SerializeField] private GameFlowController _flow;
 
         [Header("패널")]
         [SerializeField] private GameObject _deliveryPanel;
+
+        [Header("탭")]
+        [SerializeField] private Button _assignTabButton;
+        [SerializeField] private Button _activeTabButton;
+        [SerializeField] private Button _resultTabButton;
+        [SerializeField] private GameObject _assignTabContent;  // 기존 배정 영역 전체
+        [SerializeField] private GameObject _activeTabContent;
+        [SerializeField] private GameObject _resultTabContent;
+        [Tooltip("[배정, 진행중, 결과] 순서의 선택 강조 오브젝트")]
+        [SerializeField] private GameObject[] _tabSelectedMarks = new GameObject[3];
+        [Tooltip("결과 탭 버튼에 붙는 미확인 결과 알림 배지")]
+        [SerializeField] private GameObject _resultBadge;
+
+        [Header("진행 중")]
+        [SerializeField] private Transform _activeListRoot;
+        [SerializeField] private ActiveDeliveryRowItem _activeRowPrefab;
+        [SerializeField] private GameObject _activeEmpty;
+
+        [Header("결과")]
+        [SerializeField] private Transform _resultListRoot;
+        [SerializeField] private MorningReportRowItem _resultRowPrefab;  // 아침 보고와 같은 줄 모양 재사용
+        [SerializeField] private GameObject _resultEmpty;
+        [SerializeField] private Button _claimAllButton;
 
         [Header("대기 편지")]
         [SerializeField] private Transform _letterListRoot;
@@ -62,6 +94,11 @@ namespace NightPost.UI
         private readonly List<SortingLetterItem> _letterItems = new();
         private readonly List<AssignmentOptionItem> _courierItems = new();
         private readonly List<AssignmentOptionItem> _routeItems = new();
+        private readonly List<ActiveDeliveryRowItem> _activeRows = new();
+        private readonly List<MorningReportRowItem> _resultRows = new();
+
+        private ETab _currentTab = ETab.Assign;
+        private float _remainRefreshTimer;   // 진행 중 탭 남은 시간 갱신 주기
 
         private void Awake()
         {
@@ -75,6 +112,67 @@ namespace NightPost.UI
                 _closeButton.onClick.RemoveAllListeners();
                 _closeButton.onClick.AddListener(Close);
             }
+
+            if (_assignTabButton != null)
+            {
+                _assignTabButton.onClick.RemoveAllListeners();
+                _assignTabButton.onClick.AddListener(ShowAssignTab);
+            }
+            if (_activeTabButton != null)
+            {
+                _activeTabButton.onClick.RemoveAllListeners();
+                _activeTabButton.onClick.AddListener(ShowActiveTab);
+            }
+            if (_resultTabButton != null)
+            {
+                _resultTabButton.onClick.RemoveAllListeners();
+                _resultTabButton.onClick.AddListener(ShowResultTab);
+            }
+            if (_claimAllButton != null)
+            {
+                _claimAllButton.onClick.RemoveAllListeners();
+                _claimAllButton.onClick.AddListener(ClaimAllResults);
+            }
+        }
+
+        // ── 탭 ──
+        public void ShowAssignTab() => SelectTab(ETab.Assign);
+        public void ShowActiveTab() => SelectTab(ETab.Active);
+        public void ShowResultTab() => SelectTab(ETab.Result);
+
+        private void SelectTab(ETab tab)
+        {
+            _currentTab = tab;
+
+            if (_assignTabContent != null) _assignTabContent.SetActive(tab == ETab.Assign);
+            if (_activeTabContent != null) _activeTabContent.SetActive(tab == ETab.Active);
+            if (_resultTabContent != null) _resultTabContent.SetActive(tab == ETab.Result);
+
+            if (_tabSelectedMarks != null)
+            {
+                for (int i = 0; i < _tabSelectedMarks.Length; i++)
+                    if (_tabSelectedMarks[i] != null) _tabSelectedMarks[i].SetActive(i == (int)tab);
+            }
+
+            switch (tab)
+            {
+                case ETab.Active: RefreshActiveList(); break;
+                case ETab.Result: RefreshResultList(); break;
+            }
+        }
+
+        // 진행 중 탭이 열려 있는 동안 남은 시간을 1초마다 다시 계산한다.
+        private void Update()
+        {
+            if (!_isOpen || _currentTab != ETab.Active || _activeRows.Count == 0) return;
+
+            _remainRefreshTimer += Time.unscaledDeltaTime;
+            if (_remainRefreshTimer < 1f) return;
+            _remainRefreshTimer = 0f;
+
+            long now = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            for (int i = 0; i < _activeRows.Count; i++)
+                if (_activeRows[i] != null) _activeRows[i].UpdateRemaining(now);
         }
 
         // ── 열기 / 닫기 ──
@@ -102,6 +200,9 @@ namespace NightPost.UI
             ClearOptionsForNoLetter();
             ClearPreview();
             UpdateStartButton();
+
+            SelectTab(ETab.Assign); // 열 때는 항상 배정 탭부터
+            RefreshResultBadge();
         }
 
         public void Close()
@@ -113,6 +214,8 @@ namespace NightPost.UI
 
             ResetSelection();
             Unsubscribe();
+            ClearActiveRows();
+            ClearResultRows();
 
             if (_deliveryPanel != null) _deliveryPanel.SetActive(false);
             if (_playerController != null) _playerController.SetControlEnabled(true);
@@ -167,6 +270,129 @@ namespace NightPost.UI
             ClearOptionsForNoLetter();
             ClearPreview();
             UpdateStartButton();
+        }
+
+        // ── 진행 중 탭 ──
+        private void RefreshActiveList()
+        {
+            ClearActiveRows();
+            if (_deliveryService == null || _activeRowPrefab == null || _activeListRoot == null) return;
+
+            long now = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            int count = 0;
+
+            foreach (ActiveDeliveryData delivery in _deliveryService.GetActiveDeliveries())
+            {
+                if (delivery == null) continue;
+
+                ActiveDeliveryRowItem row = Instantiate(_activeRowPrefab, _activeListRoot);
+                row.gameObject.SetActive(true);
+                row.Setup(delivery.LetterID,
+                          LetterTitle(delivery.LetterID),
+                          $"{CourierName(delivery.CourierID)} · {RouteName(delivery.RouteID)}",
+                          delivery.StartedAtUnixTime,
+                          delivery.CompleteAtUnixTime);
+                row.UpdateRemaining(now);
+                _activeRows.Add(row);
+                count++;
+            }
+
+            if (_activeEmpty != null) _activeEmpty.SetActive(count == 0);
+        }
+
+        // ── 결과 탭 ──
+        private void RefreshResultList()
+        {
+            ClearResultRows();
+
+            int count = 0;
+            if (_playerData != null && _resultRowPrefab != null && _resultListRoot != null)
+            {
+                IReadOnlyList<DeliveryResultData> results = _playerData.GetUncheckedDeliveryResults();
+                if (results != null)
+                {
+                    foreach (DeliveryResultData result in results)
+                    {
+                        if (result == null) continue;
+
+                        bool hasReply = _catalog != null && _catalog.GetReplyByLetterID(result.LetterID) != null;
+
+                        MorningReportRowItem row = Instantiate(_resultRowPrefab, _resultListRoot);
+                        row.gameObject.SetActive(true);
+                        row.Setup(LetterTitle(result.LetterID), result.RewardAmount, hasReply);
+                        _resultRows.Add(row);
+                        count++;
+                    }
+                }
+            }
+
+            if (_resultEmpty != null) _resultEmpty.SetActive(count == 0);
+            if (_claimAllButton != null) _claimAllButton.interactable = count > 0;
+            RefreshResultBadge();
+        }
+
+        /// <summary>미확인 결과를 모두 확인해 보상과 답장을 받는다.</summary>
+        private void ClaimAllResults()
+        {
+            if (_flow == null || _playerData == null) return;
+
+            IReadOnlyList<DeliveryResultData> results = _playerData.GetUncheckedDeliveryResults();
+            if (results == null || results.Count == 0) return;
+
+            // 확인 처리 중 원본 목록이 바뀌므로 편지 ID를 먼저 복사해 둔다.
+            List<int> letterIds = new();
+            foreach (DeliveryResultData result in results)
+                if (result != null) letterIds.Add(result.LetterID);
+
+            foreach (int letterId in letterIds)
+            {
+                if (!_flow.SelectDeliveryResult(letterId)) continue;
+                _flow.CheckSelectedDeliveryResult();
+            }
+
+            RefreshResultList();
+        }
+
+        /// <summary>결과 탭 버튼에 미확인 결과 알림 배지를 켜고 끈다.</summary>
+        private void RefreshResultBadge()
+        {
+            if (_resultBadge == null) return;
+            IReadOnlyList<DeliveryResultData> results = _playerData != null
+                ? _playerData.GetUncheckedDeliveryResults() : null;
+            _resultBadge.SetActive(results != null && results.Count > 0);
+        }
+
+        // ── 정적 데이터 이름 조회 (카탈로그 미연결 시 ID로 대체 표시) ──
+        private string LetterTitle(int letterId)
+        {
+            LetterStaticData data = _catalog != null ? _catalog.GetLetter(letterId) : null;
+            return data != null ? data.LetterTitle : $"편지 {letterId}";
+        }
+
+        private string CourierName(int courierId)
+        {
+            CourierStaticData data = _catalog != null ? _catalog.GetCourier(courierId) : null;
+            return data != null ? data.CourierName : $"배달부 {courierId}";
+        }
+
+        private string RouteName(int routeId)
+        {
+            RouteStaticData data = _catalog != null ? _catalog.GetRoute(routeId) : null;
+            return data != null ? data.RouteName : $"노선 {routeId}";
+        }
+
+        private void ClearActiveRows()
+        {
+            for (int i = 0; i < _activeRows.Count; i++)
+                if (_activeRows[i] != null) Destroy(_activeRows[i].gameObject);
+            _activeRows.Clear();
+        }
+
+        private void ClearResultRows()
+        {
+            for (int i = 0; i < _resultRows.Count; i++)
+                if (_resultRows[i] != null) Destroy(_resultRows[i].gameObject);
+            _resultRows.Clear();
         }
 
         // ── 조회/갱신 ──
@@ -344,6 +570,7 @@ namespace NightPost.UI
             GameEvents.DeliveryCompleted += OnDeliveryCompleted;
             GameEvents.LetterStateChanged += OnLetterStateChanged;
             GameEvents.FacilityUpgraded += OnFacilityUpgraded;
+            GameEvents.DeliveryResultChecked += OnDeliveryResultChecked;
         }
 
         private void Unsubscribe()
@@ -354,6 +581,7 @@ namespace NightPost.UI
             GameEvents.DeliveryCompleted -= OnDeliveryCompleted;
             GameEvents.LetterStateChanged -= OnLetterStateChanged;
             GameEvents.FacilityUpgraded -= OnFacilityUpgraded;
+            GameEvents.DeliveryResultChecked -= OnDeliveryResultChecked;
         }
 
         private void OnDeliveryChanged(int letterID, int courierID, int routeID)
@@ -361,11 +589,25 @@ namespace NightPost.UI
             if (!_isOpen) return;
             RefreshWaitingLetters();
             if (_selectedLetterID > 0) RefreshCouriers();
+            if (_currentTab == ETab.Active) RefreshActiveList(); // 새 배달이 진행 목록에 들어온다
         }
 
         private void OnDeliveryCompleted(int letterID)
         {
-            if (_isOpen) RefreshCouriers();
+            if (!_isOpen) return;
+            RefreshCouriers();
+
+            // 완료된 배달은 진행 목록에서 빠지고 결과 목록으로 넘어간다.
+            if (_currentTab == ETab.Active) RefreshActiveList();
+            else if (_currentTab == ETab.Result) RefreshResultList();
+            RefreshResultBadge();
+        }
+
+        private void OnDeliveryResultChecked(int letterID)
+        {
+            if (!_isOpen) return;
+            if (_currentTab == ETab.Result) RefreshResultList();
+            RefreshResultBadge();
         }
 
         private void OnLetterStateChanged(int letterID, ELetterProgressState state)

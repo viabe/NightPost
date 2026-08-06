@@ -1,174 +1,78 @@
-using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace NightPost.UI
 {
     /// <summary>
-    /// 시작 화면. 게임 씬(PostOffice)과 분리된 별도 씬에서 동작한다.
+    /// 시작 화면. 게임 씬(PostOffice)과 분리된 씬에서 동작한다.
     ///
-    /// 게임 씬에는 GameBootstrap이 있어 Awake에서 세이브 로드·해금·오프라인 정산까지
-    /// 자동으로 끝낸다. 즉 "새 게임/이어하기"를 물어볼 지점이 게임 씬 안에는 없다.
-    /// 그래서 선택은 이 화면에서 먼저 받고, 그 결과에 맞춰 게임 씬을 연다.
-    ///   - 이어하기 → 그대로 게임 씬 로드(GameBootstrap이 기존 세이브를 불러온다)
-    ///   - 새 게임  → 세이브 파일을 지운 뒤 게임 씬 로드(GameBootstrap이 신규로 시작한다)
+    /// 모바일 방치형 관례에 맞춰 진입구를 하나만 둔다.
+    /// 세이브 슬롯이 하나뿐이라 "새 게임 / 이어하기"를 물을 이유가 없다.
+    /// 기록이 있으면 이어지고, 없으면 새로 시작된다 — 판단은 게임 씬의
+    /// GameBootstrap이 알아서 하므로 이 화면은 씬을 여는 일만 한다.
     ///
-    /// 주의: 세이브 삭제 API가 없어 파일을 직접 지운다.
-    ///       SaveService에 DeleteSaveData()가 생기면 그 호출로 교체할 것.
+    /// 데이터 초기화가 필요하면 게임 안 설정 화면에서 다루는 편이 낫다
+    /// (SaveService에 삭제 API가 추가된 뒤).
     /// </summary>
     public class TitleScreenController : MonoBehaviour
     {
-        // SaveService와 같은 값이어야 한다(SaveService.DatabaseFileName).
-        private const string SaveFileName = "NightPostSave.db";
-
         [Header("이동할 게임 씬")]
         [Tooltip("Build Settings에 등록된 씬 이름")]
         [SerializeField] private string _gameSceneName = "PostOffice";
 
-        [Header("버튼")]
-        [SerializeField] private Button _continueButton;  // 이어하기 (세이브 있을 때만 활성)
-        [SerializeField] private Button _newGameButton;   // 새 게임
-        [SerializeField] private Button _quitButton;      // 종료 (선택)
+        [Header("진입")]
+        [Tooltip("화면 전체를 덮는 투명 버튼을 쓰면 '아무 곳이나 탭'이 된다.")]
+        [SerializeField] private Button _startButton;
+        [Tooltip("'터치하여 시작' 같은 안내 문구. 지정하면 부드럽게 점멸한다.")]
+        [SerializeField] private TMP_Text _startHintText;
+        [SerializeField] private float _blinkCycleSeconds = 1.6f;
 
-        [Header("새 게임 확인")]
-        [Tooltip("기존 기록을 지우기 전에 띄우는 확인 창. 기본 비활성.")]
-        [SerializeField] private GameObject _confirmPanel;
-        [SerializeField] private Button _confirmYesButton;
-        [SerializeField] private Button _confirmNoButton;
+        [Header("보조")]
+        [SerializeField] private Button _settingsButton;      // 선택
+        [Tooltip("설정 버튼 동작. 설정 화면이 준비되기 전엔 잠금 안내로 연결해도 된다.")]
+        [SerializeField] private UnityEvent _onSettingsClicked;
+        [SerializeField] private TMP_Text _versionText;       // 선택
 
-        [Header("표시")]
-        [SerializeField] private GameObject _noSaveNotice; // 세이브 없을 때 안내 (선택)
-        [SerializeField] private TMP_Text _versionText;    // 선택
-
-        private bool _isLoading; // 중복 클릭으로 씬을 두 번 여는 것을 막는다
+        private bool _isLoading; // 연타로 씬을 두 번 여는 것을 막는다
 
         private void Awake()
         {
-            if (_continueButton != null)
+            if (_startButton != null)
             {
-                _continueButton.onClick.RemoveAllListeners();
-                _continueButton.onClick.AddListener(ContinueGame);
+                _startButton.onClick.RemoveAllListeners();
+                _startButton.onClick.AddListener(StartGame);
             }
-            if (_newGameButton != null)
+            if (_settingsButton != null)
             {
-                _newGameButton.onClick.RemoveAllListeners();
-                _newGameButton.onClick.AddListener(RequestNewGame);
-            }
-            if (_quitButton != null)
-            {
-                _quitButton.onClick.RemoveAllListeners();
-                _quitButton.onClick.AddListener(QuitGame);
-            }
-            if (_confirmYesButton != null)
-            {
-                _confirmYesButton.onClick.RemoveAllListeners();
-                _confirmYesButton.onClick.AddListener(StartNewGame);
-            }
-            if (_confirmNoButton != null)
-            {
-                _confirmNoButton.onClick.RemoveAllListeners();
-                _confirmNoButton.onClick.AddListener(HideConfirm);
+                _settingsButton.onClick.RemoveAllListeners();
+                _settingsButton.onClick.AddListener(OpenSettings);
             }
         }
 
         private void Start()
         {
-            if (_confirmPanel != null) _confirmPanel.SetActive(false);
             if (_versionText != null) _versionText.text = $"v{Application.version}";
-
-            RefreshSaveState();
         }
 
-        /// <summary>세이브 유무에 따라 이어하기 버튼을 켜고 끈다.</summary>
-        private void RefreshSaveState()
+        private void Update()
         {
-            bool hasSave = HasSaveFile();
-            if (_continueButton != null) _continueButton.interactable = hasSave;
-            if (_noSaveNotice != null) _noSaveNotice.SetActive(!hasSave);
+            if (_startHintText == null || _blinkCycleSeconds <= 0f) return;
+
+            // 0.35~1.0 사이를 왕복하며 문구를 점멸시킨다(완전히 사라지지 않게).
+            float t = Mathf.PingPong(Time.unscaledTime / _blinkCycleSeconds, 1f);
+            Color c = _startHintText.color;
+            c.a = Mathf.Lerp(0.35f, 1f, t);
+            _startHintText.color = c;
         }
 
-        private static string SaveFilePath => Path.Combine(Application.persistentDataPath, SaveFileName);
-
-        private static bool HasSaveFile() => File.Exists(SaveFilePath);
-
-        // ── 이어하기 ──
-        public void ContinueGame()
-        {
-            if (_isLoading) return;
-            if (!HasSaveFile())
-            {
-                // 버튼이 비활성이라 보통은 오지 않지만, 파일이 중간에 사라진 경우를 대비한다.
-                RefreshSaveState();
-                ToastController.Instance?.Show("이어할 기록이 없어요.");
-                return;
-            }
-            LoadGameScene();
-        }
-
-        // ── 새 게임 ──
-        /// <summary>기존 기록이 있으면 확인부터 받는다.</summary>
-        public void RequestNewGame()
+        /// <summary>게임 씬으로 진입. 세이브가 있으면 이어지고 없으면 새로 시작된다.</summary>
+        public void StartGame()
         {
             if (_isLoading) return;
 
-            if (!HasSaveFile())
-            {
-                LoadGameScene(); // 지울 게 없으면 바로 시작
-                return;
-            }
-
-            if (_confirmPanel != null)
-            {
-                _confirmPanel.SetActive(true);
-                return;
-            }
-
-            // 확인 창이 없으면 기록을 지우지 않는다(실수로 날리는 것을 막는다).
-            Debug.LogError("[Title] 새 게임 확인 창이 연결되지 않아 진행하지 않는다.", this);
-        }
-
-        private void HideConfirm()
-        {
-            if (_confirmPanel != null) _confirmPanel.SetActive(false);
-        }
-
-        /// <summary>기존 세이브를 지우고 새로 시작한다.</summary>
-        public void StartNewGame()
-        {
-            if (_isLoading) return;
-            HideConfirm();
-
-            if (!DeleteSaveFile())
-            {
-                ToastController.Instance?.Show("기록을 지우지 못했어요.");
-                RefreshSaveState();
-                return;
-            }
-
-            LoadGameScene();
-        }
-
-        // TODO(교체): SaveService에 DeleteSaveData()가 추가되면 그 호출로 바꾼다.
-        private bool DeleteSaveFile()
-        {
-            try
-            {
-                if (File.Exists(SaveFilePath)) File.Delete(SaveFilePath);
-                return true;
-            }
-            catch (IOException e)
-            {
-                // 파일이 잠겨 있는 경우(다른 프로세스가 DB를 열고 있음 등)
-                Debug.LogError($"[Title] 세이브 삭제 실패: {e.Message}");
-                return false;
-            }
-        }
-
-        // ── 공통 ──
-        private void LoadGameScene()
-        {
             if (string.IsNullOrEmpty(_gameSceneName))
             {
                 Debug.LogError("[Title] 이동할 씬 이름이 비어 있다.", this);
@@ -179,13 +83,6 @@ namespace NightPost.UI
             SceneManager.LoadScene(_gameSceneName);
         }
 
-        public void QuitGame()
-        {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
-        }
+        private void OpenSettings() => _onSettingsClicked?.Invoke();
     }
 }
