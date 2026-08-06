@@ -256,6 +256,7 @@ namespace NightPost.UI
         {
             _selectedCourierID = courierID;
             foreach (var it in _courierItems) it.SetSelected(it.Id == courierID);
+            UISoundPlayer.Play(ESFXType.CourierSelect);
             RefreshPreview();
         }
 
@@ -263,6 +264,7 @@ namespace NightPost.UI
         {
             _selectedRouteID = routeID;
             foreach (var it in _routeItems) it.SetSelected(it.Id == routeID);
+            UISoundPlayer.Play(ESFXType.RouteMapOpen);
             RefreshPreview();
         }
 
@@ -276,10 +278,13 @@ namespace NightPost.UI
             bool ok = _deliveryService.StartDelivery(_selectedLetterID, _selectedCourierID, _selectedRouteID);
             if (!ok)
             {
+                // 실패에는 소리를 내지 않는다(사운드 명세 §5-1: 벌하는 느낌을 주지 않는다).
                 Debug.LogWarning("[Delivery] 배달 시작 실패");
                 ToastController.Instance?.Show("지금은 배달을 시작할 수 없어요.");
                 return;
             }
+
+            UISoundPlayer.PlayAccent(ESFXType.DeliveryDepart);
 
             // 성공: 목록 갱신(편지는 Waiting에서 빠지고, 배달부는 사용 중)
             ResetSelection();
@@ -361,11 +366,15 @@ namespace NightPost.UI
             foreach (DeliveryResultData result in results)
                 if (result != null) letterIds.Add(result.LetterID);
 
+            int claimed = 0;
             foreach (int letterId in letterIds)
             {
                 if (!_flow.SelectDeliveryResult(letterId)) continue;
-                _flow.CheckSelectedDeliveryResult();
+                if (_flow.CheckSelectedDeliveryResult()) claimed++;
             }
+
+            // 여러 건을 받아도 보상음은 한 번만 울린다.
+            if (claimed > 0) UISoundPlayer.PlayAccent(ESFXType.RewardCollect);
 
             RefreshResultList();
         }

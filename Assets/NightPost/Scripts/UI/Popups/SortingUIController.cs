@@ -194,6 +194,7 @@ namespace NightPost.UI
             if (!result.IsSuccess)
             {
                 // 오답: 편지 New 유지, 틀린 항목만 표시, 다시 제출 가능
+                // 실패에는 소리를 내지 않는다(사운드 명세 §5-1).
                 ShowIncorrectResult(result);
                 _isSubmitting = false;
                 UpdateSubmitButtonState();
@@ -287,6 +288,8 @@ namespace NightPost.UI
 
         private void HandleSortingSuccess()
         {
+            UISoundPlayer.Play(ESFXType.LetterSortPlace);
+
             if (_successView != null) _successView.SetActive(true);
             RefreshLetterList();                 // Waiting으로 빠진 편지를 목록에서 제거
 

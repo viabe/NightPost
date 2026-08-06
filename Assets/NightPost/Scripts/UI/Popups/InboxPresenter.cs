@@ -90,6 +90,8 @@ namespace NightPost.UI
                 return;
             }
 
+            UISoundPlayer.Play(ESFXType.EnvelopeOpen);
+
             LetterReadController reader = GetReader();
             if (reader == null) { Debug.LogWarning("[Inbox] LetterRead 팝업 미등록 — Id가 LetterRead인지 확인"); return; }
             reader.Open(new LetterReadModel

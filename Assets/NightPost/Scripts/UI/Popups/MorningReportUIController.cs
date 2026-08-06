@@ -99,6 +99,8 @@ namespace NightPost.UI
             if (_flow == null) Debug.LogError("[MorningReport] GameFlowController 미연결", this);
             if (_playerData == null) Debug.LogError("[MorningReport] PlayerDataManager 미연결", this);
 
+            UISoundPlayer.Play(ESFXType.ReportOpen);
+
             Subscribe();
             RefreshAll();
         }
@@ -226,11 +228,15 @@ namespace NightPost.UI
             foreach (DeliveryResultData result in results)
                 if (result != null) letterIds.Add(result.LetterID);
 
+            int claimed = 0;
             foreach (int letterId in letterIds)
             {
                 if (!_flow.SelectDeliveryResult(letterId)) continue;
-                _flow.CheckSelectedDeliveryResult();
+                if (_flow.CheckSelectedDeliveryResult()) claimed++;
             }
+
+            // 여러 건을 받아도 보상음은 한 번만 울린다.
+            if (claimed > 0) UISoundPlayer.PlayAccent(ESFXType.RewardCollect);
         }
 
         private void OnUnlockRoute(int routeId)

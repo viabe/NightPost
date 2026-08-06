@@ -851,9 +851,9 @@ RectTransform:
   - {fileID: 6412994758121317348}
   m_Father: {fileID: 1978220664006749828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 160, y: -17.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5817917313482487896
@@ -1229,7 +1229,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &922785366923730044
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7344,6 +7344,7 @@ GameObject:
   - component: {fileID: 3026034957391108222}
   - component: {fileID: 3650692701518950051}
   - component: {fileID: 2743179908741968579}
+  - component: {fileID: 6789288324514374858}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -7452,6 +7453,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6789288324514374858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2519193890255316740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &2547406913130846458
 GameObject:
   m_ObjectHideFlags: 0
@@ -7775,9 +7792,9 @@ RectTransform:
   - {fileID: 1885180119246094380}
   m_Father: {fileID: 1978220664006749828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 270, y: -17.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3846443263143950869
@@ -9399,6 +9416,7 @@ GameObject:
   - component: {fileID: 365638735556968864}
   - component: {fileID: 6057504121034676829}
   - component: {fileID: 8223965609211168963}
+  - component: {fileID: 7465470874483206799}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -9507,6 +9525,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7465470874483206799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3221396514294750898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &3224573577059723782
 GameObject:
   m_ObjectHideFlags: 0
@@ -10381,6 +10415,7 @@ GameObject:
   - component: {fileID: 5810057217719843895}
   - component: {fileID: 1679616583522531186}
   - component: {fileID: 6921789864437561351}
+  - component: {fileID: 2686974517899886091}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -10489,6 +10524,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2686974517899886091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3442974965618823045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &3566108874613882126
 GameObject:
   m_ObjectHideFlags: 0
@@ -11677,10 +11728,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2867045858085169179}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400, y: -139.99841}
-  m_SizeDelta: {x: 800, y: 211.1868}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 15}
+  m_SizeDelta: {x: 800, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7880093171764823056
 CanvasRenderer:
@@ -15179,9 +15230,9 @@ RectTransform:
   - {fileID: 2708430834713753862}
   m_Father: {fileID: 1978220664006749828}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -17.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1269702387329422130
@@ -16099,6 +16150,7 @@ GameObject:
   - component: {fileID: 1932519313843976298}
   - component: {fileID: 1746213588414640953}
   - component: {fileID: 2930820741217383352}
+  - component: {fileID: 607373870969688699}
   m_Layer: 0
   m_Name: CloseButton
   m_TagString: Untagged
@@ -16207,6 +16259,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &607373870969688699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5064543855752402900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &5338062951683509271
 GameObject:
   m_ObjectHideFlags: 0
@@ -19294,6 +19362,7 @@ GameObject:
   - component: {fileID: 6236715768393981277}
   - component: {fileID: 7326670908202154690}
   - component: {fileID: 6466526202375618702}
+  - component: {fileID: 2654599233943484359}
   m_Layer: 0
   m_Name: CloseButton
   m_TagString: Untagged
@@ -19402,6 +19471,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2654599233943484359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6556210347861702838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &6617200132931746105
 GameObject:
   m_ObjectHideFlags: 0
@@ -19478,6 +19563,7 @@ GameObject:
   - component: {fileID: 6288989501748086996}
   - component: {fileID: 3101411076843495996}
   - component: {fileID: 2397194117757975053}
+  - component: {fileID: 921208588101909085}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -19586,6 +19672,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &921208588101909085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6646466568471194928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &6656419174600459744
 GameObject:
   m_ObjectHideFlags: 0
@@ -20088,6 +20190,7 @@ GameObject:
   - component: {fileID: 1439099566228603599}
   - component: {fileID: 5784618636543782916}
   - component: {fileID: 2796287481407138122}
+  - component: {fileID: 3361957782695628334}
   m_Layer: 5
   m_Name: CloseButton
   m_TagString: Untagged
@@ -20196,6 +20299,22 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3361957782695628334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6968400085040918064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1 &6980914854242138186
 GameObject:
   m_ObjectHideFlags: 0
@@ -27447,13 +27566,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8342230865324161528, guid: 684536d9328c2bf4fafe348e951aeb9b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3711968143525582705}
   m_SourcePrefab: {fileID: 100100000, guid: 684536d9328c2bf4fafe348e951aeb9b, type: 3}
 --- !u!224 &1053351670618917255 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7129018314342574358, guid: 684536d9328c2bf4fafe348e951aeb9b, type: 3}
   m_PrefabInstance: {fileID: 7814059409170669713}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2284612969370786153 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8342230865324161528, guid: 684536d9328c2bf4fafe348e951aeb9b, type: 3}
+  m_PrefabInstance: {fileID: 7814059409170669713}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3711968143525582705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2284612969370786153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6e3747fefae2442a8d931fd969b389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UISoundButton
+  uiSoundController: {fileID: 0}
+  soundType: 33
+  isSoundEnabled: 1
+  buttonVolume: 1
 --- !u!1001 &7983316196042006751
 PrefabInstance:
   m_ObjectHideFlags: 0
