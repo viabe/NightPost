@@ -1289,6 +1289,7 @@ GameObject:
   - component: {fileID: 752125618}
   - component: {fileID: 752125617}
   - component: {fileID: 752125623}
+  - component: {fileID: 752125624}
   m_Layer: 0
   m_Name: Presenters
   m_TagString: Untagged
@@ -1401,6 +1402,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54b6649012dafae468e7293b0f09638a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.GameEventSoundPresenter
+--- !u!114 &752125624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752125616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 887580be2a72e5c4cb6b1cc94885cbdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.MorningReportAutoOpener
+  _report: {fileID: 1068944347}
+  _bootstrap: {fileID: 356306964}
+  _delaySeconds: 0.4
+  _timeoutSeconds: 5
 --- !u!1 &758597781
 GameObject:
   m_ObjectHideFlags: 0
@@ -1645,6 +1662,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1068944347 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5827233736529613124, guid: 2a264d00cda51e443aff1c550da4c459, type: 3}
+  m_PrefabInstance: {fileID: 1205111793}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45523976640258445948d041b5a4051b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.MorningReportUIController
 --- !u!1 &1148968485 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4470107655154576522, guid: 2a264d00cda51e443aff1c550da4c459, type: 3}
