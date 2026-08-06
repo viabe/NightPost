@@ -193,6 +193,23 @@ namespace NightPost.UI
             if (_courierListRoot == null) Debug.LogError("[Delivery] 배달부 목록 루트 미연결", this);
             if (_routeItemPrefab == null) Debug.LogError("[Delivery] 노선 아이템 프리팹 미연결", this);
             if (_routeListRoot == null) Debug.LogError("[Delivery] 노선 목록 루트 미연결", this);
+            // 진행 중·결과 탭에서만 쓰는 참조. 비어 있으면 목록이 조용히 빈 채로 나온다.
+            if (_playerData == null) Debug.LogError("[Delivery] PlayerDataManager 미연결 — 결과 탭이 항상 비어 보인다", this);
+            if (_flow == null) Debug.LogError("[Delivery] GameFlowController 미연결 — 결과 수령이 동작하지 않는다", this);
+            if (_catalog == null) Debug.LogError("[Delivery] StaticDataCatalog 미연결 — 이름 대신 ID가 표시된다", this);
+            if (_activeRowPrefab == null) Debug.LogError("[Delivery] 진행 중 아이템 프리팹 미연결", this);
+            if (_activeListRoot == null) Debug.LogError("[Delivery] 진행 중 목록 루트 미연결", this);
+            if (_resultRowPrefab == null) Debug.LogError("[Delivery] 결과 아이템 프리팹 미연결", this);
+            if (_resultListRoot == null) Debug.LogError("[Delivery] 결과 목록 루트 미연결", this);
+
+            // 빈 상태 오브젝트에 목록 루트를 잘못 넣으면, 결과가 있을 때 목록이 통째로 꺼져
+            // "행이 만들어졌는데 안 보이는" 증상이 된다. 슬롯이 겹치면 바로 알린다.
+            if (_resultEmpty != null && _resultListRoot != null && _resultEmpty == _resultListRoot.gameObject)
+                Debug.LogError("[Delivery] Result Empty에 결과 목록 루트가 연결됐다. 빈 상태 안내 오브젝트로 바꿀 것", this);
+            if (_activeEmpty != null && _activeListRoot != null && _activeEmpty == _activeListRoot.gameObject)
+                Debug.LogError("[Delivery] Active Empty에 진행 중 목록 루트가 연결됐다. 빈 상태 안내 오브젝트로 바꿀 것", this);
+            if (_letterEmpty != null && _letterListRoot != null && _letterEmpty == _letterListRoot.gameObject)
+                Debug.LogError("[Delivery] Letter Empty에 편지 목록 루트가 연결됐다. 빈 상태 안내 오브젝트로 바꿀 것", this);
 
             Subscribe();
             ResetSelection();
