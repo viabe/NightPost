@@ -1,11 +1,61 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private PlayerMovement playerMovement;
 
     private bool isControlEnabled = true;
 
+    // 플레이어 애니메이션을 제어하는 Animator임
+    [SerializeField] private Animator animator;
+
+    // 이동 방향에 따라 스프라이트를 반전하는 Renderer임
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
+    // 원본 이미지가 오른쪽을 바라보는지 나타냄
+    [SerializeField] private bool defaultFacesRight = true;
+
+    // Animator의 IsMoving 파라미터 해시값임
+    private static readonly int IsMovingHash = Animator.StringToHash("IsMoving");
+
+    /// <summary>
+    /// 애니메이션 처리에 필요한 컴포넌트를 가져옴
+    /// </summary>
+    private void Awake()
+    {
+        // 같은 GameObject의 Animator를 가져옴
+        animator = GetComponent<Animator>();
+
+        // 같은 GameObject의 SpriteRenderer를 가져옴
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // 직접 연결되지 않았다면 같은 오브젝트에서 가져옴
+        if (playerMovement == null)
+        {
+            playerMovement = GetComponent<PlayerMovement>();
+        }
+    }
+    /// <summary>
+    /// 플레이어의 이동 상태와 방향을 애니메이션에 반영함
+    /// </summary>
+    private void Update()
+    {
+        // 이동 컴포넌트가 없다면 애니메이션을 갱신하지 않음
+        if (playerMovement == null) return;
+
+        // 현재 실제 이동 여부를 Animator에 전달함
+        animator.SetBool(IsMovingHash, playerMovement.IsMoving);
+
+        // 이동 방향이 없다면 현재 바라보는 방향을 유지함
+        if (Mathf.Approximately(playerMovement.MoveDirection, 0f)) return;
+
+        // 원본 스프라이트 방향을 기준으로 좌우 반전 여부를 결정함
+        bool isMovingLeft = playerMovement.MoveDirection < 0f;
+        spriteRenderer.flipX = defaultFacesRight ? isMovingLeft : !isMovingLeft;
+    }
     /// <summary>
     /// 전달받은 방향으로 플레이어의 수동 이동을 요청함
     /// </summary>
