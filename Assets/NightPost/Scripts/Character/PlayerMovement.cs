@@ -72,7 +72,11 @@ public class PlayerMovement : MonoBehaviour
         // 전달받은 입력값을 -1부터 1까지의 범위로 제한함
         manualMoveInput = Mathf.Clamp(input, -1f, 1f);
         // 입력값이 0이라면 마지막 이동 방향을 유지하고 종료함
-        if (Mathf.Approximately(manualMoveInput, 0f)) return;
+        if (Mathf.Approximately(manualMoveInput, 0f))
+        {
+            isManualMoving = false;
+            return;
+        }
 
         // 수동 이동 입력이 발생하면 진행 중인 자동 이동을 취소함
         CancelAutoMove();
@@ -87,7 +91,11 @@ public class PlayerMovement : MonoBehaviour
     private void MoveManual()
     {
         // 현재 좌우 입력값이 0이면 이동할 필요가 없으므로 종료함
-        if (Mathf.Approximately(manualMoveInput, 0f)) return;
+        if (Mathf.Approximately(manualMoveInput, 0f))
+        {
+            isManualMoving = false;
+            return;
+        }
 
         // Rigidbody2D에 저장된 현재 위치를 가져옴
         Vector2 currentPosition = rigidbody.position;
@@ -103,6 +111,12 @@ public class PlayerMovement : MonoBehaviour
 
         // 수동 이동 중에는 현재 Y좌표를 유지함
         float nextY = currentPosition.y;
+
+        // 실제로 위치가 변경되는지 확인함
+        isManualMoving = !Mathf.Approximately(currentPosition.x, nextX);
+
+        // 이동 범위 끝이라 실제로 움직이지 않는다면 종료함
+        if (!isManualMoving) return;
 
         // 계산한 X좌표와 기존 Y좌표로 다음 위치를 생성함
         Vector2 nextPosition = new Vector2(nextX, nextY);
@@ -166,6 +180,8 @@ public class PlayerMovement : MonoBehaviour
     {
         // 수동 이동 입력을 0으로 변경해 수동 이동을 중단함
         manualMoveInput = 0;
+        // 수동 이동 상태를 해제함
+        isManualMoving = false;
     }
     /// <summary>
     /// 현재 진행 중인 수동 이동과 자동 이동을 모두 중단함
@@ -175,7 +191,9 @@ public class PlayerMovement : MonoBehaviour
         // 수동 이동 입력을 제거함
         manualMoveInput = 0f;
         // 자동 이동 상태를 해제함
-        isAutoMoving = false;
+        CancelAutoMove();
+        // 수동 이동 상태를 해제함
+        isManualMoving = false;
     }
     /// <summary>
     /// 플레이어를 목표 위치에 배치하고 자동 이동 완료 이벤트를 발생시킴
@@ -199,7 +217,7 @@ public class PlayerMovement : MonoBehaviour
     // getter
     //==================================================================
     // 수동 이동 입력이 있거나 자동 이동 중인지 반환함
-    public bool IsMoving => isAutoMoving || manualMoveInput != 0f;
+    public bool IsMoving => isAutoMoving || isManualMoving;
     // 현재 자동 이동 중인지 반환함
     public bool IsAutoMoving => isAutoMoving;
     // 플레이어의 마지막 이동 방향을 반환함
