@@ -764,8 +764,14 @@ MonoBehaviour:
   _letterService: {fileID: 356306959}
   _playerData: {fileID: 1265680654}
   _noticeRoot: {fileID: 423641228}
+  _keepVisibleWhenIdle: 1
+  _noticeSprite: {fileID: 2095775938}
   _bobAmplitude: 0.08
   _bobSpeed: 1.4
+  _alertScale: 1.1
+  _alertAlpha: 1
+  _idleAlpha: 0.45
+  _transitionSeconds: 0.25
 --- !u!1 &517216712
 GameObject:
   m_ObjectHideFlags: 0
@@ -1703,6 +1709,10 @@ PrefabInstance:
       propertyPath: uiSoundController
       value: 
       objectReference: {fileID: 517216713}
+    - target: {fileID: 359315937778164072, guid: 2a264d00cda51e443aff1c550da4c459, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -5.800049
+      objectReference: {fileID: 0}
     - target: {fileID: 415423788952707011, guid: 2a264d00cda51e443aff1c550da4c459, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -3312,7 +3322,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: fff044a6d897e844b936e750138cf87c, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3320,7 +3330,7 @@ SpriteRenderer:
   m_Size: {x: 2.4, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!114 &1631269123
@@ -3431,8 +3441,14 @@ MonoBehaviour:
   _letterService: {fileID: 356306959}
   _playerData: {fileID: 1265680654}
   _noticeRoot: {fileID: 1321145306}
+  _keepVisibleWhenIdle: 1
+  _noticeSprite: {fileID: 292616728}
   _bobAmplitude: 0.08
   _bobSpeed: 1.4
+  _alertScale: 1.1
+  _alertAlpha: 1
+  _idleAlpha: 0.45
+  _transitionSeconds: 0.25
 --- !u!1 &1767296649
 GameObject:
   m_ObjectHideFlags: 0
