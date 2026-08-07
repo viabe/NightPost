@@ -392,13 +392,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ebf5cd5bb7cb65f4fac8fa83d85953c8, type: 2}
   - {fileID: 11400000, guid: 1f243b1eb21921143884e98330570706, type: 2}
   - {fileID: 11400000, guid: 8176f8e9abb44814db640d9fe2cb235b, type: 2}
-  - {fileID: 11400000, guid: 3310ad73cc231d243857ea77f7d1c533, type: 2}
   routeStaticDatas:
   - {fileID: 11400000, guid: 2855a13963807cf459818f29c5b20f3e, type: 2}
   - {fileID: 11400000, guid: 244be57b077bae447b970502b9f51b1a, type: 2}
   - {fileID: 11400000, guid: 2b3879045d0bc3b479bd608f47e9a24d, type: 2}
-  - {fileID: 11400000, guid: f23c0f72a6e52724d8cfdc51fbe27da9, type: 2}
-  - {fileID: 11400000, guid: 8eb4a6cfbfa338c4a83ef4a18074b2d9, type: 2}
   facilityStaticDatas:
   - {fileID: 11400000, guid: 44f9122188a0d3e4e9b6c00f6dbd60cf, type: 2}
   - {fileID: 11400000, guid: ae12f5a37209f3342b9ba91093ed6c93, type: 2}
@@ -3021,8 +3018,8 @@ Transform:
   m_GameObject: {fileID: 1321145306}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.824, y: 0.207, z: 0}
-  m_LocalScale: {x: 0.20592019, y: 0.19568272, z: 1}
+  m_LocalPosition: {x: 1.794, y: 0.477, z: 0}
+  m_LocalScale: {x: 0.4610195, y: 0.32082856, z: 2.2388263}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 292616727}
@@ -3315,15 +3312,15 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: fff044a6d897e844b936e750138cf87c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.98, y: 1.59}
+  m_Size: {x: 2.4, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!114 &1631269123
@@ -3392,10 +3389,10 @@ BoxCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
+    border: {x: 0.29999998, y: 0.39999998, z: 0.29999998, w: 0.39999998}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.54, y: 1.39}
-    newSize: {x: 0.98, y: 1.59}
+    oldSize: {x: 2.4, y: 1.28}
+    newSize: {x: 2.4, y: 1.28}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -3411,8 +3408,8 @@ Transform:
   m_GameObject: {fileID: 1631269121}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.31, y: -1.45, z: 0}
-  m_LocalScale: {x: 4.8562503, y: 5.110313, z: 1}
+  m_LocalPosition: {x: 6.2603, y: -1.667, z: 0}
+  m_LocalScale: {x: 2.1691058, y: 3.1169295, z: 0.44666266}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1321145307}
@@ -3430,7 +3427,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1baf592446a8b4429f414df4e970bc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.StationNoticeBadge
-  _source: 2
+  _source: 3
   _letterService: {fileID: 356306959}
   _playerData: {fileID: 1265680654}
   _noticeRoot: {fileID: 1321145306}

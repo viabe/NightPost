@@ -22,4 +22,4 @@ MonoBehaviour:
   courierImage: {fileID: 0}
   unlockCondition:
     unlockedByDefault: 0
-    requiredCompletedDeliveryCount: 2
+    requiredCompletedDeliveryCount: 7
