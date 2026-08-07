@@ -23,8 +23,11 @@ MonoBehaviour:
   m_OverrideGlobalSceneList: 1
   m_Scenes:
   - m_enabled: 1
-    m_path: Assets/NightPost/Scene/KMK/TestScene.unity
-    m_guid: ed35734773a5bc542af417ae2c263259
+    m_path: Assets/NightPost/Scene/Bootstrap.unity
+    m_guid: 5fe04614ef644d142910c120a1841eba
+  - m_enabled: 1
+    m_path: Assets/NightPost/Scene/PostOffice.unity
+    m_guid: 75d62d625be403f4fac2f9492b9c28d9
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
