@@ -15,7 +15,7 @@ MonoBehaviour:
   routeID: 3002
   routeName: "\uBC14\uB78C \uBD80\uB294 \uC678\uACFD\uAE38"
   regionType: 3
-  baseDeliveryTimeSeconds: 480
+  baseDeliveryTimeSeconds: 10
   difficulty: 2
   unlockCondition:
     unlockedByDefault: 0

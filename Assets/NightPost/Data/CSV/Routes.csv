@@ -1,4 +1,4 @@
 ﻿routeID,routeName,regionType,baseDeliveryTimeSeconds,difficulty,unlockedByDefault,requiredCompletedDeliveryCount
-3001,오래된 골목길,Town,300,Easy,True,0
-3002,바람 부는 외곽길,Outskirts,480,Normal,False,3
-3003,안개 낀 산길,Mountain,720,Hard,False,7
+3001,오래된 골목길,Town,5,Easy,True,0
+3002,바람 부는 외곽길,Outskirts,10,Normal,False,3
+3003,안개 낀 산길,Mountain,15,Hard,False,7

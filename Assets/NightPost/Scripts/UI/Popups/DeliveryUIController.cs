@@ -636,6 +636,7 @@ namespace NightPost.UI
             GameEvents.FacilityUpgraded += OnFacilityUpgraded;
             GameEvents.DeliveryResultChecked += OnDeliveryResultChecked;
             GameEvents.RouteUnlocked += OnRouteUnlocked;
+            GameEvents.CourierUnlocked += OnCourierUnlocked;
         }
 
         private void Unsubscribe()
@@ -648,6 +649,7 @@ namespace NightPost.UI
             GameEvents.FacilityUpgraded -= OnFacilityUpgraded;
             GameEvents.DeliveryResultChecked -= OnDeliveryResultChecked;
             GameEvents.RouteUnlocked -= OnRouteUnlocked;
+            GameEvents.CourierUnlocked -= OnCourierUnlocked;
         }
 
         private void OnDeliveryChanged(int letterID, int courierID, int routeID)
@@ -676,6 +678,14 @@ namespace NightPost.UI
             if (!_isOpen) return;
             if (_currentTab == ETab.Result) RefreshResultList();
             RefreshResultBadge();
+        }
+
+        // 배달부 해금은 DeliveryCompleted가 나간 뒤에 처리되므로, 완료 시점의 갱신에는 잡히지 않는다.
+        // 해금 이벤트로 한 번 더 갱신해 소리와 목록이 같이 움직이게 한다.
+        private void OnCourierUnlocked(int courierID)
+        {
+            if (!_isOpen) return;
+            if (_currentTab == ETab.Assign && _selectedLetterID > 0) RefreshCouriers();
         }
 
         private void OnRouteUnlocked(int routeID)
