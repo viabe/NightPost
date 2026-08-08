@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -24,20 +24,26 @@ namespace NightPost.UI
 
         private int _id;
         private Action<int> _onClick;
+        private Action<Sprite> _onSpriteChanged;
         private bool _selectable;
+        private Sprite _sprite;
 
         public int Id => _id;
 
         /// <summary>항목 초기화. selectable=false면 클릭 불가 + 잠금 표시.</summary>
-        public void Setup(int id, string name, string sub, bool selectable, Action<int> onClick)
+        public void Setup(int id, string name, string sub, bool selectable, Action<int> onClick, Sprite sprit = null, Action<Sprite> onSpriteChanged = null)
         {
             _id = id;
             _onClick = onClick;
             _selectable = selectable;
+            if(sprit != null) _sprite = sprit;
+            // 외부에서 전달받은 이미지 변경 함수를 저장함
+            if (onSpriteChanged != null) _onSpriteChanged = onSpriteChanged;
 
             if (_nameText != null) _nameText.text = name;
             if (_subText != null) _subText.text = sub;
             if (_lockedOverlay != null) _lockedOverlay.SetActive(!selectable);
+
             SetSelected(false);
 
             // 루트 Button만 자동 보정한다(자식 Button은 그 영역에서만 눌림).
@@ -64,6 +70,14 @@ namespace NightPost.UI
             Raise();
         }
 
-        private void Raise() => _onClick?.Invoke(_id);
+        private void Raise()
+        {
+            _onClick?.Invoke(_id);
+
+            if (_sprite != null)
+            {
+                _onSpriteChanged?.Invoke(_sprite);
+            }
+        }
     }
 }

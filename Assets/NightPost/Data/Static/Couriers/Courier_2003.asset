@@ -19,7 +19,7 @@ MonoBehaviour:
   trait:
     traitType: 4
     timeReductionRate: 0.2
-  courierImage: {fileID: 0}
+  courierImage: {fileID: -6320285475193947312, guid: 33df9b4f2c3d68542a7f655029455f1c, type: 3}
   unlockCondition:
     unlockedByDefault: 0
     requiredCompletedDeliveryCount: 7

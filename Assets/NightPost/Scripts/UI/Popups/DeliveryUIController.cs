@@ -85,6 +85,10 @@ namespace NightPost.UI
         [SerializeField] private Button _startButton;
         [SerializeField] private Button _closeButton;
 
+
+        [Header("배달원 미리보기 컨트롤러 추가")]
+        [SerializeField] private CourierPreviewController _courierPreviewController;
+
         private int _selectedLetterID = -1;
         private int _selectedCourierID = -1;
         private int _selectedRouteID = -1;
@@ -477,7 +481,7 @@ namespace NightPost.UI
                 if (courier == null) continue;
                 AssignmentOptionItem item = Instantiate(_courierItemPrefab, _courierListRoot);
                 item.gameObject.SetActive(true);
-                item.Setup(courier.CourierID, courier.CourierName, VehicleLabel(courier.Transportation), true, OnCourierSelected);
+                item.Setup(courier.CourierID, courier.CourierName, VehicleLabel(courier.Transportation), true, OnCourierSelected, courier.CourierImage, _courierPreviewController.SetCourierImage);
                 _courierItems.Add(item);
             }
 
