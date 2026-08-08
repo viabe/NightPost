@@ -11,6 +11,7 @@ namespace NightPost.UI
     ///
     ///   분류대 → 분류할 편지(New)가 있을 때
     ///   배달대 → 배달 대기 편지(Waiting) 또는 확인 안 한 배달 결과가 있을 때
+    ///   수신함 → 아직 읽지 않은 답장이 있을 때
     ///
     /// 시설 오브젝트의 자식으로 말풍선 스프라이트를 두고 이 컴포넌트를 붙인다.
     /// 표시 여부는 데이터로만 결정하며, 이 스크립트는 조회와 표현만 담당한다.
@@ -24,14 +25,16 @@ namespace NightPost.UI
             WaitingLetters,    // 배달 대기 편지 (배달대)
             DeliveryResults,   // 확인 안 한 배달 결과 (배달대)
             WaitingOrResults,  // 위 둘 중 하나라도 있으면 (배달대 권장)
+            UnreadReplies,     // 아직 읽지 않은 답장 (수신함)
         }
 
         [Header("알림 조건")]
         [SerializeField] private ENoticeSource _source = ENoticeSource.UnsortedLetters;
 
         [Header("의존성")]
+        [Tooltip("편지를 조건으로 쓸 때만 필요하다. 답장 조건이면 비워도 된다.")]
         [SerializeField] private LetterService _letterService;
-        [Tooltip("배달 결과를 조건으로 쓸 때만 필요하다.")]
+        [Tooltip("배달 결과 또는 답장을 조건으로 쓸 때만 필요하다.")]
         [SerializeField] private PlayerDataManager _playerData;
 
         [Header("표시")]
@@ -75,9 +78,10 @@ namespace NightPost.UI
                 Debug.LogError("[StationNotice] 말풍선 오브젝트 미연결", this);
             }
 
-            if (_letterService == null) Debug.LogError("[StationNotice] LetterService 미연결", this);
+            if (NeedsLetterService() && _letterService == null)
+                Debug.LogError("[StationNotice] 편지 조건인데 LetterService 미연결", this);
             if (NeedsPlayerData() && _playerData == null)
-                Debug.LogError("[StationNotice] 배달 결과 조건인데 PlayerDataManager 미연결", this);
+                Debug.LogError("[StationNotice] 배달 결과·답장 조건인데 PlayerDataManager 미연결", this);
         }
 
         private void OnEnable()
@@ -86,6 +90,8 @@ namespace NightPost.UI
             GameEvents.LetterStateChanged += OnLetterStateChanged;
             GameEvents.DeliveryCompleted += OnLetterChanged;
             GameEvents.DeliveryResultChecked += OnLetterChanged;
+            // 답장 수신과 읽음 처리 양쪽에서 발생한다.
+            GameEvents.UnreadReplyCountChanged += OnUnreadReplyCountChanged;
         }
 
         private void OnDisable()
@@ -94,6 +100,7 @@ namespace NightPost.UI
             GameEvents.LetterStateChanged -= OnLetterStateChanged;
             GameEvents.DeliveryCompleted -= OnLetterChanged;
             GameEvents.DeliveryResultChecked -= OnLetterChanged;
+            GameEvents.UnreadReplyCountChanged -= OnUnreadReplyCountChanged;
         }
 
         // GameBootstrap이 Awake에서 데이터를 채우므로 Start에서 첫 조회를 한다.
@@ -166,6 +173,9 @@ namespace NightPost.UI
                 case ENoticeSource.WaitingOrResults:
                     return WaitingCount() + ResultCount();
 
+                case ENoticeSource.UnreadReplies:
+                    return UnreadReplyCount();
+
                 default:
                     return 0;
             }
@@ -192,10 +202,22 @@ namespace NightPost.UI
             return list != null ? list.Count : 0;
         }
 
+        private int UnreadReplyCount()
+        {
+            if (_playerData == null) return 0;
+            return _playerData.GetUnreadReplyCount();
+        }
+
+        private bool NeedsLetterService()
+            => _source != ENoticeSource.UnreadReplies;
+
         private bool NeedsPlayerData()
-            => _source == ENoticeSource.DeliveryResults || _source == ENoticeSource.WaitingOrResults;
+            => _source == ENoticeSource.DeliveryResults
+            || _source == ENoticeSource.WaitingOrResults
+            || _source == ENoticeSource.UnreadReplies;
 
         private void OnLetterChanged(int id) => Refresh();
         private void OnLetterStateChanged(int id, ELetterProgressState state) => Refresh();
+        private void OnUnreadReplyCountChanged(int unreadCount) => Refresh();
     }
 }
