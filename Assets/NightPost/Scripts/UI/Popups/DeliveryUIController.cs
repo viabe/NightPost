@@ -19,8 +19,8 @@ namespace NightPost.UI
     /// </summary>
     public class DeliveryUIController : MonoBehaviour, IUIScreen
     {
-        /// <summary>배달대 화면의 탭. 배정 / 진행 중 / 결과.</summary>
-        public enum ETab { Assign = 0, Active = 1, Result = 2 }
+        /// <summary>배달대 화면의 탭. 배정 / 진행 중 / 결과 / 노선.</summary>
+        public enum ETab { Assign = 0, Active = 1, Result = 2, Route = 3 }
 
         [Header("의존성")]
         [SerializeField] private DeliveryService _deliveryService;
@@ -40,13 +40,17 @@ namespace NightPost.UI
         [SerializeField] private Button _assignTabButton;
         [SerializeField] private Button _activeTabButton;
         [SerializeField] private Button _resultTabButton;
+        [SerializeField] private Button _routeTabButton;
         [SerializeField] private GameObject _assignTabContent;  // 기존 배정 영역 전체
         [SerializeField] private GameObject _activeTabContent;
         [SerializeField] private GameObject _resultTabContent;
-        [Tooltip("[배정, 진행중, 결과] 순서의 선택 강조 오브젝트")]
-        [SerializeField] private GameObject[] _tabSelectedMarks = new GameObject[3];
+        [SerializeField] private GameObject _routeTabContent;
+        [Tooltip("[배정, 진행중, 결과, 노선] 순서의 선택 강조 오브젝트")]
+        [SerializeField] private GameObject[] _tabSelectedMarks = new GameObject[4];
         [Tooltip("결과 탭 버튼에 붙는 미확인 결과 알림 배지")]
         [SerializeField] private GameObject _resultBadge;
+        [Tooltip("노선 탭 버튼에 붙는 해금 가능 알림 배지")]
+        [SerializeField] private GameObject _routeBadge;
 
         [Header("진행 중")]
         [SerializeField] private Transform _activeListRoot;
@@ -75,6 +79,10 @@ namespace NightPost.UI
         [SerializeField] private AssignmentOptionItem _routeItemPrefab;
         [SerializeField] private GameObject _routeEmpty;        // 노선 0개 안내
         [SerializeField] private TMP_Text _routeEmptyText;
+
+        [Header("노선 지도 탭")]
+        [Tooltip("노선 탭 화면(RouteTabContent)에 붙인 지도 패널")]
+        [SerializeField] private RouteMapPanel _routeMapPanel;
 
         [Header("예상 정보")]
         [SerializeField] private TMP_Text _estimateText;      // "예상 3분"
@@ -138,6 +146,11 @@ namespace NightPost.UI
                 _resultTabButton.onClick.RemoveAllListeners();
                 _resultTabButton.onClick.AddListener(ShowResultTab);
             }
+            if (_routeTabButton != null)
+            {
+                _routeTabButton.onClick.RemoveAllListeners();
+                _routeTabButton.onClick.AddListener(ShowRouteTab);
+            }
             if (_claimAllButton != null)
             {
                 _claimAllButton.onClick.RemoveAllListeners();
@@ -149,6 +162,7 @@ namespace NightPost.UI
         public void ShowAssignTab() => SelectTab(ETab.Assign);
         public void ShowActiveTab() => SelectTab(ETab.Active);
         public void ShowResultTab() => SelectTab(ETab.Result);
+        public void ShowRouteTab() => SelectTab(ETab.Route);
 
         private void SelectTab(ETab tab)
         {
@@ -157,6 +171,8 @@ namespace NightPost.UI
             if (_assignTabContent != null) _assignTabContent.SetActive(tab == ETab.Assign);
             if (_activeTabContent != null) _activeTabContent.SetActive(tab == ETab.Active);
             if (_resultTabContent != null) _resultTabContent.SetActive(tab == ETab.Result);
+            // 노선 탭은 켜지는 순간 RouteMapPanel.OnEnable이 스스로 갱신한다.
+            if (_routeTabContent != null) _routeTabContent.SetActive(tab == ETab.Route);
 
             if (_tabSelectedMarks != null)
             {
@@ -168,6 +184,7 @@ namespace NightPost.UI
             {
                 case ETab.Active: RefreshActiveList(); break;
                 case ETab.Result: RefreshResultList(); break;
+                case ETab.Route: if (_routeMapPanel != null) _routeMapPanel.Refresh(); break;
             }
         }
 
@@ -233,6 +250,7 @@ namespace NightPost.UI
 
             SelectTab(ETab.Assign); // 열 때는 항상 배정 탭부터
             RefreshResultBadge();
+            RefreshRouteBadge();
         }
 
         public void Close()
@@ -399,6 +417,13 @@ namespace NightPost.UI
             IReadOnlyList<DeliveryResultData> results = _playerData != null
                 ? _playerData.GetUncheckedDeliveryResults() : null;
             _resultBadge.SetActive(results != null && results.Count > 0);
+        }
+
+        /// <summary>노선 탭 버튼에 해금 가능 알림 배지를 켜고 끈다.</summary>
+        private void RefreshRouteBadge()
+        {
+            if (_routeBadge == null) return;
+            _routeBadge.SetActive(_routeMapPanel != null && _routeMapPanel.HasUnlockableRoute());
         }
 
         // ── 정적 데이터 이름 조회 (카탈로그 미연결 시 ID로 대체 표시) ──
@@ -610,6 +635,7 @@ namespace NightPost.UI
             GameEvents.LetterStateChanged += OnLetterStateChanged;
             GameEvents.FacilityUpgraded += OnFacilityUpgraded;
             GameEvents.DeliveryResultChecked += OnDeliveryResultChecked;
+            GameEvents.RouteUnlocked += OnRouteUnlocked;
         }
 
         private void Unsubscribe()
@@ -621,6 +647,7 @@ namespace NightPost.UI
             GameEvents.LetterStateChanged -= OnLetterStateChanged;
             GameEvents.FacilityUpgraded -= OnFacilityUpgraded;
             GameEvents.DeliveryResultChecked -= OnDeliveryResultChecked;
+            GameEvents.RouteUnlocked -= OnRouteUnlocked;
         }
 
         private void OnDeliveryChanged(int letterID, int courierID, int routeID)
@@ -640,6 +667,8 @@ namespace NightPost.UI
             if (_currentTab == ETab.Active) RefreshActiveList();
             else if (_currentTab == ETab.Result) RefreshResultList();
             RefreshResultBadge();
+            // 누적 완료 배달 수가 늘어 새 노선이 열릴 수 있다.
+            RefreshRouteBadge();
         }
 
         private void OnDeliveryResultChecked(int letterID)
@@ -647,6 +676,14 @@ namespace NightPost.UI
             if (!_isOpen) return;
             if (_currentTab == ETab.Result) RefreshResultList();
             RefreshResultBadge();
+        }
+
+        private void OnRouteUnlocked(int routeID)
+        {
+            if (!_isOpen) return;
+            RefreshRouteBadge();
+            // 배정 탭에서 노선을 고르는 중이었다면 새로 열린 노선이 목록에 나타나야 한다.
+            if (_currentTab == ETab.Assign && _selectedLetterID > 0) RefreshRoutes(_selectedLetterID);
         }
 
         private void OnLetterStateChanged(int letterID, ELetterProgressState state)
