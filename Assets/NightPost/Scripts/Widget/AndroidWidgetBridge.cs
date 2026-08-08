@@ -1,27 +1,22 @@
 ﻿using UnityEngine;
 
-public enum EWidgetDeliveryState
-{
-    Waiting = 0,
-    Delivering = 1,
-    Arrived = 2
-}
-
 public static class AndroidWidgetBridge
 {
     /// <summary>
-    /// Android 홈 화면 위젯에 현재 배달 상태와 편지 수를 전달함
+    /// 현재 게임의 위젯 표시 데이터를 Android 위젯에 전달함
     /// </summary>
-    public static void UpdateWidget(
-        EWidgetDeliveryState state,
-        int letterCount)
+    public static void SyncWidgetData(int waitingLetterCount,int arrivedLetterCount,string completionTimesCsv)
     {
-        // 편지 수가 음수가 되지 않도록 처리함
-        letterCount = Mathf.Max(0, letterCount);
-
+        // 전달값이 음수가 되지 않도록 처리함
+        waitingLetterCount = Mathf.Max(0, waitingLetterCount);
+        arrivedLetterCount = Mathf.Max(0, arrivedLetterCount);
+        // 완료 예정 시각 목록이 없다면 빈 문자열로 처리함
+        if (completionTimesCsv == null)
+        {
+            completionTimesCsv = string.Empty;
+        }
 #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidJavaObject currentActivity = UnityEngine.Android.AndroidApplication.currentActivity;
-
         if (currentActivity == null)
         {
             Debug.LogWarning("[AndroidWidgetBridge] Android Activity를 찾을 수 없어 위젯을 갱신하지 못함");
@@ -31,19 +26,24 @@ public static class AndroidWidgetBridge
 
         try
         {
-            using (AndroidJavaClass widgetProvider = new AndroidJavaClass("com.nightpost.widget.NightPostWidgetProvider"))
+            using (AndroidJavaClass widgetProvider = new AndroidJavaClass( "com.nightpost.widget.NightPostWidgetProvider"))
             {
-                widgetProvider.CallStatic("updateWidgetData",currentActivity,(int)state,letterCount);
+                widgetProvider.CallStatic(
+                    "syncWidgetData",
+                    currentActivity,
+                    waitingLetterCount,
+                    arrivedLetterCount,
+                    completionTimesCsv
+                );
             }
         }
         catch (AndroidJavaException exception)
         {
-            Debug.LogError("[AndroidWidgetBridge] Android 위젯 갱신 중 오류 발생\n" +exception);
+            Debug.LogError("[AndroidWidgetBridge] Android 위젯 데이터 전달 중 오류 발생\n" +exception);
         }
 #else
-        Debug.Log(
-            $"[AndroidWidgetBridge] 위젯 갱신 - " +
-            $"상태: {state}, 편지 수: {letterCount}");
+        Debug.Log( "[AndroidWidgetBridge] 위젯 데이터 갱신\n" + $"Waiting: {waitingLetterCount}\n" +$"Arrived: {arrivedLetterCount}\n" +$"CompletionTimes: {completionTimesCsv}");
 #endif
     }
+
 }

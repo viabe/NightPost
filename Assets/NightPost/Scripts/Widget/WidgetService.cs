@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class WidgetService : MonoBehaviour
@@ -67,31 +68,20 @@ public class WidgetService : MonoBehaviour
     {
         if (!isInitialized || playerDataManager == null) return;
 
-        // 확인하지 않은 배달 결과가 있다면 도착 상태를 우선 표시함
-        int arrivedLetterCount = CountUncheckedDeliveryResults();
-
-        if (arrivedLetterCount > 0)
-        {
-            AndroidWidgetBridge.UpdateWidget(EWidgetDeliveryState.Arrived, arrivedLetterCount);
-
-            return;
-        }
-
-        // 진행 중인 배달이 있다면 배달 중 상태를 표시함
-        int deliveringLetterCount = CountActiveDeliveries();
-
-        if (deliveringLetterCount > 0)
-        {
-            AndroidWidgetBridge.UpdateWidget(EWidgetDeliveryState.Delivering, deliveringLetterCount);
-
-            return;
-        }
-
-        // 도착 또는 진행 중인 배달이 없다면 배달 대기 상태를 표시함
+        // 배달을 기다리는 편지 수를 계산함
         int waitingLetterCount = CountWaitingLetters();
 
-        AndroidWidgetBridge.UpdateWidget(EWidgetDeliveryState.Waiting, waitingLetterCount);
+        // 아직 확인하지 않은 도착 편지 수를 계산함
+        int arrivedLetterCount = CountUncheckedDeliveryResults();
+
+        // 진행 중 배달들의 완료 예정 시각을 생성함
+        string completionTimesCsv = BuildCompletionTimesCsv();
+
+
+        // Android가 현재 상태와 배달 완료 시점을 계산할 수 있도록 데이터를 전달함
+        AndroidWidgetBridge.SyncWidgetData(waitingLetterCount, arrivedLetterCount,completionTimesCsv);
     }
+
 
     /// <summary>
     /// 확인하지 않은 배달 결과 수를 반환함
@@ -112,27 +102,6 @@ public class WidgetService : MonoBehaviour
         }
 
         return resultCount;
-    }
-
-    /// <summary>
-    /// 현재 진행 중인 유효한 배달 수를 반환함
-    /// </summary>
-    private int CountActiveDeliveries()
-    {
-        IReadOnlyList<ActiveDeliveryData> activeDeliveries = playerDataManager.GetActiveDeliveries();
-
-        if (activeDeliveries == null) return 0;
-
-        int deliveryCount = 0;
-
-        foreach (ActiveDeliveryData activeDelivery in activeDeliveries)
-        {
-            if (activeDelivery == null) continue;
-
-            deliveryCount++;
-        }
-
-        return deliveryCount;
     }
 
     /// <summary>
@@ -160,7 +129,24 @@ public class WidgetService : MonoBehaviour
 
         return waitingLetterCount;
     }
+    /// <summary>
+    /// 진행 중 배달의 완료 예정 Unix 시각을 문자열로 생성함
+    /// </summary>
+    private string BuildCompletionTimesCsv()
+    {
+        IReadOnlyList<ActiveDeliveryData> activeDeliveries = playerDataManager.GetActiveDeliveries();
+        if (activeDeliveries == null || activeDeliveries.Count <= 0) return string.Empty;
+        StringBuilder builder = new StringBuilder();
 
+        foreach(ActiveDeliveryData activeDelivery in activeDeliveries)
+        {
+            if (activeDelivery == null) continue;
+            if (activeDelivery.CompleteAtUnixTime <= 0) continue;
+            if(builder.Length > 0) builder.Append(",");
+            builder.Append(activeDelivery.CompleteAtUnixTime);
+        }
+        return builder.ToString();
+    }
     /// <summary>
     /// 위젯 상태에 영향을 주는 게임 이벤트를 구독함
     /// </summary>

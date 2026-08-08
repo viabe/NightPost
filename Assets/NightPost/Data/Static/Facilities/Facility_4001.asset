@@ -16,6 +16,7 @@ MonoBehaviour:
   facilityName: "\uBD84\uB958\uB300"
   description: "\uBD84\uB958 \uC791\uC5C5 \uACF5\uAC04\uC744 \uD655\uC7A5\uD574 \uB300\uAE30
     \uD3B8\uC9C0 \uCC98\uB9AC \uD55C\uB3C4\uB97C \uB298\uB9BD\uB2C8\uB2E4."
+  facilitySprite: {fileID: 2025830855049411041, guid: 5acbdce1bcb46f34f95c216e95daea4a, type: 3}
   levelData:
   - level: 1
     upgradeCost: 0

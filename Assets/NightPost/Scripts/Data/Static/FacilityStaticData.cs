@@ -25,6 +25,8 @@ public class FacilityStaticData : ScriptableObject
     [SerializeField] private string facilityName = string.Empty;
     // 설명
     [SerializeField] private string description = string.Empty;
+    // 설비 이미지
+    [SerializeField] private Sprite facilitySprite;
     // 레벨 데이터
     [SerializeField] private FacilityLevelData[] levelData = new FacilityLevelData[0];
 
@@ -33,4 +35,5 @@ public class FacilityStaticData : ScriptableObject
     public string Description => description;   
     public FacilityLevelData[] LevelData => levelData;
     public int MaxLevel => levelData == null ? 0 : levelData.Length;
+    public Sprite FacilitySprite => facilitySprite;
 }

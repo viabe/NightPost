@@ -11,7 +11,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.widget.RemoteViews;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class NightPostWidgetProvider extends AppWidgetProvider
 {
@@ -19,48 +21,45 @@ public class NightPostWidgetProvider extends AppWidgetProvider
     private static final String PREFERENCES_NAME =
             "NightPostWidgetPreferences";
 
-    // 현재 배달 상태를 저장하는 키임
-    private static final String KEY_WIDGET_STATE =
-            "WidgetState";
+    // 배달 대기 편지 수를 저장하는 키임
+    private static final String KEY_WAITING_COUNT =
+            "WaitingCount";
 
-    // 현재 편지 수를 저장하는 키임
-    private static final String KEY_LETTER_COUNT =
-            "LetterCount";
+    // 실제 게임에서 확인하지 않은 도착 편지 수를 저장하는 키임
+    private static final String KEY_ARRIVED_COUNT =
+            "ArrivedCount";
 
-    // 자동 또는 테스트 시간대를 저장하는 키임
-    private static final String KEY_TIME_STATE =
-            "TimeState";
+    // 진행 중 배달들의 완료 예정 Unix 시각을 저장하는 키임
+    private static final String KEY_COMPLETION_TIMES =
+            "CompletionTimes";
 
-    // 시간대 배경 갱신에 사용하는 Broadcast Action임
+    // 시간대 배경 갱신 Broadcast Action임
     private static final String ACTION_REFRESH_TIME_BACKGROUND =
             "com.nightpost.widget.ACTION_REFRESH_TIME_BACKGROUND";
 
+    // 배달 완료 상태 갱신 Broadcast Action임
+    private static final String ACTION_REFRESH_DELIVERY =
+            "com.nightpost.widget.ACTION_REFRESH_DELIVERY";
+
     // 시간대 갱신 PendingIntent 식별값임
-    private static final int TIME_REFRESH_REQUEST_CODE = 1001;
+    private static final int TIME_REFRESH_REQUEST_CODE =
+            1001;
 
-    // 배경을 현재 시각에 따라 자동으로 선택함
-    private static final int TIME_AUTO = -1;
-
-    // 아침 배경 상태임
-    public static final int TIME_MORNING = 0;
-
-    // 낮 배경 상태임
-    public static final int TIME_DAY = 1;
-
-    // 밤 배경 상태임
-    public static final int TIME_NIGHT = 2;
+    // 배달 완료 갱신 PendingIntent 식별값임
+    private static final int DELIVERY_REFRESH_REQUEST_CODE =
+            1002;
 
     // 배달 대기 상태임
-    public static final int STATE_WAITING = 0;
+    private static final int STATE_WAITING = 0;
 
     // 배달 진행 상태임
-    public static final int STATE_DELIVERING = 1;
+    private static final int STATE_DELIVERING = 1;
 
     // 편지 도착 상태임
-    public static final int STATE_ARRIVED = 2;
+    private static final int STATE_ARRIVED = 2;
 
     /**
-     * 첫 번째 위젯이 홈 화면에 추가되면 화면을 갱신함
+     * 첫 번째 위젯이 홈 화면에 추가되면 현재 화면을 갱신함
      */
     @Override
     public void onEnabled(Context context)
@@ -69,14 +68,12 @@ public class NightPostWidgetProvider extends AppWidgetProvider
 
         refreshAllWidgets(context);
 
-        if (isAutomaticTimeMode(context))
-        {
-            scheduleNextTimeBackgroundRefresh(context);
-        }
+        scheduleNextTimeBackgroundRefresh(context);
+        scheduleNextDeliveryRefresh(context);
     }
 
     /**
-     * Android가 위젯 갱신을 요청하면 설치된 위젯 화면을 갱신함
+     * Android가 위젯 갱신을 요청하면 현재 데이터를 다시 표시함
      */
     @Override
     public void onUpdate(
@@ -93,14 +90,12 @@ public class NightPostWidgetProvider extends AppWidgetProvider
             );
         }
 
-        if (isAutomaticTimeMode(context))
-        {
-            scheduleNextTimeBackgroundRefresh(context);
-        }
+        scheduleNextTimeBackgroundRefresh(context);
+        scheduleNextDeliveryRefresh(context);
     }
 
     /**
-     * 시간대 변경 예약 Broadcast를 받으면 자동 배경을 갱신함
+     * 시간대 또는 배달 완료 예약 Broadcast를 처리함
      */
     @Override
     public void onReceive(
@@ -114,25 +109,31 @@ public class NightPostWidgetProvider extends AppWidgetProvider
             return;
         }
 
-        String action = intent.getAction();
+        String action =
+                intent.getAction();
 
-        if (!ACTION_REFRESH_TIME_BACKGROUND.equals(action))
+        // 아침·낮·밤 배경 변경 시점임
+        if (ACTION_REFRESH_TIME_BACKGROUND.equals(action))
         {
+            refreshAllWidgets(context);
+
+            scheduleNextTimeBackgroundRefresh(context);
+
             return;
         }
 
-        // 수동 테스트 배경 중에는 자동 시간 갱신을 적용하지 않음
-        if (!isAutomaticTimeMode(context))
+        // 진행 중 배달의 완료 예정 시각에 도달함
+        if (ACTION_REFRESH_DELIVERY.equals(action))
         {
-            return;
-        }
+            refreshAllWidgets(context);
 
-        refreshAllWidgets(context);
-        scheduleNextTimeBackgroundRefresh(context);
+            // 다음 진행 중 배달이 있다면 다시 예약함
+            scheduleNextDeliveryRefresh(context);
+        }
     }
 
     /**
-     * 마지막 위젯이 홈 화면에서 제거되면 시간대 갱신 예약을 해제함
+     * 마지막 위젯이 제거되면 예약된 알람을 해제함
      */
     @Override
     public void onDisabled(Context context)
@@ -140,55 +141,17 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         super.onDisabled(context);
 
         cancelTimeBackgroundRefresh(context);
+        cancelDeliveryRefresh(context);
     }
 
     /**
-     * Unity에서 전달받은 상태와 편지 수를 저장하고 현재 시간 배경을 적용함
+     * Unity에서 현재 게임의 위젯 데이터를 전달받음
      */
-    public static void updateWidgetData(
+    public static void syncWidgetData(
             Context context,
-            int widgetState,
-            int letterCount)
-    {
-        saveWidgetData(
-                context,
-                widgetState,
-                letterCount,
-                TIME_AUTO
-        );
-    }
-
-    /**
-     * Unity 테스트에서 전달한 아침·낮·밤 배경을 강제로 적용함
-     */
-    public static void updateWidgetTestData(
-            Context context,
-            int widgetState,
-            int letterCount,
-            int timeState)
-    {
-        if (timeState < TIME_MORNING ||
-                timeState > TIME_NIGHT)
-        {
-            timeState = TIME_AUTO;
-        }
-
-        saveWidgetData(
-                context,
-                widgetState,
-                letterCount,
-                timeState
-        );
-    }
-
-    /**
-     * 위젯 표시 데이터를 저장하고 모든 위젯을 갱신함
-     */
-    private static void saveWidgetData(
-            Context context,
-            int widgetState,
-            int letterCount,
-            int timeState)
+            int waitingCount,
+            int arrivedCount,
+            String completionTimesCsv)
     {
         if (context == null)
         {
@@ -198,15 +161,18 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         Context applicationContext =
                 getApplicationContext(context);
 
-        // 잘못된 상태값은 배달 대기로 변경함
-        if (widgetState < STATE_WAITING ||
-                widgetState > STATE_ARRIVED)
-        {
-            widgetState = STATE_WAITING;
-        }
+        // 전달된 편지 수가 음수가 되지 않도록 처리함
+        waitingCount =
+                Math.max(0, waitingCount);
 
-        // 편지 수가 음수가 되지 않도록 처리함
-        letterCount = Math.max(0, letterCount);
+        arrivedCount =
+                Math.max(0, arrivedCount);
+
+        // 완료 예정 시각 목록이 없다면 빈 문자열로 처리함
+        if (completionTimesCsv == null)
+        {
+            completionTimesCsv = "";
+        }
 
         SharedPreferences preferences =
                 applicationContext.getSharedPreferences(
@@ -214,32 +180,43 @@ public class NightPostWidgetProvider extends AppWidgetProvider
                         Context.MODE_PRIVATE
                 );
 
+        // Unity에서 전달받은 최신 데이터를 저장함
         preferences.edit()
-                .putInt(KEY_WIDGET_STATE, widgetState)
-                .putInt(KEY_LETTER_COUNT, letterCount)
-                .putInt(KEY_TIME_STATE, timeState)
+                .putInt(
+                        KEY_WAITING_COUNT,
+                        waitingCount
+                )
+                .putInt(
+                        KEY_ARRIVED_COUNT,
+                        arrivedCount
+                )
+                .putString(
+                        KEY_COMPLETION_TIMES,
+                        completionTimesCsv
+                )
                 .apply();
 
-        refreshAllWidgets(applicationContext);
+        // 현재 데이터를 위젯에 즉시 반영함
+        refreshAllWidgets(
+                applicationContext
+        );
 
-        if (timeState == TIME_AUTO)
-        {
-            scheduleNextTimeBackgroundRefresh(
-                    applicationContext
-            );
-        }
-        else
-        {
-            cancelTimeBackgroundRefresh(
-                    applicationContext
-            );
-        }
+        // 진행 중 배달의 다음 완료 시각을 예약함
+        scheduleNextDeliveryRefresh(
+                applicationContext
+        );
+
+        // 다음 아침·낮·밤 전환도 예약함
+        scheduleNextTimeBackgroundRefresh(
+                applicationContext
+        );
     }
 
     /**
-     * 현재 홈 화면에 설치된 모든 밤에 오는 편지 위젯을 갱신함
+     * 현재 홈 화면에 설치된 모든 위젯을 갱신함
      */
-    public static void refreshAllWidgets(Context context)
+    public static void refreshAllWidgets(
+            Context context)
     {
         if (context == null)
         {
@@ -276,7 +253,7 @@ public class NightPostWidgetProvider extends AppWidgetProvider
     }
 
     /**
-     * 저장된 상태와 시간대를 읽고 지정된 위젯 화면에 적용함
+     * 현재 시간과 저장 데이터를 기준으로 위젯 상태를 계산하여 표시함
      */
     private static void updateAppWidget(
             Context context,
@@ -289,26 +266,96 @@ public class NightPostWidgetProvider extends AppWidgetProvider
                         Context.MODE_PRIVATE
                 );
 
-        int widgetState =
-                preferences.getInt(
-                        KEY_WIDGET_STATE,
-                        STATE_WAITING
-                );
-
-        int letterCount =
+        // Unity에서 전달받은 배달 대기 편지 수임
+        int waitingCount =
                 Math.max(
                         0,
                         preferences.getInt(
-                                KEY_LETTER_COUNT,
+                                KEY_WAITING_COUNT,
                                 0
                         )
                 );
 
-        int timeState =
-                preferences.getInt(
-                        KEY_TIME_STATE,
-                        TIME_AUTO
+        // Unity가 실제 게임 데이터로 처리한 미확인 도착 편지 수임
+        int savedArrivedCount =
+                Math.max(
+                        0,
+                        preferences.getInt(
+                                KEY_ARRIVED_COUNT,
+                                0
+                        )
                 );
+
+        // Unity에서 전달받은 진행 중 배달 완료 예정 시각 목록임
+        String completionTimesCsv =
+                preferences.getString(
+                        KEY_COMPLETION_TIMES,
+                        ""
+                );
+
+        List<Long> completionTimes =
+                parseCompletionTimes(
+                        completionTimesCsv
+                );
+
+        // 현재 Unix 시각을 초 단위로 계산함
+        long currentUnixTime =
+                System.currentTimeMillis() / 1000L;
+
+        // 게임 종료 후 완료된 배달 수임
+        int completedSinceLastSync = 0;
+
+        // 아직 완료되지 않은 진행 중 배달 수임
+        int deliveringCount = 0;
+
+        for (long completionTime : completionTimes)
+        {
+            if (completionTime <= currentUnixTime)
+            {
+                completedSinceLastSync++;
+            }
+            else
+            {
+                deliveringCount++;
+            }
+        }
+
+        // 실제 미확인 도착 편지와
+        // 게임 종료 후 새로 완료된 편지를 합산함
+        int arrivedCount =
+                savedArrivedCount +
+                completedSinceLastSync;
+
+        int widgetState;
+        int displayCount;
+
+        // 도착한 편지를 가장 우선해서 표시함
+        if (arrivedCount > 0)
+        {
+            widgetState =
+                    STATE_ARRIVED;
+
+            displayCount =
+                    arrivedCount;
+        }
+        // 도착 편지가 없고 진행 중 배달이 있다면 배달 중으로 표시함
+        else if (deliveringCount > 0)
+        {
+            widgetState =
+                    STATE_DELIVERING;
+
+            displayCount =
+                    deliveringCount;
+        }
+        // 그 외에는 배달 대기로 표시함
+        else
+        {
+            widgetState =
+                    STATE_WAITING;
+
+            displayCount =
+                    waitingCount;
+        }
 
         String statusText;
         String countText;
@@ -317,36 +364,52 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         switch (widgetState)
         {
             case STATE_DELIVERING:
-                statusText = "배달 중";
+                statusText =
+                        "배달 중";
+
                 countText =
-                        "편지 " + letterCount + "통 이동 중";
+                        "편지 " +
+                        displayCount +
+                        "통 이동 중";
 
                 stateIconResource =
                         R.drawable.widget_icon_delivering;
+
                 break;
 
             case STATE_ARRIVED:
-                statusText = "편지가 도착했어요";
+                statusText =
+                        "편지가 도착했어요";
+
                 countText =
-                        "도착한 편지 " + letterCount + "통";
+                        "도착한 편지 " +
+                        displayCount +
+                        "통";
 
                 stateIconResource =
                         R.drawable.widget_icon_arrived;
+
                 break;
 
             case STATE_WAITING:
             default:
-                statusText = "배달 대기";
+                statusText =
+                        "배달 대기";
+
                 countText =
-                        "준비된 편지 " + letterCount + "통";
+                        "준비된 편지 " +
+                        displayCount +
+                        "통";
 
                 stateIconResource =
                         R.drawable.widget_icon_waiting;
+
                 break;
         }
 
+        // 현재 휴대폰 시간에 맞는 배경을 선택함
         int backgroundResource =
-                getBackgroundResource(timeState);
+                getCurrentTimeBackgroundResource();
 
         RemoteViews remoteViews =
                 new RemoteViews(
@@ -354,30 +417,31 @@ public class NightPostWidgetProvider extends AppWidgetProvider
                         R.layout.night_post_widget
                 );
 
-        // 현재 시간대에 맞는 배경 이미지를 적용함
+        // 아침·낮·밤 배경을 적용함
         remoteViews.setImageViewResource(
                 R.id.widget_background_image,
                 backgroundResource
         );
 
-        // 현재 배달 상태에 맞는 아이콘을 적용함
+        // 현재 배달 상태 아이콘을 적용함
         remoteViews.setImageViewResource(
                 R.id.widget_state_icon,
                 stateIconResource
         );
 
-        // 현재 배달 상태 문구를 적용함
+        // 현재 상태 문구를 적용함
         remoteViews.setTextViewText(
                 R.id.widget_status_text,
                 statusText
         );
 
-        // 현재 편지 수 문구를 적용함
+        // 현재 편지 수를 적용함
         remoteViews.setTextViewText(
                 R.id.widget_count_text,
                 countText
         );
 
+        // 위젯을 누르면 게임이 실행되도록 연결함
         connectGameLaunchIntent(
                 context,
                 remoteViews,
@@ -391,26 +455,54 @@ public class NightPostWidgetProvider extends AppWidgetProvider
     }
 
     /**
-     * 저장된 시간대 설정에 맞는 배경 이미지 리소스를 반환함
+     * Unity에서 전달받은 완료 예정 시각 문자열을 목록으로 변환함
      */
-    private static int getBackgroundResource(
-            int timeState)
+    private static List<Long> parseCompletionTimes(
+            String completionTimesCsv)
     {
-        switch (timeState)
+        List<Long> completionTimes =
+                new ArrayList<>();
+
+        if (completionTimesCsv == null ||
+                completionTimesCsv.trim().isEmpty())
         {
-            case TIME_MORNING:
-                return R.drawable.widget_background_morning;
-
-            case TIME_DAY:
-                return R.drawable.widget_background_day;
-
-            case TIME_NIGHT:
-                return R.drawable.widget_background_night;
-
-            case TIME_AUTO:
-            default:
-                return getCurrentTimeBackgroundResource();
+            return completionTimes;
         }
+
+        String[] values =
+                completionTimesCsv.split(",");
+
+        for (String value : values)
+        {
+            if (value == null ||
+                    value.trim().isEmpty())
+            {
+                continue;
+            }
+
+            try
+            {
+                long completionTime =
+                        Long.parseLong(
+                                value.trim()
+                        );
+
+                if (completionTime <= 0)
+                {
+                    continue;
+                }
+
+                completionTimes.add(
+                        completionTime
+                );
+            }
+            catch (NumberFormatException ignored)
+            {
+                // 잘못된 완료 시각은 무시함
+            }
+        }
+
+        return completionTimes;
     }
 
     /**
@@ -422,49 +514,22 @@ public class NightPostWidgetProvider extends AppWidgetProvider
                 Calendar.getInstance()
                         .get(Calendar.HOUR_OF_DAY);
 
-        // 06:00부터 11:59까지 아침 배경을 사용함
-        if (currentHour >= 6 && currentHour < 12)
+        // 06:00 ~ 11:59 아침 배경임
+        if (currentHour >= 6 &&
+                currentHour < 12)
         {
             return R.drawable.widget_background_morning;
         }
 
-        // 12:00부터 17:59까지 낮 배경을 사용함
-        if (currentHour >= 12 && currentHour < 18)
+        // 12:00 ~ 17:59 낮 배경임
+        if (currentHour >= 12 &&
+                currentHour < 18)
         {
             return R.drawable.widget_background_day;
         }
 
-        // 18:00부터 05:59까지 밤 배경을 사용함
+        // 18:00 ~ 05:59 밤 배경임
         return R.drawable.widget_background_night;
-    }
-
-    /**
-     * 현재 배경이 자동 시간 모드인지 확인함
-     */
-    private static boolean isAutomaticTimeMode(
-            Context context)
-    {
-        if (context == null)
-        {
-            return true;
-        }
-
-        Context applicationContext =
-                getApplicationContext(context);
-
-        SharedPreferences preferences =
-                applicationContext.getSharedPreferences(
-                        PREFERENCES_NAME,
-                        Context.MODE_PRIVATE
-                );
-
-        int timeState =
-                preferences.getInt(
-                        KEY_TIME_STATE,
-                        TIME_AUTO
-                );
-
-        return timeState == TIME_AUTO;
     }
 
     /**
@@ -494,7 +559,8 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         int pendingIntentFlags =
                 PendingIntent.FLAG_UPDATE_CURRENT;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.M)
         {
             pendingIntentFlags |=
                     PendingIntent.FLAG_IMMUTABLE;
@@ -515,6 +581,176 @@ public class NightPostWidgetProvider extends AppWidgetProvider
     }
 
     /**
+     * 가장 가까운 배달 완료 예정 시각에 위젯 갱신을 예약함
+     */
+    private static void scheduleNextDeliveryRefresh(
+            Context context)
+    {
+        if (context == null)
+        {
+            return;
+        }
+
+        Context applicationContext =
+                getApplicationContext(context);
+
+        AlarmManager alarmManager =
+                (AlarmManager)
+                        applicationContext.getSystemService(
+                                Context.ALARM_SERVICE
+                        );
+
+        if (alarmManager == null)
+        {
+            return;
+        }
+
+        SharedPreferences preferences =
+                applicationContext.getSharedPreferences(
+                        PREFERENCES_NAME,
+                        Context.MODE_PRIVATE
+                );
+
+        String completionTimesCsv =
+                preferences.getString(
+                        KEY_COMPLETION_TIMES,
+                        ""
+                );
+
+        List<Long> completionTimes =
+                parseCompletionTimes(
+                        completionTimesCsv
+                );
+
+        long currentUnixTime =
+                System.currentTimeMillis() / 1000L;
+
+        long nextCompletionTime =
+                Long.MAX_VALUE;
+
+        // 아직 완료되지 않은 배달 중 가장 빠른 완료시간을 찾음
+        for (long completionTime : completionTimes)
+        {
+            if (completionTime <= currentUnixTime)
+            {
+                continue;
+            }
+
+            if (completionTime < nextCompletionTime)
+            {
+                nextCompletionTime =
+                        completionTime;
+            }
+        }
+
+        PendingIntent refreshPendingIntent =
+                createDeliveryRefreshPendingIntent(
+                        applicationContext
+                );
+
+        // 이전에 등록된 배달 완료 갱신을 제거함
+        alarmManager.cancel(
+                refreshPendingIntent
+        );
+
+        // 아직 진행 중인 배달이 없다면 새 알람을 등록하지 않음
+        if (nextCompletionTime == Long.MAX_VALUE)
+        {
+            return;
+        }
+
+        long triggerTimeMillis =
+                nextCompletionTime * 1000L;
+
+        // 게임이 종료되거나 Doze 상태여도 갱신될 수 있도록 예약함
+        if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.M)
+        {
+            alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTimeMillis,
+                    refreshPendingIntent
+            );
+        }
+        else
+        {
+            alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTimeMillis,
+                    refreshPendingIntent
+            );
+        }
+    }
+
+    /**
+     * 배달 완료 갱신 Broadcast용 PendingIntent를 생성함
+     */
+    private static PendingIntent createDeliveryRefreshPendingIntent(
+            Context context)
+    {
+        Intent refreshIntent =
+                new Intent(
+                        context,
+                        NightPostWidgetProvider.class
+                );
+
+        refreshIntent.setAction(
+                ACTION_REFRESH_DELIVERY
+        );
+
+        int pendingIntentFlags =
+                PendingIntent.FLAG_UPDATE_CURRENT;
+
+        if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.M)
+        {
+            pendingIntentFlags |=
+                    PendingIntent.FLAG_IMMUTABLE;
+        }
+
+        return PendingIntent.getBroadcast(
+                context,
+                DELIVERY_REFRESH_REQUEST_CODE,
+                refreshIntent,
+                pendingIntentFlags
+        );
+    }
+
+    /**
+     * 예약된 배달 완료 갱신을 해제함
+     */
+    private static void cancelDeliveryRefresh(
+            Context context)
+    {
+        if (context == null)
+        {
+            return;
+        }
+
+        AlarmManager alarmManager =
+                (AlarmManager)
+                        context.getSystemService(
+                                Context.ALARM_SERVICE
+                        );
+
+        if (alarmManager == null)
+        {
+            return;
+        }
+
+        PendingIntent refreshPendingIntent =
+                createDeliveryRefreshPendingIntent(
+                        context
+                );
+
+        alarmManager.cancel(
+                refreshPendingIntent
+        );
+
+        refreshPendingIntent.cancel();
+    }
+
+    /**
      * 다음 아침·낮·밤 전환 시각에 배경 갱신을 예약함
      */
     private static void scheduleNextTimeBackgroundRefresh(
@@ -526,9 +762,10 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         }
 
         AlarmManager alarmManager =
-                (AlarmManager) context.getSystemService(
-                        Context.ALARM_SERVICE
-                );
+                (AlarmManager)
+                        context.getSystemService(
+                                Context.ALARM_SERVICE
+                        );
 
         if (alarmManager == null)
         {
@@ -539,17 +776,33 @@ public class NightPostWidgetProvider extends AppWidgetProvider
                 calculateNextTimeBoundaryMillis();
 
         PendingIntent refreshPendingIntent =
-                createTimeRefreshPendingIntent(context);
+                createTimeRefreshPendingIntent(
+                        context
+                );
 
-        // 기존 예약이 있다면 중복되지 않도록 제거함
-        alarmManager.cancel(refreshPendingIntent);
-
-        // 정확한 알람 권한이 필요 없는 일반 알람을 사용함
-        alarmManager.set(
-                AlarmManager.RTC,
-                nextRefreshTime,
+        // 기존 시간대 갱신 예약을 제거함
+        alarmManager.cancel(
                 refreshPendingIntent
         );
+
+        // 정확 알람 권한 없이 일반 시간대 갱신을 예약함
+        if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.M)
+        {
+            alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC,
+                    nextRefreshTime,
+                    refreshPendingIntent
+            );
+        }
+        else
+        {
+            alarmManager.set(
+                    AlarmManager.RTC,
+                    nextRefreshTime,
+                    refreshPendingIntent
+            );
+        }
     }
 
     /**
@@ -561,7 +814,9 @@ public class NightPostWidgetProvider extends AppWidgetProvider
                 Calendar.getInstance();
 
         int currentHour =
-                nextRefresh.get(Calendar.HOUR_OF_DAY);
+                nextRefresh.get(
+                        Calendar.HOUR_OF_DAY
+                );
 
         if (currentHour < 6)
         {
@@ -597,9 +852,20 @@ public class NightPostWidgetProvider extends AppWidgetProvider
             );
         }
 
-        nextRefresh.set(Calendar.MINUTE, 0);
-        nextRefresh.set(Calendar.SECOND, 0);
-        nextRefresh.set(Calendar.MILLISECOND, 0);
+        nextRefresh.set(
+                Calendar.MINUTE,
+                0
+        );
+
+        nextRefresh.set(
+                Calendar.SECOND,
+                0
+        );
+
+        nextRefresh.set(
+                Calendar.MILLISECOND,
+                0
+        );
 
         return nextRefresh.getTimeInMillis();
     }
@@ -623,7 +889,8 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         int pendingIntentFlags =
                 PendingIntent.FLAG_UPDATE_CURRENT;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        if (Build.VERSION.SDK_INT >=
+                Build.VERSION_CODES.M)
         {
             pendingIntentFlags |=
                     PendingIntent.FLAG_IMMUTABLE;
@@ -649,9 +916,10 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         }
 
         AlarmManager alarmManager =
-                (AlarmManager) context.getSystemService(
-                        Context.ALARM_SERVICE
-                );
+                (AlarmManager)
+                        context.getSystemService(
+                                Context.ALARM_SERVICE
+                        );
 
         if (alarmManager == null)
         {
@@ -659,9 +927,14 @@ public class NightPostWidgetProvider extends AppWidgetProvider
         }
 
         PendingIntent refreshPendingIntent =
-                createTimeRefreshPendingIntent(context);
+                createTimeRefreshPendingIntent(
+                        context
+                );
 
-        alarmManager.cancel(refreshPendingIntent);
+        alarmManager.cancel(
+                refreshPendingIntent
+        );
+
         refreshPendingIntent.cancel();
     }
 
