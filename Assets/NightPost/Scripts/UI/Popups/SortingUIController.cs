@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,7 +18,7 @@ namespace NightPost.UI
     ///
     /// 의존성은 SerializeField로 연결(이 프로젝트의 서비스는 MonoBehaviour라 Inspector 연결 가능).
     /// </summary>
-    public class SortingUIController : MonoBehaviour
+    public class SortingUIController : MonoBehaviour, IUIScreen
     {
         [Header("의존성")]
         [SerializeField] private GameFlowController _flow;
@@ -71,8 +71,14 @@ namespace NightPost.UI
 
         private readonly List<SortingLetterItem> _items = new();
 
+        /// <summary>다른 화면이 열릴 때 닫아야 하는지 판단하는 데 쓰인다.</summary>
+        public bool IsScreenOpen => _isOpen;
+
+        private void OnDestroy() => UIScreenRouter.Unregister(this);
+
         private void Awake()
         {
+            UIScreenRouter.Register(this);
             if (_submitButton != null)
             {
                 _submitButton.onClick.RemoveAllListeners();
@@ -90,6 +96,9 @@ namespace NightPost.UI
         {
             if (_isOpen) return; // 중복 Open 차단
             _isOpen = true;
+
+            // 서로 대체 관계인 화면이므로 열려 있던 다른 화면을 먼저 닫는다.
+            UIScreenRouter.NotifyOpened(this);
             _isSubmitting = false;
 
             if (_sortingPanel != null) _sortingPanel.SetActive(true);

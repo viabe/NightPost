@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +17,7 @@ namespace NightPost.UI
     ///   - DeliveryService.StartDelivery(letterID, courierID, routeID)
     /// 편지 목록엔 SortingLetterItem, 배달부·노선엔 AssignmentOptionItem을 재사용한다.
     /// </summary>
-    public class DeliveryUIController : MonoBehaviour
+    public class DeliveryUIController : MonoBehaviour, IUIScreen
     {
         /// <summary>배달대 화면의 탭. 배정 / 진행 중 / 결과.</summary>
         public enum ETab { Assign = 0, Active = 1, Result = 2 }
@@ -100,8 +100,14 @@ namespace NightPost.UI
         private ETab _currentTab = ETab.Assign;
         private float _remainRefreshTimer;   // 진행 중 탭 남은 시간 갱신 주기
 
+        /// <summary>다른 화면이 열릴 때 닫아야 하는지 판단하는 데 쓰인다.</summary>
+        public bool IsScreenOpen => _isOpen;
+
+        private void OnDestroy() => UIScreenRouter.Unregister(this);
+
         private void Awake()
         {
+            UIScreenRouter.Register(this);
             if (_startButton != null)
             {
                 _startButton.onClick.RemoveAllListeners();
@@ -180,6 +186,9 @@ namespace NightPost.UI
         {
             if (_isOpen) return;
             _isOpen = true;
+
+            // 서로 대체 관계인 화면이므로 열려 있던 다른 화면을 먼저 닫는다.
+            UIScreenRouter.NotifyOpened(this);
 
             if (_deliveryPanel != null) _deliveryPanel.SetActive(true);
             if (_playerController != null) _playerController.SetControlEnabled(false);

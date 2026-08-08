@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +14,7 @@ namespace NightPost.UI
     ///   GetCurrentLevelData(id) / GetNextLevelData(id) / CanUpgradeFacility(id)
     /// 강화 실행과 상세 표시는 FacilityPresenter가 담당한다(중복 구현하지 않는다).
     /// </summary>
-    public class FacilityListController : MonoBehaviour
+    public class FacilityListController : MonoBehaviour, IUIScreen
     {
         /// <summary>
         /// 시설 ID ↔ 아이콘 매핑. 정적 데이터에는 아이콘이 없으므로
@@ -50,8 +50,14 @@ namespace NightPost.UI
 
         private readonly List<FacilityListItem> _items = new();
 
+        /// <summary>다른 화면이 열릴 때 닫아야 하는지 판단하는 데 쓰인다.</summary>
+        public bool IsScreenOpen => _isOpen;
+
+        private void OnDestroy() => UIScreenRouter.Unregister(this);
+
         private void Awake()
         {
+            UIScreenRouter.Register(this);
             if (_closeButton != null)
             {
                 _closeButton.onClick.RemoveAllListeners();
@@ -64,6 +70,9 @@ namespace NightPost.UI
         {
             if (_isOpen) return;
             _isOpen = true;
+
+            // 서로 대체 관계인 화면이므로 열려 있던 다른 화면을 먼저 닫는다.
+            UIScreenRouter.NotifyOpened(this);
 
             if (_panel != null) _panel.SetActive(true);
             if (_playerController != null) _playerController.SetControlEnabled(false);
@@ -139,7 +148,11 @@ namespace NightPost.UI
         // 상세 표시와 강화는 기존 Presenter에 맡긴다.
         private void OnFacilitySelected(int facilityId)
         {
-            if (_facilityPresenter == null) return;
+            if (_facilityPresenter == null)
+            {
+                Debug.LogError("[FacilityList] FacilityPresenter 미연결 — 상세 팝업이 열리지 않는다", this);
+                return;
+            }
             _facilityPresenter.OpenFacility(facilityId);
         }
 

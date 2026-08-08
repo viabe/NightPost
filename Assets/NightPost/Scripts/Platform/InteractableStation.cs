@@ -17,7 +17,9 @@ public abstract class InteractableStation : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log($"{gameObject.name} 클릭 인식");
+        // 화면을 눌러 이동하는 중에 손가락이 시설 위를 지나가면 의도치 않게 열린다.
+        // 끌었던 입력은 이동으로만 보고 상호작용으로 치지 않는다.
+        if (eventData != null && eventData.dragging) return;
 
         if (playerInteraction == null)
         {

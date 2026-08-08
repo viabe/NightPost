@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +19,7 @@ namespace NightPost.UI
     ///
     /// 자동 표시는 ShowIfHasReport()를 부팅 시 호출해 처리한다(보고할 게 없으면 열지 않는다).
     /// </summary>
-    public class MorningReportUIController : MonoBehaviour
+    public class MorningReportUIController : MonoBehaviour, IUIScreen
     {
         [Header("의존성")]
         [SerializeField] private GameFlowController _flow;
@@ -59,8 +59,14 @@ namespace NightPost.UI
         private readonly List<MorningReportRowItem> _resultRows = new();
         private readonly List<RouteUnlockRowItem> _routeRows = new();
 
+        /// <summary>다른 화면이 열릴 때 닫아야 하는지 판단하는 데 쓰인다.</summary>
+        public bool IsScreenOpen => _isOpen;
+
+        private void OnDestroy() => UIScreenRouter.Unregister(this);
+
         private void Awake()
         {
+            UIScreenRouter.Register(this);
             if (_closeButton != null)
             {
                 _closeButton.onClick.RemoveAllListeners();
@@ -92,6 +98,9 @@ namespace NightPost.UI
         {
             if (_isOpen) return;
             _isOpen = true;
+
+            // 서로 대체 관계인 화면이므로 열려 있던 다른 화면을 먼저 닫는다.
+            UIScreenRouter.NotifyOpened(this);
 
             if (_panel != null) _panel.SetActive(true);
             if (_playerController != null) _playerController.SetControlEnabled(false);
