@@ -8570,6 +8570,7 @@ MonoBehaviour:
   - {fileID: 1386437847051726961}
   - {fileID: 4269188546126343541}
   - {fileID: 4445239564345527576}
+  - {fileID: 7350622569314974324}
   _resultBadge: {fileID: 3945667893812832762}
   _routeBadge: {fileID: 0}
   _activeListRoot: {fileID: 5024016701487261359}
@@ -13147,7 +13148,13 @@ MonoBehaviour:
   _listRoot: {fileID: 7125907101735662416}
   _itemPrefab: {fileID: 7455942750425367379}
   _emptyState: {fileID: 0}
-  _icons: []
+  _icons:
+  - FacilityId: 4001
+    Icon: {fileID: 2025830855049411041, guid: 5acbdce1bcb46f34f95c216e95daea4a, type: 3}
+  - FacilityId: 4002
+    Icon: {fileID: 2456620194376001531, guid: 5f7ab489e72c1854d80295a060a0bdb1, type: 3}
+  - FacilityId: 4003
+    Icon: {fileID: 2725305231265518519, guid: adc67ed931f382d4cb3d820634565cfe, type: 3}
   _closeButton: {fileID: 6466526202375618702}
 --- !u!1 &3395276966980894411
 GameObject:
@@ -16579,7 +16586,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -18011,6 +18018,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NightPost.UI.FacilityDetailController
   _id: 12
   _fadeDuration: 0.15
+  _icon: {fileID: 3880240975006904575}
   _name: {fileID: 5611245636885844620}
   _description: {fileID: 3683868984939783098}
   _levelText: {fileID: 2453265759858695149}
@@ -30529,7 +30537,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -355, y: 176}
+  m_AnchoredPosition: {x: -359.98, y: 184.6}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8900838467598143362

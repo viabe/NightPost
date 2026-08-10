@@ -153,7 +153,8 @@ namespace NightPost.UI
                 Debug.LogError("[FacilityList] FacilityPresenter 미연결 — 상세 팝업이 열리지 않는다", this);
                 return;
             }
-            _facilityPresenter.OpenFacility(facilityId);
+            // 아이콘 매핑은 여기에만 있으므로 팝업까지 같이 넘긴다.
+            _facilityPresenter.OpenFacility(facilityId, GetIcon(facilityId));
         }
 
         private void ClearList()

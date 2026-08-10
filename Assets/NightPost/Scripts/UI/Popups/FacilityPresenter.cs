@@ -19,6 +19,8 @@ namespace NightPost.UI
         [SerializeField] private PlayerDataManager _playerData;
 
         private int _displayedFacilityId;
+        // 아이콘은 정적 데이터에 없고 목록 UI가 들고 있다. 열 때 받아두고 갱신 때도 계속 쓴다.
+        private Sprite _displayedIcon;
 
         private void OnEnable()
         {
@@ -32,8 +34,14 @@ namespace NightPost.UI
             GameEvents.CurrencyChanged -= OnCurrencyChanged;
         }
 
-        /// <summary>시설 상세 열기. Station UnityEvent나 테스트 버튼에서 호출.</summary>
-        public void OpenFacility(int facilityId)
+        /// <summary>
+        /// 시설 상세 열기. Station UnityEvent나 테스트 버튼에서 호출.
+        /// 아이콘 없이 열리므로 팝업의 아이콘 자리는 숨겨진다.
+        /// </summary>
+        public void OpenFacility(int facilityId) => OpenFacility(facilityId, null);
+
+        /// <summary>아이콘까지 지정해 시설 상세를 연다. 시설 목록에서 넘어올 때 쓴다.</summary>
+        public void OpenFacility(int facilityId, Sprite icon)
         {
             if (_flow == null) return;
             if (!_flow.SelectFacility(facilityId))
@@ -42,6 +50,7 @@ namespace NightPost.UI
                 return;
             }
             _displayedFacilityId = facilityId;
+            _displayedIcon = icon;
 
             FacilityDetailController popup = GetPopup();
             if (popup == null) { Debug.LogWarning("[Facility] 팝업 미등록 — Id가 Facility인지 확인"); return; }
@@ -75,6 +84,7 @@ namespace NightPost.UI
                 FacilityId = facilityId,
                 Name = facility != null ? facility.FacilityName : $"시설 {facilityId}",
                 Description = facility != null ? facility.Description : string.Empty,
+                Icon = _displayedIcon,
                 CurrentLevel = currentLevel,
                 MaxLevel = facility != null ? facility.MaxLevel : 0,
                 CurrentEffectText = UILabels.FacilityEffect(current, isCurrent: true),
