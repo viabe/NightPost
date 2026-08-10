@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSaveData
   currency: 0
   completedDeliveryCount: 0
-  ownedCourierIDs: d1070000d2070000
+  ownedCourierIDs: d1070000
   unlockedRouteIDs: b80b0000b90b0000
   letterProgressList: []
   activeDeliveryList: []

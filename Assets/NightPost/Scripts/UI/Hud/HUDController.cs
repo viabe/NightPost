@@ -31,6 +31,11 @@ namespace NightPost.UI
         [SerializeField] private TMP_Text _levelText;
         [SerializeField] private TMP_Text _expText;     // "2450/3600" (선택)
 
+        [Header("편지 보관")]
+        [SerializeField] private TMP_Text _letterCapacityText; // "4 / 10"
+        [SerializeField] private Slider _letterCapacityBar;    // 선택
+        [SerializeField] private GameObject _letterFullMark;   // 한도 도달 표시(선택)
+
         [Header("오늘의 업무 (고정 3종)")]
         [SerializeField] private MissionRow[] _missions = new MissionRow[3];
 
@@ -86,6 +91,17 @@ namespace NightPost.UI
         {
             if (_expText != null) _expText.text = $"{currentExp}/{maxExp}";
             SetLevel(level, maxExp > 0 ? (float)currentExp / maxExp : 0f);
+        }
+
+        /// <summary>
+        /// 편지 보관 현황 표시. current는 분류 전(New) + 배달 대기(Waiting) 편지 수다.
+        /// 한도에 도달하면 새 편지가 들어오지 않으므로 눈에 띄게 알린다.
+        /// </summary>
+        public void SetLetterCapacity(int current, int max)
+        {
+            if (_letterCapacityText != null) _letterCapacityText.text = $"{current} / {max}";
+            if (_letterCapacityBar != null) _letterCapacityBar.value = max > 0 ? Mathf.Clamp01((float)current / max) : 0f;
+            if (_letterFullMark != null) _letterFullMark.SetActive(max > 0 && current >= max);
         }
 
         public void SetMission(int index, string label, int current, int goal)

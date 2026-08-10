@@ -6,7 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/NightPost/Scene/Bootstrap.unity
+    guid: 5fe04614ef644d142910c120a1841eba
+  - enabled: 1
+    path: Assets/NightPost/Scene/PostOffice.unity
+    guid: 75d62d625be403f4fac2f9492b9c28d9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

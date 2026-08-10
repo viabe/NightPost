@@ -46,6 +46,31 @@ namespace NightPost.UI
             }
         }
 
+        /// <summary>
+        /// 시설 효과 문구. isCurrent=false면 "업그레이드 후 …" 형태로 바꾼다.
+        /// (시설 시스템 UI 연동 명세서 v1.2 §9 규칙)
+        /// </summary>
+        public static string FacilityEffect(FacilityLevelData data, bool isCurrent)
+        {
+            if (data == null) return "효과 없음";
+
+            switch (data.EffectType)
+            {
+                case EFacilityEffectType.DeliveryTimeReduction:
+                {
+                    int pct = UnityEngine.Mathf.RoundToInt(data.EffectValue * 100f);
+                    return isCurrent ? $"배달 시간 {pct}% 감소" : $"업그레이드 후 {pct}% 감소";
+                }
+                case EFacilityEffectType.LetterCapacityIncrease:
+                {
+                    int n = UnityEngine.Mathf.FloorToInt(data.EffectValue);
+                    return isCurrent ? $"편지 보유 한도 +{n}통" : $"업그레이드 후 +{n}통";
+                }
+                default:
+                    return "적용 효과 없음";
+            }
+        }
+
         /// <summary>초 단위 시간을 "3분 20초" 형태로. 0 이하면 "곧 도착".</summary>
         public static string Duration(long seconds)
         {

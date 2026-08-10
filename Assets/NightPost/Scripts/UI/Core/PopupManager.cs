@@ -83,6 +83,7 @@ namespace NightPost.UI
                 return null;
             }
             if (!_stack.Contains(view)) _stack.Add(view);
+            view.transform.SetAsLastSibling(); // 나중에 연 팝업이 항상 위에 오도록
             view.Open(model);
             RefreshDimmer();
             return view;
@@ -93,6 +94,9 @@ namespace NightPost.UI
         {
             if (view == null) return;
             if (!_stack.Contains(view)) _stack.Add(view);
+            // 계층 순서가 곧 그리기 순서다. 나중에 연 팝업을 맨 뒤로 보내
+            // 항상 이전 팝업 위에 오게 한다.
+            view.transform.SetAsLastSibling();
             view.Open();
             RefreshDimmer();
         }
