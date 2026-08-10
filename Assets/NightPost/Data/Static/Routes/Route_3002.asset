@@ -19,4 +19,4 @@ MonoBehaviour:
   difficulty: 2
   unlockCondition:
     unlockedByDefault: 0
-    requiredCompletedDeliveryCount: 3
+    requiredCompletedDeliveryCount: 2
