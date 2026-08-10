@@ -1,4 +1,4 @@
 ﻿courierID,courierName,transportation,speed,traitType,timeReductionRate,courierImagePath,unlockedByDefault,requiredCompletedDeliveryCount
 2001,민아,Bicycle,1.15,UrgentExpert,0.1,,True,0
 2002,준호,Motorcycle,1.05,MountainExpert,0.2,,False,3
-2003,소라,Truck,0.9,HeavyLoadExpert,0.2,,False,7
+2003,소라,Truck,0.9,HeavyLoadExpert,0.2,,False,5

@@ -15,6 +15,8 @@ namespace NightPost.UI
     public class FacilityDetailController : BaseView<FacilityDetailModel>
     {
         [Header("정보")]
+        [Tooltip("시설 아이콘. 모델에 그림이 없으면 빈 사각형이 보이지 않게 통째로 끈다.")]
+        [SerializeField] private Image _icon;
         [SerializeField] private TMP_Text _name;
         [SerializeField] private TMP_Text _description;
         [SerializeField] private TMP_Text _levelText;         // "1 / 3"
@@ -29,6 +31,11 @@ namespace NightPost.UI
 
         protected override void Bind(FacilityDetailModel model)
         {
+            if (_icon != null)
+            {
+                _icon.sprite = model.Icon;
+                _icon.enabled = model.Icon != null; // 아이콘 미지정이면 빈 사각형이 보이지 않게 끈다
+            }
             if (_name != null) _name.text = model.Name;
             if (_description != null) _description.text = model.Description;
             if (_levelText != null) _levelText.text = $"{model.CurrentLevel} / {model.MaxLevel}";
@@ -84,6 +91,7 @@ namespace NightPost.UI
         public int FacilityId;
         public string Name;
         public string Description;
+        public Sprite Icon;              // null이면 아이콘을 숨긴다
         public int CurrentLevel;
         public int MaxLevel;
         public string CurrentEffectText; // "효과 없음" / "배달 시간 10% 감소" / "편지 보유 한도 +4통"
